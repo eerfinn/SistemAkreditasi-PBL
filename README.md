@@ -1,26 +1,26 @@
-<h3 align="center">بِسْــــــــــــــمِ اللهِ الرَّحْمَنِ الرَّحِيْــــــــــــــمِ</h3>
+<h3 align="center">بِسْــــــــــــــمِ اللهِ الرَّحْمَنِ الرَّحِيْــــــــــــــمِ</h3><br><br><br>
 
 
 
-### Clone Repository
+### 1. Clone Repository
 
 ```bash
 git clone https://github.com/eerfinn/SistemAkreditasi-PBL.git
 ```
 
-### Masuk ke Direktori Proyek
+### 2. Masuk ke Direktori Proyek
 
 ```bash
 cd SistemAkreditasi-PBL
 ```
 
-### Install Dependensi
+### 3. Install Dependensi
 
 ```bash
 composer install
 ```
 
-### Konfigurasi File `.env`
+### 4. Konfigurasi File `.env`
 
 ```bash
 cp .env.example .env
@@ -35,19 +35,19 @@ cp .env.example .env
   DB_PASSWORD=
   ```
 
-### Generate Application Key
+### 5. Generate Application Key
 
 ```bash
 php artisan key:generate
 ```
 
-### Jalankan Server Laravel
+### 6. Jalankan Server Laravel
 
 ```bash
 php artisan serve
 ```
 
-### Akses Aplikasi di Browser
+### 7. Akses Aplikasi di Browser
 
 Buka browser dan akses:
 
