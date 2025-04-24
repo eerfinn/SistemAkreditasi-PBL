@@ -31,7 +31,7 @@
 	
 	<!-- Style css -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
 	
 </head>
 <body>
