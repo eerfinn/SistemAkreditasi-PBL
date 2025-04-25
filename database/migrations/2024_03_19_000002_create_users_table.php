@@ -10,12 +10,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id('user_id');
+            $table->string('username')->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->foreignId('level_id')->constrained('levels')->onDelete('cascade');
+            $table->unsignedBigInteger('level_id');
             $table->rememberToken();
             $table->timestamps();
+            
+            $table->foreign('level_id')->references('level_id')->on('levels')->onDelete('cascade');
         });
     }
 

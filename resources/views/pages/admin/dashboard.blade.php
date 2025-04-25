@@ -46,9 +46,7 @@
 @section('content')
     <div class="welcome-container">
         <div class="welcome-card">
-
-            <h1 class="mb-0">Welcome, {{-- {{ Auth::user()->name }} --}}!</h1>
-
+            <h1 class="mb-0">Welcome, {{ auth()->user()->name }}!</h1>
         </div>
     </div>
     <div class="col-xl-3 col-sm-6">
@@ -94,6 +92,33 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header border-0 pb-0">
+                <h4 class="card-title">Statistik Sistem</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5>Total Pengguna</h5>
+                                <h2>{{ App\Models\User::count() }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5>Total Level</h5>
+                                <h2>{{ App\Models\Level::count() }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

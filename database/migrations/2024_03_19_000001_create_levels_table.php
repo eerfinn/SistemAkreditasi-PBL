@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('levels', function (Blueprint $table) {
             $table->id('level_id');
             $table->string('level_kode')->unique();
-            $table->string('name');
+            $table->string('level_nama');
             $table->timestamps();
         });
     }

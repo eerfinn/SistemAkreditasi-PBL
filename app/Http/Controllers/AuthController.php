@@ -10,18 +10,46 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'username' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'login' => 'required', // Menggunakan username atau email
+            'password' => 'required'
         ]);
 
-        if (Auth::attempt($credentials)) {
+        // Cek apakah input adalah email atau username
+        $fieldType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        // Autentikasi berdasarkan field yang sesuai
+        if (Auth::attempt([$fieldType => $credentials['login'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            // Redirect berdasarkan role user
+            $roleCode = Auth::user()->level->level_kode;
+
+            switch ($roleCode) {
+                case 'ADM':
+                    return redirect()->route('admin.dashboard');
+                case 'ANG':
+                    return redirect()->route('anggota.dashboard');
+                case 'KJM':
+                    return redirect()->route('kjm.dashboard');
+                case 'KPS':
+                    return redirect()->route('kps.dashboard');
+                case 'KJR':
+                    return redirect()->route('kajur.dashboard');
+                default:
+                    return redirect('/');
+            }
         }
 
         return back()->withErrors([
-            'username' => 'The provided credentials do not match our records.',
-        ])->onlyInput('username');
+            'login' => 'The provided credentials do not match our records.',
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
     }
 }

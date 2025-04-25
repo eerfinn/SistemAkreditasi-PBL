@@ -42,13 +42,6 @@ Route::prefix('levels')->name('levels.')->group(function () {
     Route::delete('/{level}', [LevelController::class, 'destroy'])->name('destroy');
 });
 
-// Kriteria Routes
-Route::prefix('kriteria')->name('kriteria.')->group(function () {
-    Route::get('/', [KriteriaController::class, 'index'])->name('index');
-    Route::get('/suplemen', [KriteriaController::class, 'suplemen'])->name('suplemen');
-    Route::get('/{id}', [KriteriaController::class, 'show'])->name('show');
-});
-
 // Dashboard
 Route::get('/dashboard', function () {
     return view('pages.dashboard');
@@ -56,7 +49,6 @@ Route::get('/dashboard', function () {
 // Protected Routes
 Route::middleware('auth')->group(function () {
     
-
     // Admin Routes
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
        

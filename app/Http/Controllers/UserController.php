@@ -11,7 +11,8 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('level')->get();
-        return view('pages.users.index', compact('users'));
+        $levels = Level::all();
+        return view('pages.admin.users.index', compact('users', 'levels'));
     }
 
     public function create()
@@ -26,11 +27,20 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
-            'level_id' => 'required|exists:levels,id'
+            'level_id' => 'required|exists:levels,level_id'
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
-        User::create($validated);
+        $user = User::create($validated);
+        $user->load('level');
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User created successfully.',
+                'user' => $user
+            ]);
+        }
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -50,8 +60,8 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'level_id' => 'required|exists:levels,id'
+            'email' => 'required|email|unique:users,email,' . $user->user_id . ',user_id',
+            'level_id' => 'required|exists:levels,level_id'
         ]);
 
         if ($request->filled('password')) {
@@ -60,12 +70,28 @@ class UserController extends Controller
 
         $user->update($validated);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User updated successfully.',
+                'user' => $user->load('level')
+            ]);
+        }
+
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
     {
         $user->delete();
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
-} 
+}

@@ -20,6 +20,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',
@@ -45,14 +46,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    
+
     public function level()
     {
         return $this->belongsTo(Level::class, 'level_id');
     }
-    
+
     public function isAdmin()
     {
-        return $this->level && $this->level->name === 'Administrator';
+        return $this->level && $this->level->level_kode === 'ADM';
     }
 }
