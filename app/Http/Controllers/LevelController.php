@@ -81,6 +81,6 @@ class LevelController extends Controller
             ]);
         }
 
-        return redirect()->route('levels.index')->with('success', 'Level deleted successfully.');
+        return redirect()->route('admin.levels.index')->with('success', 'Level deleted successfully.');
     }
 } 

@@ -47,8 +47,8 @@
         @csrf
         <img style="width: 860px; height: 910px; left: 956px; top: 24px; position: absolute; opacity: 0.70; border-radius: 25px" src="{{ asset('assets/images/LoginImage.jpg') }}" />
         
-        <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" style="width: 330px; height: 45px; left: 303px; top: 498px; position: absolute; background: rgba(217, 217, 217, 0); border-radius: 12px; border: 1px #C9C9C9 solid; padding-left: 10px; font-size: 13px; font-family: Poppins; font-weight: 400; color: #3F3E3E;" />
-        @error('email')
+        <input type="email" name="login" placeholder="Email" value="{{ old('login') }}" style="width: 330px; height: 45px; left: 303px; top: 498px; position: absolute; background: rgba(217, 217, 217, 0); border-radius: 12px; border: 1px #C9C9C9 solid; padding-left: 10px; font-size: 13px; font-family: Poppins; font-weight: 400; color: #3F3E3E;" />
+        @error('login')
         <div class="error-message" style="top: 548px;">{{ $message }}</div>
         @enderror
         

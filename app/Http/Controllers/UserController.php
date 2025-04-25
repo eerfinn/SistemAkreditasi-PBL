@@ -18,7 +18,7 @@ class UserController extends Controller
     public function create()
     {
         $levels = Level::all();
-        return view('pages.users.create', compact('levels'));
+        return view('pages.admin.users.create', compact('levels'));
     }
 
     public function store(Request $request)
@@ -42,18 +42,18 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
     public function show(User $user)
     {
-        return view('pages.users.show', compact('user'));
+        return view('pages.admin.users.show', compact('user'));
     }
 
     public function edit(User $user)
     {
         $levels = Level::all();
-        return view('pages.users.edit', compact('user', 'levels'));
+        return view('pages.admin.users.edit', compact('user', 'levels'));
     }
 
     public function update(Request $request, User $user)
@@ -78,7 +78,7 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
@@ -92,6 +92,6 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
 }

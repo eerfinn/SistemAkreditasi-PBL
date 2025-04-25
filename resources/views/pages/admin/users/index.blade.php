@@ -37,7 +37,7 @@
                                 <td>{{ $user->level->name }}</td>
                                 <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    <a href="/admin/users/{{ $user->user_id }}/edit" class="btn btn-info btn-sm" title="Edit">
+                                    <a href="{{ route('admin.users.edit', $user->user_id) }}" class="btn btn-info btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->user_id }}" title="Delete">
@@ -141,7 +141,7 @@ $(document).ready(function() {
                         response.user.email,
                         response.user.level.name,
                         response.user.created_at,
-                        `<a href="/admin/users/${response.user.user_id}/edit" class="btn btn-info btn-sm" title="Edit">
+                        `<a href="${'{{ route("admin.users.edit", ":id") }}'.replace(':id', response.user.user_id)}" class="btn btn-info btn-sm" title="Edit">
                             <i class="fas fa-edit"></i>
                         </a>
                         <button class="btn btn-danger btn-sm delete-user" data-id="${response.user.user_id}" title="Delete">
@@ -198,7 +198,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: `/admin/users/${userId}`,
+                    url: '{{ route("admin.users.destroy", ":id") }}'.replace(':id', userId),
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}'

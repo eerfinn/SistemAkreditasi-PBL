@@ -11,7 +11,7 @@
                     <h3 class="card-title">Create New Level</h3>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('levels.store') }}" method="POST">
+                    <form action="{{ route('admin.levels.store') }}" method="POST">
                         @csrf
                         <div class="form-group">
                             <label for="name">Name</label>
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Create Level</button>
-                        <a href="{{ route('levels.index') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{ route('admin.levels.index') }}" class="btn btn-secondary">Cancel</a>
                     </form>
                 </div>
             </div>
