@@ -43,6 +43,7 @@
           <li><a href="#about">About</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#contact">Contact</a></li>
+          <li><a href="/login">Login</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -232,8 +233,6 @@
           </div>
 
           <div class="col-lg-8">
-           <p>k nninini</p>
-          </div>
         </div>
       </div>
     </section><!-- /Contact Section -->
