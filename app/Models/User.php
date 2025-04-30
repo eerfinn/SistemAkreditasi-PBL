@@ -12,19 +12,16 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $primaryKey = 'user_id';
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'nama',
         'username',
-        'name',
-        'email',
         'password',
-        'level_id'
+        'role'
     ];
 
     /**
@@ -33,8 +30,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password'
     ];
 
     /**
@@ -43,17 +39,16 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
-    public function level()
-    {
-        return $this->belongsTo(Level::class, 'level_id');
-    }
-
     public function isAdmin()
     {
-        return $this->level && $this->level->level_kode === 'ADM';
+        return $this->role === 'administrator';
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
     }
 }

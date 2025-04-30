@@ -13,38 +13,39 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'username' => 'admin',
-                'name' => 'Administrator',
-                'email' => 'admin@example.com',
+                'nama' => 'Administrator',
                 'password' => Hash::make('admin123'),
-                'level_id' => 1, // ADM
+                'role' => 'administrator',
             ],
             [
                 'username' => 'anggota',
-                'name' => 'Dosen',
-                'email' => 'dosen1@example.com',
+                'nama' => 'Dosen',
                 'password' => Hash::make('anggota123'),
-                'level_id' => 2, // ANG
+                'role' => 'anggota',
             ],
             [
                 'username' => 'kjm',
-                'name' => 'Kepala Jaminan Mutu',
-                'email' => 'kjm@example.com',
+                'nama' => 'Kepala Jaminan Mutu',
                 'password' => Hash::make('kjm123'),
-                'level_id' => 3, // KJM
+                'role' => 'kjm',
             ],
             [
                 'username' => 'kaprodi',
-                'name' => 'Ketua Program Studi',
-                'email' => 'kaprodi@example.com',
+                'nama' => 'Ketua Program Studi',
                 'password' => Hash::make('kps123'),
-                'level_id' => 4, // KPS
+                'role' => 'kaprodi',
             ],
             [
                 'username' => 'kajur',
-                'name' => 'Ketua Jurusan',
-                'email' => 'kajur@example.com',
+                'nama' => 'Ketua Jurusan',
                 'password' => Hash::make('kajur123'),
-                'level_id' => 5, // KJR
+                'role' => 'kajur',
+            ],
+            [
+                'username' => 'koordinator',
+                'nama' => 'Koordinator',
+                'password' => Hash::make('koordinator123'),
+                'role' => 'koordinator',
             ],
         ];
 

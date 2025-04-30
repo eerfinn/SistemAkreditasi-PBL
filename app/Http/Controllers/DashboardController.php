@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Level;
 
 class DashboardController extends Controller
 {
@@ -12,19 +11,19 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        // Check user level and redirect to appropriate dashboard
-        switch($user->level->level_kode) {
-            case 'ADM':
+        // Check user role and redirect to appropriate dashboard
+        switch($user->role) {
+            case 'administrator':
                 return $this->adminDashboard();
-            case 'ANG':
+            case 'anggota':
                 return $this->anggotaDashboard();
-            case 'KRT':
+            case 'koordinator':
                 return $this->koordinatorDashboard();
-            case 'KJM':
+            case 'kjm':
                 return $this->kjmDashboard();
-            case 'KPS':
+            case 'kaprodi':
                 return $this->kaprodiDashboard();
-            case 'KJR':
+            case 'kajur':
                 return $this->kajurDashboard();
             default:
                 return redirect()->route('login')->with('error', 'Unauthorized access');
@@ -35,7 +34,6 @@ class DashboardController extends Controller
     {
         $data = [
             'total_users' => User::count(),
-            'total_levels' => Level::count(),
             'user' => auth()->user()
         ];
         

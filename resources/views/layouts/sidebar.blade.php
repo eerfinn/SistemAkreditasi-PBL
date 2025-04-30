@@ -17,7 +17,7 @@
             </li>
 
             {{-- Admin Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'ADM')
+            @if(auth()->user()->role === 'administrator')
             <li>
                 <a class="has-arrow {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -37,12 +37,6 @@
                 </a>
                 <ul aria-expanded="false">
                     <li>
-                        <a href="{{ route('admin.levels.index') }}"
-                            class="{{ request()->routeIs('admin.levels.index') ? 'active' : '' }}">
-                            Levels
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{ route('admin.users.index') }}"
                             class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
                             Users
@@ -53,7 +47,7 @@
             @endif
 
             {{-- Anggota Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'ANG')
+            @if(auth()->user()->role === 'anggota')
             <li>
                 <a class="has-arrow {{ request()->routeIs('dokumen.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -80,7 +74,7 @@
             @endif
 
             {{-- Kaprodi & Kajur Menu Items --}}
-            @if(in_array(auth()->user()->level->level_kode, ['KPS', 'KJR']))
+            @if(in_array(auth()->user()->role, ['kaprodi', 'kajur']))
             <li>
                 <a class="has-arrow {{ request()->routeIs('review.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -107,7 +101,7 @@
             @endif
 
             {{-- KJM Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'KJM')
+            @if(auth()->user()->role === 'kjm')
             <li>
                 <a class="has-arrow {{ request()->routeIs('monitoring.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -133,8 +127,8 @@
             </li>
             @endif
 
-            {{-- Koordinator Kriteria Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'KRT')
+            {{-- Koordinator Menu Items --}}
+            @if(auth()->user()->role === 'koordinator')
             <li>
                 <a class="has-arrow {{ request()->routeIs('validasi.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">

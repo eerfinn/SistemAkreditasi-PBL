@@ -10,32 +10,28 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'login' => 'required', // Menggunakan username atau email
+            'username' => 'required',
             'password' => 'required'
         ]);
 
-        // Cek apakah input adalah email atau username
-        $fieldType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
-        // Autentikasi berdasarkan field yang sesuai
-        if (Auth::attempt([$fieldType => $credentials['login'], 'password' => $credentials['password']])) {
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
             // Get user's role and redirect accordingly
-            $userRole = Auth::user()->level->level_kode;
+            $userRole = Auth::user()->role;
             
             switch ($userRole) {
-                case 'ADM':
+                case 'administrator':
                     return redirect()->route('admin.dashboard');
-                case 'ANG':
+                case 'anggota':
                     return redirect()->route('anggota.dashboard');
-                case 'KJM':
+                case 'kjm':
                     return redirect()->route('kjm.dashboard');
-                case 'KPS':
-                    return redirect()->route('kps.dashboard');
-                case 'KJR':
+                case 'kaprodi':
+                    return redirect()->route('kaprodi.dashboard');
+                case 'kajur':
                     return redirect()->route('kajur.dashboard');
-                case 'KRT':
+                case 'koordinator':
                     return redirect()->route('koordinator.dashboard');
                 default:
                     return redirect()->route('dashboard');
@@ -43,8 +39,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'login' => 'The provided credentials do not match our records.',
-        ]);
+            'username' => 'The provided credentials do not match our records.',
+        ])->onlyInput('username');
     }
 
     public function logout(Request $request)
