@@ -47,8 +47,8 @@
         @csrf
         <img style="width: 860px; height: 910px; left: 956px; top: 24px; position: absolute; opacity: 0.70; border-radius: 25px" src="{{ asset('assets/images/LoginImage.jpg') }}" />
         
-        <input type="email" name="login" placeholder="Email" value="{{ old('login') }}" style="width: 330px; height: 45px; left: 303px; top: 498px; position: absolute; background: rgba(217, 217, 217, 0); border-radius: 12px; border: 1px #C9C9C9 solid; padding-left: 10px; font-size: 13px; font-family: Poppins; font-weight: 400; color: #3F3E3E;" />
-        @error('login')
+        <input type="text" name="username" placeholder="Username" value="{{ old('username') }}" style="width: 330px; height: 45px; left: 303px; top: 498px; position: absolute; background: rgba(217, 217, 217, 0); border-radius: 12px; border: 1px #C9C9C9 solid; padding-left: 10px; font-size: 13px; font-family: Poppins; font-weight: 400; color: #3F3E3E;" />
+        @error('username')
         <div class="error-message" style="top: 548px;">{{ $message }}</div>
         @enderror
         
@@ -61,7 +61,7 @@
         
         <div style="left: 303px; top: 408px; position: absolute; color: #3F3E3E; font-size: 30px; font-family: Poppins; font-weight: 600; word-wrap: break-word">Member Sign In</div>
         
-        <div style="left: 303px; top: 460px; position: absolute; color: #828282; font-size: 13px; font-family: Poppins; font-weight: 400; word-wrap: break-word">Enter your email and password to sign in</div>
+        <div style="left: 303px; top: 460px; position: absolute; color: #828282; font-size: 13px; font-family: Poppins; font-weight: 400; word-wrap: break-word">Enter your username and password to sign in</div>
         
         <div style="left: 325px; top: 683px; position: absolute">
           <span style="color: #828282; font-size: 13px; font-family: Poppins; font-weight: 400;">Forgot your password? please contact </span>

@@ -9,16 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id('user_id');
+            $table->id();
+            $table->string('nama');
             $table->string('username')->unique();
-            $table->string('name');
-            $table->string('email')->unique();
             $table->string('password');
-            $table->unsignedBigInteger('level_id');
-            $table->rememberToken();
+            $table->enum('role', ['administrator', 'anggota', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
             $table->timestamps();
-            
-            $table->foreign('level_id')->references('level_id')->on('levels')->onDelete('cascade');
         });
     }
 
