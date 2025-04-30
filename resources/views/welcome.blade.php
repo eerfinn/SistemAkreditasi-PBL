@@ -231,6 +231,18 @@
               </div>
             </div>
           </div>
+          
+          <div class="col-lg-8" data-aos="fade-up" data-aos-delay="500">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3951.167353535012!2d112.61413937495053!3d-7.975771268346114!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd629d395c57f5d%3A0x359b25c44813318!2sPoliteknik%20Negeri%20Malang!5e0!3m2!1sid!2sid!4v1730278857457!5m2!1sid!2sid" 
+              width="100%" 
+              height="400" 
+              style="border:0;" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
 
           <div class="col-lg-8">
         </div>

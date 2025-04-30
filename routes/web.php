@@ -12,6 +12,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/profile', function () {
+    return view('profil.app-profile-1');
+})->name('profile');
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
