@@ -82,7 +82,7 @@
                 <p>D4 Sistem Informasi Bisnis - Jurusan Teknologi Informasi</p>
             </div>
 
-            <div class="row align-items-center">
+            <div class="row align-items-center">    
                 <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="about-img">
                         <img src="{{ asset('assets\images\IMG_1397.JPG') }}" alt="Kelas SIB" class="img-fluid">
