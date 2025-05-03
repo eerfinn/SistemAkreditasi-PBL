@@ -21,10 +21,10 @@
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon.png') }}">
     <link href="{{ asset('assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css') }}" rel="stylesheet">
-    
+
     <!-- DataTables CSS -->
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
-    
+
     <!-- SweetAlert2 CSS -->
     <link href="{{ asset('assets/vendor/sweetalert2/dist/sweetalert2.min.css') }}" rel="stylesheet">
 
@@ -66,6 +66,8 @@
             @csrf
         </form>
 
+        
+
         @include('layouts/footer')
     </div>
     <!--**********************************
@@ -78,10 +80,10 @@
     <!-- Required vendors -->
     <script src="{{ asset('assets/vendor/global/global.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-    
+
     <!-- DataTables -->
     <script src="{{ asset('assets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-    
+
     <!-- SweetAlert2 -->
     <script src="{{ asset('assets/vendor/sweetalert2/dist/sweetalert2.min.js') }}"></script>
 
