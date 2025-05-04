@@ -2,475 +2,466 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Index - Selecao Bootstrap Template</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>SiAkred - Sistem Akreditasi D4 SIB Polinema</title>
+    <meta name="description" content="Sistem Akreditasi Program Studi D4 Sistem Informasi Bisnis - Jurusan Teknologi Informasi Politeknik Negeri Malang">
+    <meta name="keywords" content="akreditasi, sistem informasi, politeknik negeri malang, D4 SIB">
 
-  <!-- Favicons -->
-  <link href="Selecao/assets/img/favicon.png" rel="icon">
-  <link href="Selecao/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <!-- Favicons -->
+    <link href="{{ asset('assets\images\Jti_polinema.png') }}" rel="icon">
+    <link href="{{ asset('Selecao/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-  <link href="{{asset('Selecao/assets/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-  <link href="{{asset('Selecao/assets/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-  <link href="{{asset('Selecao/assets/vendor/aos/aos.css')}}" rel="stylesheet">
-  <link href="{{asset('Selecao/assets/vendor/animate.css/animate.min.css')}}" rel="stylesheet">
-  <link href="{{asset('Selecao/assets/vendor/glightbox/css/glightbox.min.css')}}" rel="stylesheet">
-  <link href="{{asset('Selecao/assets/vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="{{ asset('Selecao/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('Selecao/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('Selecao/assets/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('Selecao/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
 
-  <!-- Main CSS File -->
-  <link href="Selecao/assets/css/main.css" rel="stylesheet">
-
-  <!-- =======================================================
-  * Template Name: Selecao
-  * Template URL: https://bootstrapmade.com/selecao-bootstrap-template/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+    <!-- Main CSS File -->
+    <link href="{{ asset('assets/css/welcome.css') }}" rel="stylesheet">
 </head>
 
-<body class="index-page">
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ asset('assets\images\Jti_polinema.png') }}" alt="Polinema Logo">
+                <span class="sitename">SiAkred</span>
+            </a>
 
-  <header id="header" class="header d-flex align-items-center fixed-top">
-    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" onclick="scrollToTop()">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-      <a href="index.html" class="logo d-flex align-items-center">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <!-- <img src="assets/img/logo.png" alt=""> -->
-        <h1 class="sitename">Si</h1>
-      </a>
-
-      <nav id="navmenu" class="navmenu">
-        <ul>
-          <li><a href="#hero" class="active">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#portfolio">Portfolio</a></li>
-          <li><a href="#team">Team</a></li>
-          <li><a href="blog.html">Blog</a></li>
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">Profil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Visi Misi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Kontak</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-primary" href="/login">Login</a>
+                    </li>
                 </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
-          <li><a href="#contact">Contact</a></li>
-          <li><a href="/login">Login</a></li>
-        </ul>
-        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-      </nav>
-
-    </div>
-  </header>
-
-  <main class="main">
-
-    <!-- Hero Section -->
-    <section id="hero" class="hero section">
-
-      <div id="hero-carousel" data-bs-interval="5000" class="container carousel carousel-fade" data-bs-ride="carousel">
-
-        <!-- Slide 1 -->
-        <div class="carousel-item active">
-          <div class="carousel-container">
-            <h2 class="animate__animated animate__fadeInDown">Welcome to <span>Selecao</span></h2>
-            <p class="animate__animated animate__fadeInUp">Ut velit est quam dolor ad a aliquid qui aliquid. Sequi ea ut et est quaerat sequi nihil ut aliquam. Occaecati alias dolorem mollitia ut. Similique ea voluptatem. Esse doloremque accusamus repellendus deleniti vel. Minus et tempore modi architecto.</p>
-            <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a>
-          </div>
+            </div>
         </div>
+    </header>
 
-        <!-- Slide 2 -->
-        <div class="carousel-item">
-          <div class="carousel-container">
-            <h2 class="animate__animated animate__fadeInDown">Lorem Ipsum Dolor</h2>
-            <p class="animate__animated animate__fadeInUp">Ut velit est quam dolor ad a aliquid qui aliquid. Sequi ea ut et est quaerat sequi nihil ut aliquam. Occaecati alias dolorem mollitia ut. Similique ea voluptatem. Esse doloremque accusamus repellendus deleniti vel. Minus et tempore modi architecto.</p>
-            <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a>
-          </div>
+<section id="home" class="hero" style="background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('{{ asset('assets/images/Gedung JTI.jpg') }}');">
+        <div class="container">
+            <div class="hero-content" data-aos="fade-up" data-aos-delay="100">
+                <h1>Sistem Akreditasi D4 Sistem Informasi Bisnis</h1>
+                <p>Jurusan Teknologi Informasi Politeknik Negeri Malang</p>
+                <div class="hero-buttons">
+                    <a href="#about" class="btn btn-primary">Selengkapnya</a>
+                </div>
+            </div>
         </div>
-
-        <!-- Slide 3 -->
-        <div class="carousel-item">
-          <div class="carousel-container">
-            <h2 class="animate__animated animate__fadeInDown">Sequi ea ut et est quaerat</h2>
-            <p class="animate__animated animate__fadeInUp">Ut velit est quam dolor ad a aliquid qui aliquid. Sequi ea ut et est quaerat sequi nihil ut aliquam. Occaecati alias dolorem mollitia ut. Similique ea voluptatem. Esse doloremque accusamus repellendus deleniti vel. Minus et tempore modi architecto.</p>
-            <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a>
-          </div>
-        </div>
-
-        <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
-        </a>
-
-        <a class="carousel-control-next" href="#hero-carousel" role="button" data-bs-slide="next">
-          <span class="carousel-control-next-icon bi bi-chevron-right" aria-hidden="true"></span>
-        </a>
-
-      </div>
-
-      <svg class="hero-waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28 " preserveAspectRatio="none">
-        <defs>
-          <path id="wave-path" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
-        </defs>
-        <g class="wave1">
-          <use xlink:href="#wave-path" x="50" y="3"></use>
-        </g>
-        <g class="wave2">
-          <use xlink:href="#wave-path" x="50" y="0"></use>
-        </g>
-        <g class="wave3">
-          <use xlink:href="#wave-path" x="50" y="9"></use>
-        </g>
-      </svg>
-
-    </section><!-- /Hero Section -->
+    </section>
 
     <!-- About Section -->
-    <section id="about" class="about section">
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Profil Program Studi</h2>
+                <p>D4 Sistem Informasi Bisnis - Jurusan Teknologi Informasi</p>
+            </div>
 
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>About</h2>
-        <p>PROFIL</p>
-      </div><!-- End Section Title -->
+            <div class="row align-items-center">    
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="about-img">
+                        <img src="{{ asset('assets\images\IMG_1397.JPG') }}" alt="Kelas SIB" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="about-content">
+                        <h3>Tentang Program Studi Kami</h3>
+                        <p>Berawal dari Fakultas Non Gelar Teknologi Universitas Brawijaya yang beroperasi setelah disahkannya Surat Keputusan Presiden Republik Indonesia No. 59 Tahun 1982, Politeknik Negeri Malang saat ini telah berkembang menjadi institusi pendidikan vokasi mandiri.</p>
+                        <p>Perubahan status tersebut tercantum dalam Surat Keputusan Menteri Pendidikan dan Kebudayaan No. 0313/O/1991. Politeknik Negeri Malang berupaya secara terus menerus untuk melakukan perubahan ke arah perbaikan, khususnya dalam bidang Pendidikan, Penelitian dan Pengabdian kepada Masyarakat yang berorientasi pada teknologi terapan.</p>
 
-      <div class="container">
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <div>
+                                    <h5>Akreditasi A (BAN-PT)</h5>
+                                    <p class="text-muted">SK No. 409/SK/BAN-PT/Akred/PT/XII/2018</p>
+                                </div>
+                            </div>
 
-        <div class="row gy-4">
-
-          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
-            <p>
-              Berawal dari Fakultas Non Gelar Teknologi Universitas Brawijaya yang beroperasi setelah disahkannya Surat Keputusan Presiden Republik Indonesia No. 59 Tahun 1982, Politeknik Negeri Malang saat ini telah berkembang menjadi institusi pendidikan vokasi mandiri.
-            </p>
-            <p>
-              Perubahan status tersebut tercantum dalam Surat Keputusan Menteri Pendidikan dan Kebudayaan No. 0313/O/1991. Politeknik Negeri Malang berupaya secara terus menerus untuk melakukan perubahan ke arah perbaikan, khususnya dalam bidang Pendidikan, Penelitian dan Pengabdian kepada Masyarakat yang berorientasi pada teknologi terapan. Usaha tersebut menunjukkan hasil yang positif, yang ditunjukkan dengan pencapaian akreditasi A pada tahun 2018 (SK 409/SK/BANPT/Akred/PT/XII/2018) dan akreditasi internasional ASIC (Acreditation Service for International School Collage and University) pada tahun 2020 untuk 20 program studi.
-            </p>
-          </div>
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-            <p>Program studi D4-SIB didirikan pada tahun 2010 berdasarkanSuratKeputusanMenteriPendidikanNasionalno.50/D/O/2010.Padaawalnyaberdirinya,program studi D4 Sistem informasi bisnis berada di bawah jurusan Teknik Elektro, Politeknik NegeriMalang, sebelumpadaakhirnyamulaitahun2015, setelahdidirikannyajurusanTeknologiInformasi, program studi D4-SIB masuk ke dalamnya. Pada tahun 2018, program studi D4-SIBmendapatkan peringkat B untuk akreditasi program studi dari BAN-PT, berdasarkan SK Nomor1810/SK/BANPT/Akred/DiplIV/VII/2018.</p>
-            <a href="#" class="read-more"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-          </div>
-
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <div>
+                                    <h5>Akreditasi Internasional</h5>
+                                    <p class="text-muted">ASIC Accreditation for 20 Study Programs</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>
 
-      </div>
+    <!-- Stats Section -->
+    <section class="section stats">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="stat-number">120+</div>
+                        <div class="stat-title">Mahasiswa Aktif</div>
+                    </div>
+                </div>
 
-    </section><!-- /About Section -->
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-award"></i>
+                        </div>
+                        <div class="stat-number">15+</div>
+                        <div class="stat-title">Dosen Berkompeten</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="stat-number">50+</div>
+                        <div class="stat-title">Mata Kuliah</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div class="stat-number">10+</div>
+                        <div class="stat-title">Mitra Industri</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Features Section -->
-    <section id="features" class="features section">
-
-      <div class="container">
-
-        <ul class="nav nav-tabs row  d-flex" data-aos="fade-up" data-aos-delay="100">
-          <li class="nav-item col-3">
-            <a class="nav-link active show" data-bs-toggle="tab" data-bs-target="#features-tab-1">
-              <i class="bi bi-binoculars">VISI</i>
-              <h4 class="d-none d-lg-block"></h4>
-            </a>
-          </li>
-          <li class="nav-item col-3">
-            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-2">
-              <i class="bi bi-box-seam"></i>
-              <h4 class="d-none d-lg-block">MISI</h4>
-            </a>
-          </li>
-          <li class="nav-item col-3">
-            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-3">
-              <i class="bi bi-brightness-high"></i>
-              <h4 class="d-none d-lg-block">TUJUAN</h4>
-            </a>
-          </li>
-          <li class="nav-item col-3">
-            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-4">
-              <i class="bi bi-command"></i>
-              <h4 class="d-none d-lg-block">SASARAN</h4>
-            </a>
-          </li>
-        </ul><!-- End Tab Nav -->
-
-        <div class="tab-content" data-aos="fade-up" data-aos-delay="200">
-
-          <div class="tab-pane fade active show" id="features-tab-1">
-            <div class="row">
-              <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
-                <h3>Menjadi Program Studi yang Unggul dalam Bidang Sistem informasi bisnis Baik di Tingkat Nasional Maupun Internasional</h3>
-                <!-- <p class="fst-italic">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-                  magna aliqua.
-                </p>
-                <ul>
-                  <li><i class="bi bi-check2-all"></i>
-                    <spab>Ullamco laboris nisi ut aliquip ex ea commodo consequat.</spab>
-                  </li>
-                  <li><i class="bi bi-check2-all"></i> <span>Duis aute irure dolor in reprehenderit in voluptate velit</span>.</li>
-                  <li><i class="bi bi-check2-all"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate trideta storacalaperda mastiro dolore eu fugiat nulla pariatur.</span></li>
-                </ul>
-                <p>
-                  Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                  culpa qui officia deserunt mollit anim id est laborum
-                </p> -->
-              </div>
-              <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="Selecao/assets/img/working-1.jpg" alt="" class="img-fluid">
-              </div>
+    <section id="features" class="section bg-light">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Visi & Misi</h2>
+                <p>Program Studi D4 Sistem Informasi Bisnis</p>
             </div>
-          </div><!-- End Tab Content Item -->
 
-          <div class="tab-pane fade" id="features-tab-2">
-            <div class="row">
-              <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
-                <h3>1. Melaksanakan pendidikan vokasi yang inovatif berdasarkan pada sistem pendidikan terapan dengan memanfaatkan kemajuan teknologi, sehingga mampu menghasilkan lulusan yang memiliki kompetensi di bidang sistem informasi bisnis dan siap bersaing di tingkat nasional dan global.</h3><br>
-                <h3>2. Menyelenggarakan penelitian terapan berbasis produk dan jasa bidang Sistem informasi bisnis.</h3><br>
-                <h3>3. Melaksanakan pengabdian masyarakat dengan menggunakan kemajuan bidang Sistem informasi bisnis untuk meningkatkan kesejahteraan.</h3><br>
-                <h3>4. Mewujudkan kerjasama yang saling menguntungkan dengan berbagai pihak baik didalam maupun diluar negeri pada bidang sistem informasi bisnis</h3>
-                <!-- <p>
-                  Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                  culpa qui officia deserunt mollit anim id est laborum
-                </p>
-                <p class="fst-italic">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-                  magna aliqua.
-                </p>
-                <ul>
-                  <li><i class="bi bi-check2-all"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat.</span></li>
-                  <li><i class="bi bi-check2-all"></i> <span>Duis aute irure dolor in reprehenderit in voluptate velit.</span></li>
-                  <li><i class="bi bi-check2-all"></i> <span>Provident mollitia neque rerum asperiores dolores quos qui a. Ipsum neque dolor voluptate nisi sed.</span></li>
-                  <li><i class="bi bi-check2-all"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate trideta storacalaperda mastiro dolore eu fugiat nulla pariatur.</span></li>
-                </ul> -->
-              </div>
-              <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="Selecao/assets/img/working-2.jpg" alt="" class="img-fluid">
-              </div>
+            <ul class="nav nav-pills features-tabs mb-4" id="features-tab" role="tablist" data-aos="fade-up" data-aos-delay="100">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="vision-tab" data-bs-toggle="pill" data-bs-target="#vision" type="button" role="tab" aria-controls="vision" aria-selected="true">
+                        <i class="bi bi-eye me-2"></i>Visi
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="mission-tab" data-bs-toggle="pill" data-bs-target="#mission" type="button" role="tab" aria-controls="mission" aria-selected="false">
+                        <i class="bi bi-bullseye me-2"></i>Misi
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="goals-tab" data-bs-toggle="pill" data-bs-target="#goals" type="button" role="tab" aria-controls="goals" aria-selected="false">
+                        <i class="bi bi-flag me-2"></i>Tujuan
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="targets-tab" data-bs-toggle="pill" data-bs-target="#targets" type="button" role="tab" aria-controls="targets" aria-selected="false">
+                        <i class="bi bi-bar-chart me-2"></i>Sasaran
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="features-tabContent" data-aos="fade-up" data-aos-delay="200">
+                <div class="tab-pane fade show active" id="vision" role="tabpanel" aria-labelledby="vision-tab">
+                    <div class="feature-tab-content">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <h3 class="mb-4">Visi Program Studi</h3>
+                                <div class="d-flex align-items-start mb-4">
+                                    <div class="me-3 text-primary">
+                                        <i class="bi bi-check-circle-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0">Menjadi Program Studi yang Unggul dalam Bidang Sistem Informasi Bisnis Baik di Tingkat Nasional Maupun Internasional</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mt-4 mt-lg-0">
+                                <div class="feature-tab-img">
+                                    <img src="{{ asset('assets\images\IMG_1393.JPG') }}" alt="Visi SIB" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="mission" role="tabpanel" aria-labelledby="mission-tab">
+                    <div class="feature-tab-content">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <h3 class="mb-4">Misi Program Studi</h3>
+
+                                <div class="d-flex align-items-start mb-4">
+                                    <span class="badge bg-primary rounded-circle me-3 mt-1">1</span>
+                                    <div>
+                                        <h5>Pendidikan Vokasi Inovatif</h5>
+                                        <p class="mb-0">Melaksanakan pendidikan vokasi yang inovatif berdasarkan pada sistem pendidikan terapan dengan memanfaatkan kemajuan teknologi.</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start mb-4">
+                                    <span class="badge bg-primary rounded-circle me-3 mt-1">2</span>
+                                    <div>
+                                        <h5>Penelitian Terapan</h5>
+                                        <p class="mb-0">Menyelenggarakan penelitian terapan berbasis produk dan jasa bidang Sistem informasi bisnis.</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start mb-4">
+                                    <span class="badge bg-primary rounded-circle me-3 mt-1">3</span>
+                                    <div>
+                                        <h5>Pengabdian Masyarakat</h5>
+                                        <p class="mb-0">Melaksanakan pengabdian masyarakat dengan menggunakan kemajuan bidang Sistem informasi bisnis.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mt-4 mt-lg-0">
+                                <div class="feature-tab-img">
+                                    <img src="{{ asset('assets\images\IMG_1397.JPG') }}" alt="Misi SIB" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="goals" role="tabpanel" aria-labelledby="goals-tab">
+                    <div class="feature-tab-content">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <h3 class="mb-4">Tujuan Program Studi</h3>
+
+                                <div class="accordion" id="goalsAccordion">
+                                    <div class="accordion-item mb-3 border-0">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                Lulusan Berkualitas
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#goalsAccordion">
+                                            <div class="accordion-body">
+                                                Menghasilkan lulusan bidang sistem informasi bisnis yang sesuai kebutuhan, beretika dan bermoral baik, berpengetahuan dan berketerampilan tinggi.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="accordion-item mb-3 border-0">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                Penelitian Bermutu
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#goalsAccordion">
+                                            <div class="accordion-body">
+                                                Menghasilkan penelitian terapan bidang sistem informasi bisnis yang berskala nasional dan internasional, meningkatkan efektivitas, efisiensi, dan produktivitas dalam dunia usaha dan industri.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="accordion-item border-0">
+                                        <h2 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                Pengabdian Masyarakat
+                                            </button>
+                                        </h2>
+                                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#goalsAccordion">
+                                            <div class="accordion-body">
+                                                Menghasilkan pengabdian kepada masyarakat yang dilaksanakan melalui penerapan dan penyebarluasan ilmu pengetahuan dan teknologi.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mt-4 mt-lg-0">
+                                <div class="feature-tab-img">
+                                    <img src="{{ asset('assets\images\IMG_1395.JPG') }}" alt="Tujuan SIB" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="targets" role="tabpanel" aria-labelledby="targets-tab">
+                    <div class="feature-tab-content">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <h3 class="mb-4">Sasaran Program Studi</h3>
+
+                                <ul class="list-unstyled">
+                                    <li class="d-flex mb-4">
+                                        <div class="me-3 text-primary">
+                                            <i class="bi bi-check-circle-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Peningkatan Akses Pendidikan</h5>
+                                            <p class="mb-0">Meningkatnya akses relevansi, kuantitas, dan kualitas Pendidikan Program Studi D4 - SIB</p>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex mb-4">
+                                        <div class="me-3 text-primary">
+                                            <i class="bi bi-check-circle-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Pembelajaran Berkualitas</h5>
+                                            <p class="mb-0">Meningkatnya relevansi dan kualitas kegiatan pembelajaran di Program Studi D4 - SIB</p>
+                                        </div>
+                                    </li>
+
+                                    <li class="d-flex">
+                                        <div class="me-3 text-primary">
+                                            <i class="bi bi-check-circle-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Kegiatan Kemahasiswaan</h5>
+                                            <p class="mb-0">Meningkatnya kualitas hasil kegiatan kemahasiswaan D4 - SIB dan inisiasi pembinaan karier untuk pembekalan lulusan.</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-6 mt-4 mt-lg-0">
+                                <div class="feature-tab-img">
+                                    <img src="{{ asset('assets\images\IMG_1393.JPG') }}" alt="Sasaran SIB" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div><!-- End Tab Content Item -->
+        </div>
+    </section>
 
-          <div class="tab-pane fade" id="features-tab-3">
-            <div class="row">
-              <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
-                <h3>1. Menghasilkan lulusan bidang sistem informasi bisnis yang sesuai kebutuhan, beretika dan bermoral baik, berpengetahuan dan berketerampilan tinggi, siap bekerja dan/atau berwirausaha yang mampu bersaing dalam skala nasional dan global;</h3><br>
-                <h3>2. Menghasilkan penelitian terapan bidang sistem informasi bisnis yang berskala nasional dan internasional, meningkatkan efektivitas, efisiensi, dan produktivitas dalam dunia usaha dan industri, serta mengarah pada pencapaian Hak atas Kekayaan Intelektual (HaKI), perolehan paten, dan kesejahteraan masyarakat;</h3><br>
-                <h3>3. Menghasilkan pengabdian kepada masyarakat yang dilaksanakan melalui penerapan dan penyebarluasan ilmu pengetahuan dan teknologi serta pemberian layanan hasil secara profesional dalam bidang sistem informasi bisnis sehingga bermanfaat secara langsung dalam meningkatkan kesejahteraan masyarakat;</h3><br>
-                <h3>4. Menghasilkan sistem manajemen pendidikan bidang sistem informasi bisnis yang memenuhi prinsip-prinsip tata kelola yang baik;</h3><br>
-                <h3>5. Terwujudnya kerja sama yang saling menguntungkan dengan berbagai pihak baik di dalam maupun di luar negeri pada bidang sistem informasi bisnis untuk meningkatkan daya saing.</h3><br>
-                <!-- <p>
-                  Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                  culpa qui officia deserunt mollit anim id est laborum
-                </p>
-                <ul>
-                  <li><i class="bi bi-check2-all"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat.</span></li>
-                  <li><i class="bi bi-check2-all"></i> <span>Duis aute irure dolor in reprehenderit in voluptate velit.</span></li>
-                  <li><i class="bi bi-check2-all"></i> <span>Provident mollitia neque rerum asperiores dolores quos qui a. Ipsum neque dolor voluptate nisi sed.</span></li>
-                </ul>
-                <p class="fst-italic">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-                  magna aliqua.
-                </p> -->
-              </div>
-              <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <!-- <img src="assets/img/working-3.jpg" alt="" class="img-fluid"> -->
-              </div>
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Kontak Kami</h2>
+                <p>Hubungi Program Studi D4 Sistem Informasi Bisnis</p>
             </div>
-          </div><!-- End Tab Content Item -->
 
-          <div class="tab-pane fade" id="features-tab-4">
-            <div class="row">
-              <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
-                <h3>1. Meningkatnya akses relevansi, kuantitas, dan kualitas Pendidikan Program Studi D4 - SIB</h3><br>
-                <h3>2. Meningkatnya relevansi dan kualitas kegiatan pembelajaran di Program Studi D4 - SIB</h3><br>
-                <h3>3. Meningkatnya kualitas hasil kegiatan kemahasiswaan D4 - SIB dan inisiasi  pembinaan karier untuk pembekalan lulusan.</h3><br>
-                <h3>4. Meningkatnya relevansi, kuantitas, kualitas, dan kemanfaatan hasil penelitian seluruh    sivitas akademika.</h3><br>
-                <h3>5. Meningkatnya relevansi, kuantitas, kualitas, dan kemanfaatan hasil pengabdian kepada masyarakat untuk kesejahteraan masyarakat.</h3><br>
-                <!-- <p>
-                  Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                  culpa qui officia deserunt mollit anim id est laborum
-                </p>
-                <p class="fst-italic">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-                  magna aliqua.
-                </p>
-                <ul>
-                  <li><i class="bi bi-check2-all"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat.</span></li>
-                  <li><i class="bi bi-check2-all"></i> <span>Duis aute irure dolor in reprehenderit in voluptate velit.</span></li>
-                  <li><i class="bi bi-check2-all"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate trideta storacalaperda mastiro dolore eu fugiat nulla pariatur.</span></li> -->
-                </ul>
-              </div>
-              <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="{{asset('Selecao/assets/img/working-4.jpg')}}" alt="" class="img-fluid">
-              </div>
+            <div class="row gy-4">
+                <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100">
+                    <div class="contact-info">
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h3>Alamat</h3>
+                                <p>Jl. Soekarno Hatta NO.9, Jatimulyo, Kec. Lowokwaru, Kota Malang, Jawa Timur 65141</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="bi bi-telephone"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h3>Telepon</h3>
+                                <p>(0341) 404424 - 404425</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item">
+                            <div class="contact-info-icon">
+                                <i class="bi bi-envelope"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h3>Email</h3>
+                                <p>humas@polinema.ac.id</p>
+                            </div>
+                        </div>
+
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/polinema" class="social-link"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/polinema_campus/" class="social-link"><i class="bi bi-instagram"></i></a>
+                            <a href="https://www.linkedin.com/school/polinema-joss/" class="social-link"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7" data-aos="fade-up" data-aos-delay="200">
+                    <div class="map-container">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3951.5027343114866!2d112.61354597618481!3d-7.946885879169167!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e78827687d272e7%3A0x789ce9a636cd3aa2!2sPoliteknik%20Negeri%20Malang!5e0!3m2!1sid!2sid!4v1746021758826!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
             </div>
-          </div><!-- End Tab Content Item -->
+        </div>
+    </section>
 
+ <!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="footer-logo mb-4">
+                    <a href="#" class="d-inline-flex align-items-center justify-content-center">
+                        <img src="{{ asset('assets/images/Jti_polinema.png') }}" alt="Polinema Logo" class="me-2" style="height: 40px;">
+                        <span class="sitename" style="font-size: 1.5rem; font-weight: 700;">SiAkred</span>
+                    </a>
+                </div>
+                <p class="mb-4 mx-auto" style="max-width: 600px;">
+                    Sistem Akreditasi Program Studi D4 Sistem Informasi Bisnis<br>
+                    Jurusan Teknologi Informasi Politeknik Negeri Malang
+                </p>
+
+            </div>
         </div>
 
-      </div>
-
-    </section><!-- /Features Section -->
-
-    <!-- Call To Action Section -->
-    <section id="call-to-action" class="call-to-action section dark-background">
-
-      <div class="container">
-
-        <div class="row" data-aos="zoom-in" data-aos-delay="100">
-          <div class="col-xl-9 text-center text-xl-start">
-            <h3>Call To Action</h3>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-          </div>
-          <div class="col-xl-3 cta-btn-container text-center">
-            <a class="cta-btn align-middle" href="#">Call To Action</a>
-          </div>
+        <div class="footer-bottom text-center pt-4 mt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+            <p class="mb-0">&copy; 2025 SiAkred - Sistem Akreditasi D4 SIB. All Rights Reserved.</p>
         </div>
-
-      </div>
-
-    </section><!-- /Call To Action Section -->
-
-    <!-- Services Section -->
-   
-    <section id="contact" class="contact section">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Contact</h2>
-        <p>Contact Us</p>
-      </div><!-- End Section Title -->
-
-      <div class="container" data-aos="fade" data-aos-delay="100">
-
-        <div class="row gy-4">
-
-          <div class="col-lg-4">
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
-              <i class="bi bi-geo-alt flex-shrink-0"></i>
-              <div>
-                <h3>Address</h3>
-                <p>Jl.Soekarno Hatta NO.9, Jatimulyo, Kec. Lowokwaru, Kota Malang, Jawa Timur 65141</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
-              <i class="bi bi-telephone flex-shrink-0"></i>
-              <div>
-                <h3>Call Us</h3>
-                <p>+1 5589 55488 55</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
-              <i class="bi bi-envelope flex-shrink-0"></i>
-              <div>
-                <h3>Email Us</h3>
-                <p>humas@polinema.ac.id</p>
-              </div>
-            </div><!-- End Info Item -->
-
-          </div>
-
-          <div class="col-lg-8">
-            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-              <div class="row gy-4">
-
-                <div class="col-md-6">
-                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
-                </div>
-
-                <div class="col-md-6 ">
-                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
-                </div>
-                </div>
-
-                <div class="col-md-12">
-                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
-                </div>
-
-                <div class="col-md-12 text-center">
-                  <div class="loading">Loading</div>
-                  <div class="error-message"></div>
-                  <div class="sent-message">Your message has been sent. Thank you!</div>
-
-                  <button type="submit">Send Message</button>
-                </div>
-
-              </div>
-            </form>
-          </div><!-- End Contact Form -->
-
-        </div>
-
-      </div>
-
-    </section><!-- /Contact Section -->
-
-  </main>
-
-  <footer id="footer" class="footer dark-background">
-    <!-- <div class="container">
-      <h3 class="sitename">Selecao</h3>
-      <p>Et aut eum quis fuga eos sunt ipsa nihil. Labore corporis magni eligendi fuga maxime saepe commodi placeat.</p>
-      <div class="social-links d-flex justify-content-center">
-        <a href=""><i class="bi bi-twitter-x"></i></a>
-        <a href=""><i class="bi bi-facebook"></i></a>
-        <a href=""><i class="bi bi-instagram"></i></a>
-        <a href=""><i class="bi bi-skype"></i></a>
-        <a href=""><i class="bi bi-linkedin"></i></a>
-      </div> -->
-      <div class="container">
-        <div class="copyright">
-          <span>Copyright</span> <strong class="px-1 sitename">Sistem Akreditasi 2025</strong>
-        </div>
-        <!-- <div class="credits"> -->
-          <!-- All the links in the footer should remain intact. -->
-          <!-- You can delete the links only if you've purchased the pro version. -->
-          <!-- Licensing information: https://bootstrapmade.com/license/ -->
-          <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-          <!-- Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-        </div> -->
-      </div>
     </div>
-  </footer>
+</footer>
 
-  <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top"><i class="bi bi-arrow-up"></i></a>
 
-  <!-- Preloader -->
-  <div id="preloader"></div>
+    <!-- Vendor JS Files -->
+    <script src="{{ asset('Selecao/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('Selecao/assets/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('Selecao/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
 
-  <!-- Vendor JS Files -->
-  <script src="Selecao/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="Selecao/assets/vendor/php-email-form/validate.js"></script>
-  <script src="Selecao/assets/vendor/aos/aos.js"></script>
-  <script src="Selecao/assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="Selecao/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
-  <script src="Selecao/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="Selecao/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <!-- Main JS File -->
 
-  <!-- Main JS File -->
-  <script src="Selecao/assets/js/main.js"></script>
+    <script src="{{ asset('assets/js/welcome.js') }}"></script>
 
 </body>
-
 </html>

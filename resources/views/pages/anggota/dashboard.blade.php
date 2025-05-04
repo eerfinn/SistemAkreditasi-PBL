@@ -25,7 +25,6 @@
                     <div class="profile-info">
                         <p><strong>Username:</strong> {{ $user->username }}</p>
                         <p><strong>Email:</strong> {{ $user->email }}</p>
-                        <p><strong>Level:</strong> {{ $user->level->level_nama }}</p>
                     </div>
                 </div>
             </div>
@@ -46,4 +45,4 @@
             </div>
         </div>
     </div>
-@endsection 
+@endsection

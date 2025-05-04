@@ -16,7 +16,7 @@ class CheckRole
 
         $user = Auth::user();
         
-        if(in_array($user->level->level_kode, $roles)) {
+        if(in_array($user->role, $roles)) {
             return $next($request);
         }
         

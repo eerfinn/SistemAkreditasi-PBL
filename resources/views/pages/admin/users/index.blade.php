@@ -21,26 +21,26 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Level</th>
+                                <th>Nama</th>
+                                <th>Username</th>
+                                <th>Role</th>
                                 <th>Created At</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($users as $index => $user)
-                            <tr id="user-{{ $user->user_id }}">
+                            <tr id="user-{{ $user->id }}">
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ $user->level->name }}</td>
+                                <td>{{ $user->nama }}</td>
+                                <td>{{ $user->username }}</td>
+                                <td>{{ ucfirst($user->role) }}</td>
                                 <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    <a href="{{ route('admin.users.edit', $user->user_id) }}" class="btn btn-info btn-sm" title="Edit">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-info btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->user_id }}" title="Delete">
+                                    <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->id }}" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -68,15 +68,15 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                        <span class="invalid-feedback" role="alert" id="name-error"></span>
+                        <label for="nama">Nama</label>
+                        <input type="text" class="form-control" id="nama" name="nama" required>
+                        <span class="invalid-feedback" role="alert" id="nama-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                        <span class="invalid-feedback" role="alert" id="email-error"></span>
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <span class="invalid-feedback" role="alert" id="username-error"></span>
                     </div>
 
                     <div class="form-group">
@@ -86,14 +86,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="level_id">Level</label>
-                        <select class="form-control" id="level_id" name="level_id" required>
-                            <option value="">Select Level</option>
-                            @foreach($levels as $level)
-                                <option value="{{ $level->level_id }}">{{ $level->name }}</option>
-                            @endforeach
+                        <label for="role">Role</label>
+                        <select class="form-control" id="role" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="administrator">Administrator</option>
+                            <option value="anggota">Anggota</option>
+                            <option value="koordinator">Koordinator</option>
+                            <option value="kjm">KJM</option>
+                            <option value="kaprodi">Kaprodi</option>
+                            <option value="kajur">Kajur</option>
                         </select>
-                        <span class="invalid-feedback" role="alert" id="level_id-error"></span>
+                        <span class="invalid-feedback" role="alert" id="role-error"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -137,20 +140,20 @@ $(document).ready(function() {
                     // Add new row to DataTable
                     let newRow = table.row.add([
                         table.rows().count() + 1,
-                        response.user.name,
-                        response.user.email,
-                        response.user.level.name,
+                        response.user.nama,
+                        response.user.username,
+                        response.user.role.charAt(0).toUpperCase() + response.user.role.slice(1),
                         response.user.created_at,
-                        `<a href="${'{{ route("admin.users.edit", ":id") }}'.replace(':id', response.user.user_id)}" class="btn btn-info btn-sm" title="Edit">
+                        `<a href="${'{{ route("admin.users.edit", ":id") }}'.replace(':id', response.user.id)}" class="btn btn-info btn-sm" title="Edit">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <button class="btn btn-danger btn-sm delete-user" data-id="${response.user.user_id}" title="Delete">
+                        <button class="btn btn-danger btn-sm delete-user" data-id="${response.user.id}" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>`
                     ]).draw().node();
                     
                     // Add row ID
-                    $(newRow).attr('id', 'user-' + response.user.user_id);
+                    $(newRow).attr('id', 'user-' + response.user.id);
                     
                     // Show success message
                     $('#alert-container').html(
