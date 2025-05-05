@@ -54,9 +54,67 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Kontak</a>
                     </li>
+                    @guest
                     <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
                         <a class="btn btn-primary" href="/login">Login</a>
                     </li>
+                    @else
+                    <li class="nav-item ps-3">
+                        <div class="dropdown nav-profile">
+                            <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="profile-info d-flex align-items-center">
+                                    <div class="profile-image">
+                                        <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <div class="card border-0 mb-0">
+                                    <div class="card-header py-2">
+                                        <div class="profile-header">
+                                            <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" class="avatar avatar-md" alt="">
+                                            <div>
+                                                <h6>{{ Auth::user()->name }}</h6>
+                                                <span>{{ Auth::user()->role }}</span>	
+                                            </div>	
+                                        </div>
+                                    </div>
+                                    <div class="card-body px-0 py-2">
+                                        <a href="/dashboard" class="dropdown-item ai-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M16.28 13.61C15.15 14.74 13.53 15.09 12.1 14.64L9.51001 17.22C9.33001 17.41 8.96001 17.53 8.69001 17.49L7.49001 17.33C7.09001 17.28 6.73001 16.9 6.67001 16.51L6.51001 15.31C6.47001 15.05 6.60001 14.68 6.78001 14.49L9.36001 11.91C8.92001 10.48 9.26001 8.86001 10.39 7.73001C12.01 6.11001 14.65 6.11001 16.28 7.73001C17.9 9.34001 17.9 11.98 16.28 13.61Z" stroke="var(--primary)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M10.45 16.28L9.59998 15.42" stroke="var(--primary)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M13.3945 10.7H13.4035" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <span class="ms-2">Dashboard</span>
+                                        </a>
+                                        <a href="/user/profile" class="dropdown-item ai-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9848 15.3462C8.11714 15.3462 4.81429 15.931 4.81429 18.2729C4.81429 20.6148 8.09619 21.2205 11.9848 21.2205C15.8524 21.2205 19.1543 20.6348 19.1543 18.2938C19.1543 15.9529 15.8733 15.3462 11.9848 15.3462Z" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9848 12.0059C14.5229 12.0059 16.58 9.94779 16.58 7.40969C16.58 4.8716 14.5229 2.81445 11.9848 2.81445C9.44667 2.81445 7.38857 4.8716 7.38857 7.40969C7.38 9.93922 9.42381 11.9973 11.9524 12.0059H11.9848Z" stroke="var(--primary)" stroke-width="1.42857" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <span class="ms-2">Profile</span>
+                                        </a>
+                                    </div>
+                                    <div class="card-footer px-0 py-2">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="dropdown-item ai-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                                </svg>
+                                                <span class="ms-2">Logout</span>
+                                            </a>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    @endguest
                 </ul>
             </div>
         </div>
@@ -337,7 +395,7 @@
 
                                     <li class="d-flex mb-4">
                                         <div class="me-3 text-primary">
-                                            <i class="bi bi-check-circle-fill fs-4"></i>
+                                            <i class="bi ybi-check-circle-fill fs-4"></i>
                                         </div>
                                         <div>
                                             <h5>Pembelajaran Berkualitas</h5>
