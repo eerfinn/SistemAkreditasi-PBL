@@ -357,6 +357,11 @@
 
 <body>
     <div class="login-form-section">
+
+        <a href="{{ url('/') }}" class="back-home-button" style="display:inline-block; margin-bottom: 1rem; color: var(--primary-color); font-weight: 600; text-decoration: none;">
+            &larr; Kembali ke Home
+        </a>
+
         <div class="logo-header">
             <img class="logo-icon" src="{{ asset('assets/images/eyeSearchLogin.png') }}" alt="SIAkred Logo">
             <div class="logo-text">SiAkred</div>
