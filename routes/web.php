@@ -11,6 +11,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/profile', function () {
+    return view('profil.app-profile-1');
+})->name('profile');
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
@@ -51,6 +55,9 @@ Route::middleware('auth')->group(function () {
         ->name('koordinator.dashboard')
         ->middleware('role:koordinator');
 
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+
+
     // Admin Routes with Admin Middleware
     Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
         // User Management
@@ -87,3 +94,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/suplemen', [KriteriaController::class, 'suplemen'])->name('suplemen');
     });
 });
+
