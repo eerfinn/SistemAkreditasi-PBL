@@ -55,6 +55,9 @@ Route::middleware('auth')->group(function () {
         ->name('koordinator.dashboard')
         ->middleware('role:koordinator');
 
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+
+
     // Admin Routes with Admin Middleware
     Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
         // User Management
@@ -91,3 +94,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/suplemen', [KriteriaController::class, 'suplemen'])->name('suplemen');
     });
 });
+
