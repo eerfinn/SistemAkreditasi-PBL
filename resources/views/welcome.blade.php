@@ -70,15 +70,6 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <div class="card border-0 mb-0">
-                                    <div class="card-header py-2">
-                                        <div class="profile-header">
-                                            <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" class="avatar avatar-md" alt="">
-                                            <div>
-                                                <h6>{{ Auth::user()->name }}</h6>
-                                                <span>{{ Auth::user()->role }}</span>	
-                                            </div>	
-                                        </div>
-                                    </div>
                                     <div class="card-body px-0 py-2">
                                         <a href="/dashboard" class="dropdown-item ai-icon">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -88,13 +79,6 @@
                                                 <path d="M13.3945 10.7H13.4035" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
                                             <span class="ms-2">Dashboard</span>
-                                        </a>
-                                        <a href="/user/profile" class="dropdown-item ai-icon">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9848 15.3462C8.11714 15.3462 4.81429 15.931 4.81429 18.2729C4.81429 20.6148 8.09619 21.2205 11.9848 21.2205C15.8524 21.2205 19.1543 20.6348 19.1543 18.2938C19.1543 15.9529 15.8733 15.3462 11.9848 15.3462Z" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9848 12.0059C14.5229 12.0059 16.58 9.94779 16.58 7.40969C16.58 4.8716 14.5229 2.81445 11.9848 2.81445C9.44667 2.81445 7.38857 4.8716 7.38857 7.40969C7.38 9.93922 9.42381 11.9973 11.9524 12.0059H11.9848Z" stroke="var(--primary)" stroke-width="1.42857" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                            <span class="ms-2">Profile</span>
                                         </a>
                                     </div>
                                     <div class="card-footer px-0 py-2">
