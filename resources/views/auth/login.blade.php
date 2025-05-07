@@ -358,8 +358,12 @@
 <body>
     <div class="login-form-section">
 
-        <a href="{{ url('/') }}" class="back-home-button" style="display:inline-block; margin-bottom: 1rem; color: var(--primary-color); font-weight: 600; text-decoration: none;">
-            &larr; Kembali ke Home
+        <a href="{{ url('/') }}" class="back-home-button" style="display:inline-flex; align-items: center; gap: 0.3rem; margin-bottom: 1rem; color: var(--primary-color); font-weight: 600; text-decoration: none;">
+            <svg width="24" height="24" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="1.2">
+                <rect width="24" height="24" fill="white"></rect>
+                <path d="M14.5 17L9.5 12L14.5 7" stroke="#055fc5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            Kembali ke Home
         </a>
 
         <div class="logo-header">
