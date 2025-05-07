@@ -1,9 +1,8 @@
 <div class="deznav">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
-            {{-- Common Dashboard Menu Item for All Users --}}
             <li>
-                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">
                     <div class="menu-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -12,12 +11,25 @@
                                 fill="#90959F" />
                         </svg>
                     </div>
+                    <span class="nav-text">Home</span>
+                </a>
+            </li>
+            {{-- Common Dashboard Menu Item for All Users --}}
+            <li>
+                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <div class="menu-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="#90959F" stroke-width="2"/>
+                            <path d="M3 9H21" stroke="#90959F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 21V9" stroke="#90959F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
 
             {{-- Admin Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'ADM')
+            @if(auth()->user()->role === 'administrator')
             <li>
                 <a class="has-arrow {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -37,12 +49,6 @@
                 </a>
                 <ul aria-expanded="false">
                     <li>
-                        <a href="{{ route('admin.levels.index') }}"
-                            class="{{ request()->routeIs('admin.levels.index') ? 'active' : '' }}">
-                            Levels
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{ route('admin.users.index') }}"
                             class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
                             Users
@@ -50,10 +56,33 @@
                     </li>
                 </ul>
             </li>
+            <li>
+                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                    <div class="menu-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.4" d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z" fill="#90959F"/>
+                            <path d="M12.5 11.5C12.5 10.672 13.172 10 14 10C14.828 10 15.5 10.672 15.5 11.5C15.5 12.328 14.828 13 14 13C13.172 13 12.5 12.328 12.5 11.5Z" fill="#90959F"/>
+                        </svg>
+                    </div>
+                    <span class="nav-text">Kriteria</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.1') ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.2') ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.3') ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.4') ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.5') ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.6') ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.7') ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.8') ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.9') ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.suplemen') }}" class="{{ request()->routeIs('kriteria.suplemen') ? 'active' : '' }}">Suplemen</a></li>
+                </ul>
+            </li>
             @endif
 
             {{-- Anggota Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'ANG')
+            @if(auth()->user()->role === 'anggota')
             <li>
                 <a class="has-arrow {{ request()->routeIs('dokumen.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -77,10 +106,34 @@
                     </li>
                 </ul>
             </li>
+            <li>
+                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                    <div class="menu-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.5" d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z" fill="#90959F"/>
+                            <path d="M12.5 11.5C12.5 10.672 13.172 10 14 10C14.828 10 15.5 10.672 15.5 11.5C15.5 12.328 14.828 13 14 13C13.172 13 12.5 12.328 12.5 11.5Z" fill="#90959F"/>
+                        </svg>
+                    </div>
+                    <span class="nav-text">Kriteria</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.1') ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.2') ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.3') ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.4') ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.5') ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.6') ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.7') ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.8') ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.9') ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.suplemen') }}" class="{{ request()->routeIs('kriteria.suplemen') ? 'active' : '' }}">Suplemen</a></li>
+                </ul>
+            </li>
             @endif
 
             {{-- Kaprodi & Kajur Menu Items --}}
-            @if(in_array(auth()->user()->level->level_kode, ['KPS', 'KJR']))
+            @if(in_array(auth()->user()->role, ['kaprodi', 'kajur']))
             <li>
                 <a class="has-arrow {{ request()->routeIs('review.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -104,10 +157,34 @@
                     </li>
                 </ul>
             </li>
+            <li>
+                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                    <div class="menu-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.5" d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z" fill="#90959F"/>
+                            <path d="M12.5 11.5C12.5 10.672 13.172 10 14 10C14.828 10 15.5 10.672 15.5 11.5C15.5 12.328 14.828 13 14 13C13.172 13 12.5 12.328 12.5 11.5Z" fill="#90959F"/>
+                        </svg>
+                    </div>
+                    <span class="nav-text">Kriteria</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.1') ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.2') ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.3') ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.4') ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.5') ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.6') ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.7') ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.8') ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.9') ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.suplemen') }}" class="{{ request()->routeIs('kriteria.suplemen') ? 'active' : '' }}">Suplemen</a></li>
+                </ul>
+            </li>
             @endif
 
             {{-- KJM Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'KJM')
+            @if(auth()->user()->role === 'kjm')
             <li>
                 <a class="has-arrow {{ request()->routeIs('monitoring.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -131,10 +208,34 @@
                     </li>
                 </ul>
             </li>
+            <li>
+                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                    <div class="menu-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.5" d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z" fill="#90959F"/>
+                            <path d="M12.5 11.5C12.5 10.672 13.172 10 14 10C14.828 10 15.5 10.672 15.5 11.5C15.5 12.328 14.828 13 14 13C13.172 13 12.5 12.328 12.5 11.5Z" fill="#90959F"/>
+                        </svg>
+                    </div>
+                    <span class="nav-text">Kriteria</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.1') ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.2') ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.3') ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.4') ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.5') ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.6') ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.7') ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.8') ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="#" class="{{ request()->routeIs('kriteria.9') ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.suplemen') }}" class="{{ request()->routeIs('kriteria.suplemen') ? 'active' : '' }}">Suplemen</a></li>
+                </ul>
+            </li>
             @endif
 
-            {{-- Koordinator Kriteria Menu Items --}}
-            @if(auth()->user()->level->level_kode === 'KRT')
+            {{-- Koordinator Menu Items --}}
+            @if(auth()->user()->role === 'koordinator')
             <li>
                 <a class="has-arrow {{ request()->routeIs('validasi.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">

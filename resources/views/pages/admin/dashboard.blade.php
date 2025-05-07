@@ -46,7 +46,7 @@
 @section('content')
     <div class="welcome-container">
         <div class="welcome-card">
-            <h1 class="mb-0">Welcome, {{ auth()->user()->name }}!</h1>
+            <h1 class="mb-0">Welcome, {{ auth()->user()->nama }}!</h1>
         </div>
     </div>
     <div class="col-xl-3 col-sm-6">
@@ -112,8 +112,8 @@
                     <div class="col-md-6 mb-3">
                         <div class="card bg-success text-white">
                             <div class="card-body">
-                                <h5>Total Level</h5>
-                                <h2>{{ App\Models\Level::count() }}</h2>
+                                <h5>Total Role</h5>
+                                <h2>6</h2>
                             </div>
                         </div>
                     </div>

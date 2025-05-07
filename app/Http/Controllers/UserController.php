@@ -3,36 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Level;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('level')->get();
-        $levels = Level::all();
-        return view('pages.admin.users.index', compact('users', 'levels'));
+        $users = User::all();
+        return view('pages.admin.users.index', compact('users'));
     }
 
     public function create()
     {
-        $levels = Level::all();
-        return view('pages.admin.users.create', compact('levels'));
+        $roles = ['administrator', 'anggota', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
+        return view('pages.admin.users.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'nama' => 'required|string|max:255',
+            'username' => 'required|string|unique:users',
             'password' => 'required|string|min:8',
-            'level_id' => 'required|exists:levels,level_id'
+            'role' => 'required|in:administrator,anggota,koordinator,kjm,kaprodi,kajur'
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
         $user = User::create($validated);
-        $user->load('level');
 
         if ($request->ajax()) {
             return response()->json([
@@ -52,16 +50,16 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $levels = Level::all();
-        return view('pages.admin.users.edit', compact('user', 'levels'));
+        $roles = ['administrator', 'anggota', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
+        return view('pages.admin.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->user_id . ',user_id',
-            'level_id' => 'required|exists:levels,level_id'
+            'nama' => 'required|string|max:255',
+            'username' => 'required|string|unique:users,username,' . $user->id,
+            'role' => 'required|in:administrator,anggota,koordinator,kjm,kaprodi,kajur'
         ]);
 
         if ($request->filled('password')) {
@@ -74,7 +72,7 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'User updated successfully.',
-                'user' => $user->load('level')
+                'user' => $user
             ]);
         }
 
@@ -94,4 +92,11 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
+    
+    public function profile()
+{
+    $user = Auth::user(); // Ambil data user yang sedang login
+    return view('profil.app-profile-1', compact('user'));
+}
+    
 }

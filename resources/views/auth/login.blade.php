@@ -1,103 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Abhaya+Libre&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Poppins', sans-serif;
-      background: #f5f5f5;
-    }
-    .wrapper {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-    }
-    .scaled-content {
-      transform: scale(0.7);
-      transform-origin: top left;
-      width: 1920px;
-      height: 1080px;
-    }
-    .error-message {
-      color: #dc3545;
-      font-size: 12px;
-      margin-top: 5px;
-      font-family: Poppins;
-      position: absolute;
-      left: 303px;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrapper">
-    <div class="scaled-content">
-      <form method="POST" action="{{ route('login') }}" style="width: 1920px; height: 1080px; position: relative; background: white; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); overflow: hidden; outline: 1px black solid; outline-offset: -1px">
-        @csrf
-        <img style="width: 860px; height: 910px; left: 956px; top: 24px; position: absolute; opacity: 0.70; border-radius: 25px" src="{{ asset('assets/images/LoginImage.jpg') }}" />
-        
-        <input type="email" name="login" placeholder="Email" value="{{ old('login') }}" style="width: 330px; height: 45px; left: 303px; top: 498px; position: absolute; background: rgba(217, 217, 217, 0); border-radius: 12px; border: 1px #C9C9C9 solid; padding-left: 10px; font-size: 13px; font-family: Poppins; font-weight: 400; color: #3F3E3E;" />
-        @error('login')
-        <div class="error-message" style="top: 548px;">{{ $message }}</div>
-        @enderror
-        
-        <button type="submit" style="width: 330px; height: 45px; left: 303px; top: 620px; position: absolute; background: #055FC5; border-radius: 12px; border: none; color: white; font-size: 17px; font-family: Poppins; font-weight: 600; transition: background-color 0.3s ease, transform 0.2s ease; cursor: pointer;"
-          onmouseover="this.style.backgroundColor='#044a9c'; this.style.transform='scale(1.05)';"
-          onmouseout="this.style.backgroundColor='#055FC5'; this.style.transform='scale(1)';"
-        >Log in</button>
-        
-        <div style="width: 132px; height: 39px; left: 471px; top: 303px; position: absolute; background: #055FC5; border-radius: 12px; border: 1px rgba(200.81, 200.81, 200.81, 0) solid"></div>
-        
-        <div style="left: 303px; top: 408px; position: absolute; color: #3F3E3E; font-size: 30px; font-family: Poppins; font-weight: 600; word-wrap: break-word">Member Sign In</div>
-        
-        <div style="left: 303px; top: 460px; position: absolute; color: #828282; font-size: 13px; font-family: Poppins; font-weight: 400; word-wrap: break-word">Enter your email and password to sign in</div>
-        
-        <div style="left: 325px; top: 683px; position: absolute">
-          <span style="color: #828282; font-size: 13px; font-family: Poppins; font-weight: 400;">Forgot your password? please contact </span>
-          <span style="color: #055FC5; font-size: 13px; font-family: Poppins; font-weight: 600;">admin</span>
-        </div>
-        
-        <div style="position: relative; width: 330px; height: 45px; left: 303px; top: 559px; position: absolute;">
-          <input id="password" type="password" name="password" placeholder="Password" style="width: 100%; height: 100%; background: rgba(217, 217, 217, 0); border-radius: 12px; border: 1px #C9C9C9 solid; padding-left: 10px; font-size: 13px; font-family: Poppins; font-weight: 400; color: #3F3E3E;" />
-          <img id="togglePassword" src="{{ asset('assets/images/EyePassword.png') }}" alt="Toggle Password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; width: 20px; height: 20px;" />
-        </div>
-        @error('password')
-        <div class="error-message" style="top: 609px;">{{ $message }}</div>
-        @enderror
-        
-        <script>
-          const togglePassword = document.querySelector('#togglePassword');
-          const password = document.querySelector('#password');
-          togglePassword.addEventListener('click', function () {
-            if (password.type === 'password') {
-              password.type = 'text';
-              this.src = "{{ asset('assets/images/EyePassword.png') }}";
-            } else {
-              password.type = 'password';
-              this.src = "{{ asset('assets/images/EyeHide.png') }}";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SIAkred</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #055FC5;
+            --primary-hover: #044a9c;
+            --text-color: #2d3748;
+            --text-secondary: #718096;
+            --error-color: #e53e3e;
+            --input-border: #e2e8f0;
+            --input-focus: rgba(5, 95, 197, 0.1);
+            --background: #f8fafc;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: var(--background);
+        }
+
+        .login-form-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem 4rem;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .login-image-section {
+            flex: 1.5;
+            background: url('{{ asset('assets/images/LoginImage.jpg') }}') center/cover no-repeat;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding-left: 4rem;
+        }
+
+        .login-image-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(5, 95, 197, 0.7) 0%, rgba(2, 48, 102, 0.8) 100%);
+        }
+
+        .polinema-brand {
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+            max-width: 400px;
+        }
+
+        .polinema-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1.5rem;
+        }
+
+        .polinema-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .polinema-subtitle {
+            font-size: 1.5rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .logo-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            margin-right: 1rem;
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .form-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .form-header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.25rem;
+            /* Added right padding for eye icon */
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--input-focus);
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #a0aec0;
+            opacity: 1;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            cursor: pointer;
+            width: 22px;
+            height: 22px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+
+
+        .password-toggle:hover {
+            opacity: 1;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 6px rgba(5, 95, 197, 0.1);
+        }
+
+        .login-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(5, 95, 197, 0.15);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+            color: var(--primary-hover);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: block;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
-          });
-        </script>
-        <div style="width: 241px; left: 1029px; top: 240px; position: absolute; text-align: center; color: rgba(0, 0, 0, 0.80); font-size: 28px; font-family: 'Abhaya Libre', serif; font-weight: 400; line-height: 33px;">POLITEKNIK NEGERI MALANG</div>
-        
-        <img style="width: 161px; height: 162px; left: 1066px; top: 69px; position: absolute" src="{{ asset('assets/images/LogoPolinema.png') }}" />
-        
-        <div style="left: 478px; top: 300px; position: absolute; text-align: center; color: white; font-size: 30px; font-family: Poppins; font-weight: 600;">SiAkred</div>
-        
-        <img style="width: 137px; height: 108px; left: 293px; top: 271px; position: absolute" src="{{ asset('assets/images/eyeSearchLogin.png') }}" />
-      </form>
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-5px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .login-form-section {
+                padding: 3rem;
+            }
+
+            .login-image-section {
+                padding-left: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .login-image-section {
+                min-height: 300px;
+                order: -1;
+                padding: 2rem;
+                flex: 1;
+                align-items: center;
+                justify-content: flex-start;
+            }
+
+            .polinema-brand {
+                text-align: center;
+                max-width: 100%;
+            }
+
+            .polinema-logo {
+                margin: 0 auto 1rem;
+            }
+
+            .polinema-title {
+                font-size: 1.8rem;
+            }
+
+            .polinema-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .login-form-section {
+                padding: 2.5rem 2rem;
+                max-width: 100%;
+            }
+
+            .logo-header {
+                margin-bottom: 2rem;
+            }
+
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .logo-text {
+                font-size: 1.8rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-form-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .logo-text {
+                font-size: 1.6rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .form-input {
+                padding: 0.9rem 2.5rem 0.9rem 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-form-section">
+
+        <a href="{{ url('/') }}" class="back-home-button" style="display:inline-flex; align-items: center; gap: 0.3rem; margin-bottom: 1rem; color: var(--primary-color); font-weight: 600; text-decoration: none;">
+            <svg width="24" height="24" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="1.2">
+                <rect width="24" height="24" fill="white"></rect>
+                <path d="M14.5 17L9.5 12L14.5 7" stroke="#055fc5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            Kembali ke Home
+        </a>
+
+        <div class="logo-header">
+            <img class="logo-icon" src="{{ asset('assets/images/eyeSearchLogin.png') }}" alt="SIAkred Logo">
+            <div class="logo-text">SiAkred</div>
+        </div>
+
+        <div class="form-header">
+            <h2>Member Sign In</h2>
+            <p>Enter your username and password to sign in.</p>
+        </div>
+
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
+
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-input"
+                    placeholder="Enter your username" value="{{ old('username') }}" required autocomplete="username"
+                    autocapitalize="off">
+                @error('username')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" class="form-input"
+                        placeholder="Enter your password" required autocomplete="current-password">
+                    <img id="togglePassword" class="password-toggle" src="{{ asset('assets/images/EyeHide.png') }}"
+                        alt="Toggle Password">
+                    @error('password')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
+            <button type="submit" class="login-button">Log In</button>
+
+            <div class="forgot-password">
+                Forgot your password? Please contact <a href="mailto:admin@polinema.ac.id">admin</a>
+            </div>
+        </form>
     </div>
-  </div>
+
+    <div class="login-image-section">
+        <div class="polinema-brand">
+            <img class="polinema-logo" src="{{ asset('assets/images/LogoPolinema.png') }}" alt="Polinema Logo">
+            <h2 class="polinema-title">POLITEKNIK</h2>
+            <p class="polinema-subtitle">NEGERI MALANG</p>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function() {
+            const isPassword = password.type === 'password';
+            password.type = isPassword ? 'text' : 'password';
+            this.src = isPassword ?
+                "{{ asset('assets/images/EyePassword.png') }}" :
+                "{{ asset('assets/images/EyeHide.png') }}";
+        });
+
+        // Add focus effect when clicking on form inputs
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.querySelector('.form-label').style.color = '#055FC5';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.querySelector('.form-label').style.color = '';
+            });
+        });
+
+        // Prevent form submission animation from being interrupted
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const button = this.querySelector('button[type="submit"]');
+            button.disabled = true;
+            button.innerHTML = 'Logging in...';
+        });
+    </script>
 </body>
+
 </html>
