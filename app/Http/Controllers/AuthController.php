@@ -23,8 +23,8 @@ class AuthController extends Controller
             switch ($userRole) {
                 case 'administrator':
                     return redirect()->route('admin.dashboard');
-                case 'anggota':
-                    return redirect()->route('anggota.dashboard');
+                case 'dosen':
+                    return redirect()->route('dosen.dashboard');
                 case 'kjm':
                     return redirect()->route('kjm.dashboard');
                 case 'kaprodi':

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('username')->unique();
             $table->string('password');
-            $table->enum('role', ['administrator', 'anggota', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
+            $table->enum('role', ['administrator', 'dosen', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
             $table->string('path_profile')->nullable();
             $table->timestamps();
         });

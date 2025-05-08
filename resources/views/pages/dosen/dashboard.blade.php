@@ -1,6 +1,6 @@
 @extends('layouts/master')
 
-@section('title', 'Dashboard Anggota')
+@section('title', 'Dashboard Dosen')
 
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/swiper/css/swiper-bundle.min.css') }}" rel="stylesheet">
@@ -11,7 +11,7 @@
     <div class="welcome-container">
         <div class="welcome-card">
             <h1 class="mb-0">Selamat Datang, {{ $user->nama }}!</h1>
-            <p class="mt-3">Dashboard Anggota</p>
+            <p class="mt-3">Dashboard Dosen</p>
         </div>
     </div>
 
@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <!-- Tambahkan section untuk tugas dan aktivitas anggota -->
+    <!-- Tambahkan section untuk tugas dan aktivitas dosen -->
     <div class="row">
         <div class="col-xl-12">
             <div class="card">

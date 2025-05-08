@@ -31,7 +31,7 @@
             {{-- Admin Menu Items --}}
             @if(auth()->user()->role === 'administrator')
             <li>
-                <a class="has-arrow {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
                     <div class="menu-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -47,14 +47,6 @@
                     </div>
                     <span class="nav-text">User Management</span>
                 </a>
-                <ul aria-expanded="false">
-                    <li>
-                        <a href="{{ route('admin.users.index') }}"
-                            class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
-                            Users
-                        </a>
-                    </li>
-                </ul>
             </li>
             <li>
                 <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
@@ -80,8 +72,8 @@
             </li>
             @endif
 
-            {{-- Anggota Menu Items --}}
-            @if(auth()->user()->role === 'anggota')
+            {{-- Dosen Menu Items --}}
+            @if(auth()->user()->role === 'dosen')
             {{-- <li>
                 <a class="has-arrow {{ request()->routeIs('dokumen.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">

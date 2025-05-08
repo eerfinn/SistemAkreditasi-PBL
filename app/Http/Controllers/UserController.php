@@ -16,7 +16,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = ['administrator', 'anggota', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
+        $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
         return view('pages.admin.users.create', compact('roles'));
     }
 
@@ -26,7 +26,7 @@ class UserController extends Controller
             'nama' => 'required|string|max:255',
             'username' => 'required|string|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:administrator,anggota,koordinator,kjm,kaprodi,kajur'
+            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur'
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
@@ -50,7 +50,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $roles = ['administrator', 'anggota', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
+        $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
         return view('pages.admin.users.edit', compact('user', 'roles'));
     }
 
@@ -59,7 +59,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'username' => 'required|string|unique:users,username,' . $user->id,
-            'role' => 'required|in:administrator,anggota,koordinator,kjm,kaprodi,kajur'
+            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur'
         ]);
 
         if ($request->filled('password')) {

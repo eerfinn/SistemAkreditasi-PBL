@@ -35,9 +35,9 @@ Route::middleware('auth')->group(function () {
         ->name('admin.dashboard')
         ->middleware('role:administrator');
         
-    Route::get('/anggota/dashboard', [DashboardController::class, 'anggotaDashboard'])
-        ->name('anggota.dashboard')
-        ->middleware('role:anggota');
+    Route::get('/dosen/dashboard', [DashboardController::class, 'dosenDashboard'])
+        ->name('dosen.dashboard')
+        ->middleware('role:dosen');
         
     Route::get('/kjm/dashboard', [DashboardController::class, 'kjmDashboard'])
         ->name('kjm.dashboard')
@@ -73,8 +73,8 @@ Route::middleware('auth')->group(function () {
     });
 
     // Placeholder routes for other roles - to be implemented later
-    Route::prefix('dokumen')->name('dokumen.')->middleware('role:anggota')->group(function () {
-        // Anggota document routes will go here
+    Route::prefix('dokumen')->name('dokumen.')->middleware('role:dosen')->group(function () {
+        // Dosen document routes will go here
     });
 
     Route::prefix('review')->name('review.')->middleware('role:kaprodi,kajur')->group(function () {

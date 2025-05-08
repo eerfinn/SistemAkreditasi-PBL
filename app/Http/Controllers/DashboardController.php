@@ -15,8 +15,8 @@ class DashboardController extends Controller
         switch($user->role) {
             case 'administrator':
                 return $this->adminDashboard();
-            case 'anggota':
-                return $this->anggotaDashboard();
+            case 'dosen':
+                return $this->dosenDashboard();
             case 'koordinator':
                 return $this->koordinatorDashboard();
             case 'kjm':
@@ -40,13 +40,13 @@ class DashboardController extends Controller
         return view('pages.admin.dashboard', $data);
     }
 
-    public function anggotaDashboard()
+    public function dosenDashboard()
     {
         $data = [
             'user' => auth()->user()
         ];
         
-        return view('pages.anggota.dashboard', $data);
+        return view('pages.dosen.dashboard', $data);
     }
 
     public function koordinatorDashboard()

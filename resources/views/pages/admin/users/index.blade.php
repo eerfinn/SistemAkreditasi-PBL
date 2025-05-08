@@ -90,7 +90,7 @@
                         <select class="form-control" id="role" name="role" required>
                             <option value="">Select Role</option>
                             <option value="administrator">Administrator</option>
-                            <option value="anggota">Anggota</option>
+                            <option value="dosen">Dosen</option>
                             <option value="koordinator">Koordinator</option>
                             <option value="kjm">KJM</option>
                             <option value="kaprodi">Kaprodi</option>
