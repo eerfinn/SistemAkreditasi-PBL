@@ -91,7 +91,15 @@ Route::middleware('auth')->group(function () {
 
     // Kriteria Routes
     Route::prefix('kriteria')->name('kriteria.')->group(function () {
-        Route::get('/suplemen', [KriteriaController::class, 'suplemen'])->name('suplemen');
+        Route::get('/1', [KriteriaController::class, 'kriteria1'])->name('1');
+        Route::get('/2', [KriteriaController::class, 'kriteria2'])->name('2');
+        Route::get('/3', [KriteriaController::class, 'kriteria3'])->name('3');
+        Route::get('/4', [KriteriaController::class, 'kriteria4'])->name('4');
+        Route::get('/5', [KriteriaController::class, 'kriteria5'])->name('5');
+        Route::get('/6', [KriteriaController::class, 'kriteria6'])->name('6');
+        Route::get('/7', [KriteriaController::class, 'kriteria7'])->name('7');
+        Route::get('/8', [KriteriaController::class, 'kriteria8'])->name('8');
+        Route::get('/9', [KriteriaController::class, 'kriteria9'])->name('9');
     });
 });
 
