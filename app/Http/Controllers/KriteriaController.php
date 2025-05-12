@@ -3,16 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Kriteria;
+use App\Models\Dokumen;
 
 class KriteriaController extends Controller
 {
-    public function kriteria1() { return view('pages.kriteria.kriteria1'); }
-    public function kriteria2() { return view('pages.kriteria.kriteria2'); }
-    public function kriteria3() { return view('pages.kriteria.kriteria3'); }
-    public function kriteria4() { return view('pages.kriteria.kriteria4'); }
-    public function kriteria5() { return view('pages.kriteria.kriteria5'); }
-    public function kriteria6() { return view('pages.kriteria.kriteria6'); }
-    public function kriteria7() { return view('pages.kriteria.kriteria7'); }
-    public function kriteria8() { return view('pages.kriteria.kriteria8'); }
-    public function kriteria9() { return view('pages.kriteria.kriteria9'); }
+    public function show($id)
+    {
+        $kriteria = Kriteria::findOrFail($id);
+        $daftarDokumen = Dokumen::where('kriteria_id', $id)->with('user')->get();
+        // Hitung status dokumen
+        $statusCounts = [
+            'menunggu' => $daftarDokumen->where('status', 'menunggu')->count(),
+            'revisi' => $daftarDokumen->where('status', 'revisi')->count(),
+            'diterima' => $daftarDokumen->where('status', 'diterima')->count(),
+            'diverifikasi' => $daftarDokumen->where('status', 'diverifikasi')->count(),
+        ];
+        return view('pages.kriteria.kriteria', compact('kriteria', 'daftarDokumen', 'statusCounts'));
+    }
+
+    public function uploadForm($id)
+    {
+        $kriteria = Kriteria::findOrFail($id);
+        return view('pages.kriteria.upload-kriteria.form', compact('kriteria'));
+    }
 }   
