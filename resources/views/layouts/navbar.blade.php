@@ -2,11 +2,8 @@
     Nav header start
 ***********************************-->
 <div class="nav-header">
-    {{-- Menghapus inline style display:flex dari <a>, agar styling dari class .brand-logo tema yang mengatur .logo-abbr dan .brand-title bisa berlaku --}}
     <a href="{{ url('/') }}" class="brand-logo">
-        {{-- Menambahkan class logo-abbr ke gambar --}}
         <img src="{{ asset('assets/images/Jti_polinema.png') }}" class="logo-abbr" alt="Polinema Logo" style="height: 40px;">
-        {{-- Menambahkan class brand-title ke span dan mempertahankan style teksnya --}}
         <span class="brand-title" style="font-weight: bold; font-size: 1.4rem; color: white;">SiAkred</span>
     </a>
     <div class="nav-control">
