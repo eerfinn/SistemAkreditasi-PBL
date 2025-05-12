@@ -99,4 +99,8 @@ class UserController extends Controller
     return view('profil.app-profile-1', compact('user'));
 }
     
+    public function showJson(User $user)
+    {
+        return response()->json($user);
+    }
 }

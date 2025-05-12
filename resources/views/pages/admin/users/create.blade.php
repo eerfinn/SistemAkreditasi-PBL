@@ -14,29 +14,19 @@
                         @csrf
 
                         <div class="mb-3">
+                            <label for="nama" class="form-label">Nama</label>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama') }}" required>
+                            @error('nama')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username') }}" required>
                             @error('username')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
-                            @error('name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
-                            @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -54,16 +44,18 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="level_id" class="form-label">Level</label>
-                            <select class="form-control @error('level_id') is-invalid @enderror" id="level_id" name="level_id" required>
-                                <option value="">Select Level</option>
-                                @foreach($levels as $level)
-                                    <option value="{{ $level->level_id }}" {{ old('level_id') == $level->level_id ? 'selected' : '' }}>
-                                        {{ $level->name }}
-                                    </option>
-                                @endforeach
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="administrator" {{ old('role') == 'administrator' ? 'selected' : '' }}>Administrator</option>
+                                <option value="dosen" {{ old('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
+                                <option value="koordinator" {{ old('role') == 'koordinator' ? 'selected' : '' }}>Koordinator</option>
+                                <option value="kjm" {{ old('role') == 'kjm' ? 'selected' : '' }}>KJM</option>
+                                <option value="kaprodi" {{ old('role') == 'kaprodi' ? 'selected' : '' }}>Kaprodi</option>
+                                <option value="kajur" {{ old('role') == 'kajur' ? 'selected' : '' }}>Kajur</option>
+                                <option value="kps" {{ old('role') == 'kps' ? 'selected' : '' }}>KPS</option>
                             </select>
-                            @error('level_id')
+                            @error('role')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>

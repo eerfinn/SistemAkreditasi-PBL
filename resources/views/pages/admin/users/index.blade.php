@@ -107,6 +107,59 @@
         </div>
     </div>
 </div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <form id="editUserForm">
+              @csrf
+              @method('PUT')
+              <input type="hidden" id="edit-id" name="id">
+              <div class="modal-body">
+                  <div class="form-group">
+                      <label for="edit-nama">Nama</label>
+                      <input type="text" class="form-control" id="edit-nama" name="nama" required>
+                      <span class="invalid-feedback" role="alert" id="edit-nama-error"></span>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit-username">Username</label>
+                      <input type="text" class="form-control" id="edit-username" name="username" required>
+                      <span class="invalid-feedback" role="alert" id="edit-username-error"></span>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit-password">Password (Kosongkan jika tidak ingin diubah)</label>
+                      <input type="password" class="form-control" id="edit-password" name="password">
+                      <span class="invalid-feedback" role="alert" id="edit-password-error"></span>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit-role">Role</label>
+                      <select class="form-control" id="edit-role" name="role" required>
+                          <option value="">Select Role</option>
+                          <option value="administrator">Administrator</option>
+                          <option value="dosen">Dosen</option>
+                          <option value="koordinator">Koordinator</option>
+                          <option value="kjm">KJM</option>
+                          <option value="kaprodi">Kaprodi</option>
+                          <option value="kajur">Kajur</option>
+                      </select>
+                      <span class="invalid-feedback" role="alert" id="edit-role-error"></span>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Update User</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -120,22 +173,69 @@ $(document).ready(function() {
         language: {
             search: "_INPUT_",
             searchPlaceholder: "Search...",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
         }
     });
 
+    // Reset form and error state when modal is shown
+    $('#addUserModal').on('show.bs.modal', function () {
+        $('#addUserForm')[0].reset();
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').text('');
+    });
+    $('#editUserModal').on('show.bs.modal', function () {
+        $('#editUserForm')[0].reset();
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').text('');
+    });
+
+    // Remove modal-open and backdrop on modal hidden
+    $('#addUserModal').on('hidden.bs.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+    });
+    $('#editUserModal').on('hidden.bs.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+    });
+
+    // Hapus backdrop saat modal benar-benar sudah tampil
+    $('#addUserModal').on('shown.bs.modal', function () {
+        $('.modal-backdrop').remove();
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 100);
+    });
+    $('#editUserModal').on('shown.bs.modal', function () {
+        $('.modal-backdrop').remove();
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 100);
+    });
+
     // Add User Form Submit
-    $('#addUserForm').on('submit', function(e) {
+    $('#addUserForm').off('submit').on('submit', function(e) {
         e.preventDefault();
-        
+
         // Reset previous errors
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').text('');
-        
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         $.ajax({
             url: '{{ route("admin.users.store") }}',
             type: 'POST',
             data: $(this).serialize(),
             success: function(response) {
+                console.log('Success:', response);
                 if(response.success) {
                     // Add new row to DataTable
                     let newRow = table.row.add([
@@ -151,10 +251,10 @@ $(document).ready(function() {
                             <i class="fas fa-trash"></i>
                         </button>`
                     ]).draw().node();
-                    
+
                     // Add row ID
                     $(newRow).attr('id', 'user-' + response.user.id);
-                    
+
                     // Show success message
                     $('#alert-container').html(
                         `<div class="alert alert-success alert-dismissible fade show">
@@ -162,13 +262,14 @@ $(document).ready(function() {
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                         </div>`
                     );
-                    
+
                     // Reset form and close modal
                     $('#addUserForm')[0].reset();
                     $('#addUserModal').modal('hide');
                 }
             },
             error: function(xhr) {
+                console.log('Error:', xhr);
                 if(xhr.status === 422) {
                     let errors = xhr.responseJSON.errors;
                     Object.keys(errors).forEach(function(key) {
@@ -183,6 +284,7 @@ $(document).ready(function() {
                         </div>`
                     );
                 }
+                $('#addUserModal').modal('hide');
             }
         });
     });
@@ -227,6 +329,78 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Handle Edit Button Click
+    $(document).on('click', '.btn-info.btn-sm', function(e) {
+        e.preventDefault();
+        let url = $(this).attr('href');
+        $.get(url.replace('/edit', '/json'), function(user) {
+            $('#edit-id').val(user.id);
+            $('#edit-nama').val(user.nama);
+            $('#edit-username').val(user.username);
+            $('#edit-password').val('');
+            $('#edit-role').val(user.role);
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').text('');
+            $('#editUserModal').modal('show');
+        });
+    });
+
+    // Handle Edit User Form Submit
+    $('#editUserForm').off('submit').on('submit', function(e) {
+        e.preventDefault();
+        let userId = $('#edit-id').val();
+        let url = '{{ route("admin.users.update", ":id") }}'.replace(':id', userId);
+        let data = $(this).serialize();
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: data,
+            success: function(response) {
+                if(response.success) {
+                    // Update row in DataTable
+                    let row = $('#user-' + userId);
+                    row.find('td').eq(1).text(response.user.nama);
+                    row.find('td').eq(2).text(response.user.username);
+                    row.find('td').eq(3).text(response.user.role.charAt(0).toUpperCase() + response.user.role.slice(1));
+                    $('#editUserModal').modal('hide');
+                    $('#alert-container').html(
+                        `<div class="alert alert-success alert-dismissible fade show">
+                            ${response.message}
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        </div>`
+                    );
+                }
+            },
+            error: function(xhr) {
+                if(xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    Object.keys(errors).forEach(function(key) {
+                        $(`#edit-${key}`).addClass('is-invalid');
+                        $(`#edit-${key}-error`).text(errors[key][0]);
+                    });
+                } else {
+                    $('#alert-container').html(
+                        `<div class="alert alert-danger alert-dismissible fade show">
+                            An error occurred while updating the user.
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        </div>`
+                    );
+                }
+            }
+        });
+    });
 });
 </script>
+@endpush
+
+@push('styles')
+<style>
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+.modal {
+    z-index: 1051 !important;
+}
+</style>
 @endpush 
