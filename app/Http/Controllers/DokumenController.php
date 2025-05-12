@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DokumenController extends Controller
 {
@@ -27,24 +28,51 @@ class DokumenController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->check()) {
+            return back()->withErrors(['user' => 'Anda harus login untuk mengupload dokumen.'])->withInput();
+        }
+
         $request->validate([
-            'penetapan' => 'required|file|mimes:pdf,doc,docx,xlsx,xls|max:2048',
             'kriteria_id' => 'required|exists:kriteria,id',
+            'dokumen' => 'required|array',
+            'dokumen.*' => 'nullable|file|mimes:pdf,doc,docx,xlsx,xls|max:2048',
+        ], [
+            'dokumen.required' => 'Minimal satu dokumen harus diupload.'
         ]);
 
-        $file = $request->file('penetapan');
-        $path = $file->store('dokumen_akreditasi', 'public');
-        $nama_dokumen = $file->getClientOriginalName();
+        $kriteriaId = $request->kriteria_id;
+        $userId = auth()->id();
+        $status = 'menunggu';
+        $deskripsi = $request->input('deskripsi', []);
+        $uploaded = false;
 
-        \App\Models\Dokumen::create([
-            'user_id' => auth()->id(),
-            'kriteria_id' => $request->kriteria_id,
-            'nama_dokumen' => $nama_dokumen,
-            'path' => $path,
-            'status' => 'menunggu',
-        ]);
+        foreach ($request->file('dokumen', []) as $jenis => $file) {
+            if ($file) {
+                $path = $file->store('dokumen_akreditasi', 'public');
+                $nama_dokumen = $file->getClientOriginalName();
+                $dokumen = \App\Models\Dokumen::create([
+                    'user_id' => $userId,
+                    'kriteria_id' => $kriteriaId,
+                    'nama_dokumen' => $nama_dokumen,
+                    'path' => $path,
+                    'status' => $status,
+                ]);
+                Log::info('Dokumen berhasil diupload', [
+                    'user_id' => $userId,
+                    'kriteria_id' => $kriteriaId,
+                    'nama_dokumen' => $nama_dokumen,
+                    'path' => $path,
+                    'dokumen_id' => $dokumen->id,
+                ]);
+                $uploaded = true;
+            }
+        }
 
-        return redirect()->route('kriteria.show', 1)->with('success', 'Dokumen berhasil diupload!');
+        if (!$uploaded) {
+            return back()->withErrors(['dokumen' => 'Minimal satu dokumen harus diupload.'])->withInput();
+        }
+
+        return redirect()->route('kriteria.show', $kriteriaId)->with('success', 'Dokumen berhasil diupload!');
     }
 
     /**
