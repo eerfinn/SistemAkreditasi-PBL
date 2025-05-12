@@ -47,7 +47,8 @@
                         <div class="col-md-4 text-md-end">
                             @if (isset($kriteria))
                                 @can('upload-dokumen-kriteria', $kriteria)
-                                    <a href="{{ route('kriteria.upload.show', ['kriteria' => $kriteria->id]) }}" class="btn btn-primary btn-sm">
+                                    {{-- Menggunakan nama route 'kriteria.upload.form' yang benar --}}
+                                    <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id]) }}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-plus me-1"></i> Unggah Dokumen Baru
                                     </a>
                                 @endcan
@@ -133,6 +134,7 @@
         </div>
         @endif
 
+        {{-- Tabel Dokumen --}}
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body p-4">
