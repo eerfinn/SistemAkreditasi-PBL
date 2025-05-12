@@ -31,8 +31,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('upload-dokumen-kriteria', function (User $user, Kriteria $kriteria) {
             // Sesuaikan logika ini dengan kebutuhan Guys.
             // Contoh: Hanya peran 'dosen' yang bisa upload.
-            // Pastikan nilai 'dosen' ini sama persis dengan yang ada di database guys
-            // dan di UserSeeder.php
+            // Pastikan nilai 'dosen' ini sama persis dengan yang ada di database guys dan di UserSeeder.php
             return $user->role === 'dosen';
 
             // Bisa menambahkan logika lebih kompleks di sini jika perlu, misalnya:
@@ -42,7 +41,7 @@ class AuthServiceProvider extends ServiceProvider
         // Contoh Gate untuk mengedit dokumen
         Gate::define('edit-dokumen', function (User $user, Dokumen $dokumen) {
             // Contoh: Hanya user yang mengunggah dokumen tersebut DAN berperan 'dosen' yang bisa edit.
-            // Anda juga bisa menambahkan pengecekan status dokumen jika perlu.
+            // Juga bisa menambahkan pengecekan status dokumen jika perlu.
             return $user->id === $dokumen->user_id && $user->role === 'dosen';
             // return $user->id === $dokumen->user_id && $user->role === 'dosen' && in_array($dokumen->status, ['menunggu', 'revisi']);
         });
