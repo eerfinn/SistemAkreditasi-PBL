@@ -2,10 +2,13 @@
     Nav header start
 ***********************************-->
 <div class="nav-header">
-<a href="{{ url('/') }}" class="brand-logo" style="display: flex; align-items: center; gap: 8px;">
-    <img src="{{ asset('assets/images/Jti_polinema.png') }}" alt="Polinema Logo" style="height: 40px;">
-<span style="font-weight: bold; font-size: 1.4rem; color: white;">SiAkred</span>
-</a>
+    {{-- Menghapus inline style display:flex dari <a>, agar styling dari class .brand-logo tema yang mengatur .logo-abbr dan .brand-title bisa berlaku --}}
+    <a href="{{ url('/') }}" class="brand-logo">
+        {{-- Menambahkan class logo-abbr ke gambar --}}
+        <img src="{{ asset('assets/images/Jti_polinema.png') }}" class="logo-abbr" alt="Polinema Logo" style="height: 40px;">
+        {{-- Menambahkan class brand-title ke span dan mempertahankan style teksnya --}}
+        <span class="brand-title" style="font-weight: bold; font-size: 1.4rem; color: white;">SiAkred</span>
+    </a>
     <div class="nav-control">
         <div class="hamburger">
             <span class="line">
@@ -17,6 +20,7 @@
         </div>
     </div>
 </div>
+
 <!--**********************************
     Nav header end
 ***********************************-->
@@ -27,7 +31,7 @@
 <div class="chatbox">
     <div class="chatbox-close"></div>
     <div class="custom-tab-1">
-        
+
         <ul class="nav nav-tabs">
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#notes">Notes</a>
@@ -248,7 +252,7 @@
                         <div>
                             <h6 class="mb-1">Chat with Khelesh</h6>
                             <p class="mb-0 text-success">Online</p>
-                        </div>							
+                        </div>
                         <div class="dropdown">
                             <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><circle fill="#000000" cx="5" cy="12" r="2"/><circle fill="#000000" cx="12" cy="12" r="2"/><circle fill="#000000" cx="19" cy="12" r="2"/></g></svg></a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -552,7 +556,7 @@
                                     <rect x="0" y="0" width="24" height="24"/>
                                     <path d="M12.0700837,4.0003006 C11.3895108,5.17692613 11,6.54297551 11,8 C11,12.3948932 14.5439081,15.9620623 18.9299163,15.9996994 C17.5467214,18.3910707 14.9612535,20 12,20 C7.581722,20 4,16.418278 4,12 C4,7.581722 7.581722,4 12,4 C12.0233848,4 12.0467462,4.00010034 12.0700837,4.0003006 Z" fill="#000000"/>
                                 </g>
-                                </svg>	
+                                </svg>
                             </a>
                         </li>
                         <li class="nav-item dropdown notification_dropdown">
@@ -797,8 +801,8 @@
                                                 <img src="{{ asset('assets/images/user.jpg') }}" class="avatar avatar-md" alt="">
                                                 <div>
                                                     <h6>Hanuman Prajapati</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
+                                                    <span>Web Designer</span>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="card-body px-0 py-2">
@@ -809,7 +813,7 @@
                                                 </svg>
                                                 <span class="ms-2">Profile </span>
                                             </a>
-                                            
+
                                             <form method="POST" action="{{ route('logout') }}">
                                                 @csrf
                                                 <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="dropdown-item ai-icon">
@@ -819,7 +823,7 @@
                                             </form>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </li>
