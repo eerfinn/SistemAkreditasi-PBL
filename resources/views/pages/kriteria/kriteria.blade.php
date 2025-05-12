@@ -9,6 +9,12 @@
 @endsection
 
 @section('content')
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 <div class="row">
     <div class="col-xl-12">
         {{-- Breadcrumb --}}
@@ -35,7 +41,7 @@
                         <p class="mb-0">{{ isset($kriteria) ? $kriteria->deskripsi : 'Deskripsi kriteria tidak tersedia.' }}</p>
                     </div>
                     <div class="col-md-4 text-md-end">
-                        <a href="{{ url('kriteria/upload-kriteria/upload-kriteria1') }}" class="btn btn-success mb-2">
+                        <a href="{{ route('kriteria.upload', $kriteria->id) }}" class="btn btn-success mb-2">
                             <i class="fas fa-upload me-1"></i> Upload Dokumen
                         </a>
                         @if (isset($kriteria))
@@ -256,4 +262,4 @@
         });
     });
 </script>
-@endsection
+@endsection 
