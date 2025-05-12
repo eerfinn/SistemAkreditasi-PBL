@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Dokumen;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -11,12 +10,24 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        // Hanya redirect ke adminDashboard
-        if ($user->role === 'administrator') {
-            return $this->adminDashboard();
+        
+        // Check user role and redirect to appropriate dashboard
+        switch($user->role) {
+            case 'administrator':
+                return $this->adminDashboard();
+            case 'dosen':
+                return $this->dosenDashboard();
+            case 'koordinator':
+                return $this->koordinatorDashboard();
+            case 'kjm':
+                return $this->kjmDashboard();
+            case 'kaprodi':
+                return $this->kaprodiDashboard();
+            case 'kajur':
+                return $this->kajurDashboard();
+            default:
+                return redirect()->route('login')->with('error', 'Unauthorized access');
         }
-        // Jika bukan admin, redirect ke login atau halaman lain sesuai kebutuhan
-        return redirect()->route('login')->with('error', 'Unauthorized access');
     }
 
     public function adminDashboard()
@@ -25,6 +36,52 @@ class DashboardController extends Controller
             'total_users' => User::count(),
             'user' => auth()->user()
         ];
+        
         return view('pages.admin.dashboard', $data);
+    }
+
+    public function dosenDashboard()
+    {
+        $data = [
+            'user' => auth()->user()
+        ];
+        
+        return view('pages.dosen.dashboard', $data);
+    }
+
+    public function koordinatorDashboard()
+    {
+        $data = [
+            'user' => auth()->user()
+        ];
+        
+        return view('pages.koordinator.dashboard', $data);
+    }
+
+    public function kjmDashboard()
+    {
+        $data = [
+            'user' => auth()->user()
+        ];
+        
+        return view('pages.kjm.dashboard', $data);
+    }
+
+    public function kaprodiDashboard()
+    {
+        $data = [
+            'user' => auth()->user()
+        ];
+        
+        return view('pages.kaprodi.dashboard', $data);
+    }
+
+    public function kajurDashboard()
+    {
+        $data = [
+            'user' => auth()->user()
+        ];
+        
+        return view('pages.kajur.dashboard', $data);
     }
 } 
