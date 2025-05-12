@@ -101,6 +101,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/7', [KriteriaController::class, 'kriteria7'])->name('7');
         Route::get('/8', [KriteriaController::class, 'kriteria8'])->name('8');
         Route::get('/9', [KriteriaController::class, 'kriteria9'])->name('9');
+        Route::get('/upload-kriteria/upload-kriteria1', function() {
+            return view('pages.kriteria.upload-kriteria.upload-kriteria1');
+        })->name('upload-kriteria1');
     });
 });
 

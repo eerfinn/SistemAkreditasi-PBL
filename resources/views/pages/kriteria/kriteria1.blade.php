@@ -35,6 +35,9 @@
                         <p class="mb-0">{{ isset($kriteria) ? $kriteria->deskripsi : 'Deskripsi kriteria tidak tersedia.' }}</p>
                     </div>
                     <div class="col-md-4 text-md-end">
+                        <a href="{{ url('kriteria/upload-kriteria/upload-kriteria1') }}" class="btn btn-success mb-2">
+                            <i class="fas fa-upload me-1"></i> Upload Dokumen
+                        </a>
                         @if (isset($kriteria))
                             @can('upload-dokumen-kriteria', $kriteria)
                                 <a href="{{-- route('anggota.dokumen.create', ['kriteria_id' => $kriteria->id]) --}}" class="btn btn-primary btn-sm">
