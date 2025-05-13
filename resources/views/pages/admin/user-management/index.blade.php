@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Users Management')
+@section('title', 'User Management')
 
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Users Management</h3>
+                    <h3 class="card-title">User Management</h3>
                     <div class="card-tools">
                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
                             <i class="fas fa-plus"></i> Add New User
@@ -17,7 +17,7 @@
                 </div>
                 <div class="card-body">
                     <div id="alert-container"></div>
-                    <table id="usersTable" class="table table-bordered table-striped">
+                    <table id="userTable" class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -37,7 +37,7 @@
                                 <td>{{ ucfirst($user->role) }}</td>
                                 <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-info btn-sm" title="Edit">
+                                    <a href="{{ route('user.edit', $user->id) }}" class="btn btn-info btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->id }}" title="Delete">
@@ -60,9 +60,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
             <form id="addUserForm">
                 @csrf
@@ -93,8 +90,8 @@
                             <option value="dosen">Dosen</option>
                             <option value="koordinator">Koordinator</option>
                             <option value="kjm">KJM</option>
-                            <option value="kaprodi">Kaprodi</option>
-                            <option value="kajur">Kajur</option>
+                            <option value="kaprodi">Ketua Program Studi</option>
+                            <option value="kajur">Ketua Jurusan</option>
                         </select>
                         <span class="invalid-feedback" role="alert" id="role-error"></span>
                     </div>
@@ -114,9 +111,6 @@
       <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
           </div>
           <form id="editUserForm">
               @csrf
@@ -146,8 +140,8 @@
                           <option value="dosen">Dosen</option>
                           <option value="koordinator">Koordinator</option>
                           <option value="kjm">KJM</option>
-                          <option value="kaprodi">Kaprodi</option>
-                          <option value="kajur">Kajur</option>
+                          <option value="kaprodi">Ketua Program Studi</option>
+                          <option value="kajur">Ketua Jurusan</option>
                       </select>
                       <span class="invalid-feedback" role="alert" id="edit-role-error"></span>
                   </div>
@@ -166,7 +160,7 @@
 <script>
 $(document).ready(function() {
     // Initialize DataTable
-    let table = $('#usersTable').DataTable({
+    let table = $('#userTable').DataTable({
         responsive: true,
         autoWidth: false,
         order: [[0, 'asc']],
@@ -231,7 +225,7 @@ $(document).ready(function() {
         });
 
         $.ajax({
-            url: '{{ route("admin.users.store") }}',
+            url: '{{ route("user.store") }}',
             type: 'POST',
             data: $(this).serialize(),
             success: function(response) {
@@ -244,7 +238,7 @@ $(document).ready(function() {
                         response.user.username,
                         response.user.role.charAt(0).toUpperCase() + response.user.role.slice(1),
                         response.user.created_at,
-                        `<a href="${'{{ route("admin.users.edit", ":id") }}'.replace(':id', response.user.id)}" class="btn btn-info btn-sm" title="Edit">
+                        `<a href="${'{{ route("user.edit", ":id") }}'.replace(':id', response.user.id)}" class="btn btn-info btn-sm" title="Edit">
                             <i class="fas fa-edit"></i>
                         </a>
                         <button class="btn btn-danger btn-sm delete-user" data-id="${response.user.id}" title="Delete">
@@ -303,7 +297,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '{{ route("admin.users.destroy", ":id") }}'.replace(':id', userId),
+                    url: '{{ route("user.destroy", ":id") }}'.replace(':id', userId),
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}'
@@ -350,7 +344,7 @@ $(document).ready(function() {
     $('#editUserForm').off('submit').on('submit', function(e) {
         e.preventDefault();
         let userId = $('#edit-id').val();
-        let url = '{{ route("admin.users.update", ":id") }}'.replace(':id', userId);
+        let url = '{{ route("user.update", ":id") }}'.replace(':id', userId);
         let data = $(this).serialize();
         $.ajax({
             url: url,

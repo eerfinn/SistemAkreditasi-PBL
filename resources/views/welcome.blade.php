@@ -31,7 +31,7 @@
     <!-- Header -->
     <header class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <img src="{{ asset('assets\images\Jti_polinema.png') }}" alt="Polinema Logo">
                 <span class="sitename">SiAkred</span>
             </a>
@@ -55,56 +55,56 @@
                         <a class="nav-link" href="#contact">Kontak</a>
                     </li>
                     @guest
-                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-                        <a class="btn btn-primary" href="/login">Login</a>
-                    </li>
+                        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                            <a class="btn btn-primary" href="/login">Login</a>
+                        </li>
                     @else
-                    <li class="nav-item ps-3">
-                        <div class="dropdown nav-profile">
+                        <li class="nav-item ps-3">
+                            <div class="dropdown nav-profile">
                             <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div class="profile-info d-flex align-items-center">
-                                    <div class="profile-image">
+                                    <div class="profile-info d-flex align-items-center">
+                                        <div class="profile-image">
                                         <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <div class="card border-0 mb-0">
-                                    <div class="card-body px-0 py-2">
-                                        <a href="/dashboard" class="dropdown-item ai-icon">
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <div class="card border-0 mb-0">
+                                        <div class="card-body px-0 py-2">
+                                            <a href="/dashboard" class="dropdown-item ai-icon">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M16.28 13.61C15.15 14.74 13.53 15.09 12.1 14.64L9.51001 17.22C9.33001 17.41 8.96001 17.53 8.69001 17.49L7.49001 17.33C7.09001 17.28 6.73001 16.9 6.67001 16.51L6.51001 15.31C6.47001 15.05 6.60001 14.68 6.78001 14.49L9.36001 11.91C8.92001 10.48 9.26001 8.86001 10.39 7.73001C12.01 6.11001 14.65 6.11001 16.28 7.73001C17.9 9.34001 17.9 11.98 16.28 13.61Z" stroke="var(--primary)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M10.45 16.28L9.59998 15.42" stroke="var(--primary)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M13.3945 10.7H13.4035" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                            <span class="ms-2">Dashboard</span>
-                                        </a>
-                                    </div>
-                                    <div class="card-footer px-0 py-2">
-                                        <form method="POST" action="{{ route('logout') }}">
-                                            @csrf
+                                                </svg>
+                                                <span class="ms-2">Dashboard</span>
+                                            </a>
+                                        </div>
+                                        <div class="card-footer px-0 py-2">
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
                                             <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="dropdown-item ai-icon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                                        <polyline points="16 17 21 12 16 7"></polyline>
                                                     <line x1="21" y1="12" x2="9" y2="12"></line>
-                                                </svg>
-                                                <span class="ms-2">Logout</span>
-                                            </a>
-                                        </form>
+                                                    </svg>
+                                                    <span class="ms-2">Logout</span>
+                                                </a>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
+                        </li>
                     @endguest
                 </ul>
             </div>
         </div>
     </header>
 
-<section id="home" class="hero" style="background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('{{ asset('assets/images/Gedung JTI.jpg') }}');">
+    <section id="home" class="hero" style="background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('{{ asset('assets/images/Gedung JTI.jpg') }}');">
         <div class="container">
             <div class="hero-content" data-aos="fade-up" data-aos-delay="100">
                 <h1>Sistem Akreditasi D4 Sistem Informasi Bisnis</h1>
@@ -123,8 +123,7 @@
                 <h2>Profil Program Studi</h2>
                 <p>D4 Sistem Informasi Bisnis - Jurusan Teknologi Informasi</p>
             </div>
-
-            <div class="row align-items-center">    
+            <div class="row align-items-center">
                 <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="about-img">
                         <img src="{{ asset('assets\images\IMG_1397.JPG') }}" alt="Kelas SIB" class="img-fluid">
@@ -135,7 +134,6 @@
                         <h3>Tentang Program Studi Kami</h3>
                         <p>Berawal dari Fakultas Non Gelar Teknologi Universitas Brawijaya yang beroperasi setelah disahkannya Surat Keputusan Presiden Republik Indonesia No. 59 Tahun 1982, Politeknik Negeri Malang saat ini telah berkembang menjadi institusi pendidikan vokasi mandiri.</p>
                         <p>Perubahan status tersebut tercantum dalam Surat Keputusan Menteri Pendidikan dan Kebudayaan No. 0313/O/1991. Politeknik Negeri Malang berupaya secara terus menerus untuk melakukan perubahan ke arah perbaikan, khususnya dalam bidang Pendidikan, Penelitian dan Pengabdian kepada Masyarakat yang berorientasi pada teknologi terapan.</p>
-
                         <div class="feature-list">
                             <div class="feature-item">
                                 <div class="feature-icon">
@@ -270,7 +268,6 @@
                         <div class="row align-items-center">
                             <div class="col-lg-6">
                                 <h3 class="mb-4">Misi Program Studi</h3>
-
                                 <div class="d-flex align-items-start mb-4">
                                     <span class="badge bg-primary rounded-circle me-3 mt-1">1</span>
                                     <div>
@@ -309,7 +306,6 @@
                         <div class="row align-items-center">
                             <div class="col-lg-6">
                                 <h3 class="mb-4">Tujuan Program Studi</h3>
-
                                 <div class="accordion" id="goalsAccordion">
                                     <div class="accordion-item mb-3 border-0">
                                         <h2 class="accordion-header" id="headingOne">
@@ -365,7 +361,6 @@
                         <div class="row align-items-center">
                             <div class="col-lg-6">
                                 <h3 class="mb-4">Sasaran Program Studi</h3>
-
                                 <ul class="list-unstyled">
                                     <li class="d-flex mb-4">
                                         <div class="me-3 text-primary">
@@ -468,30 +463,28 @@
         </div>
     </section>
 
- <!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <div class="footer-logo mb-4">
-                    <a href="#" class="d-inline-flex align-items-center justify-content-center">
-                        <img src="{{ asset('assets/images/Jti_polinema.png') }}" alt="Polinema Logo" class="me-2" style="height: 40px;">
-                        <span class="sitename" style="font-size: 1.5rem; font-weight: 700;">SiAkred</span>
-                    </a>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="footer-logo mb-4">
+                        <a href="#" class="d-inline-flex align-items-center justify-content-center">
+                            <img src="{{ asset('assets/images/Jti_polinema.png') }}" alt="Polinema Logo" class="me-2" style="height: 40px;">
+                            <span class="sitename" style="font-size: 1.5rem; font-weight: 700;">SiAkred</span>
+                        </a>
+                    </div>
+                    <p class="mb-4 mx-auto" style="max-width: 600px;">
+                        Sistem Akreditasi Program Studi D4 Sistem Informasi Bisnis<br>
+                        Jurusan Teknologi Informasi Politeknik Negeri Malang
+                    </p>
                 </div>
-                <p class="mb-4 mx-auto" style="max-width: 600px;">
-                    Sistem Akreditasi Program Studi D4 Sistem Informasi Bisnis<br>
-                    Jurusan Teknologi Informasi Politeknik Negeri Malang
-                </p>
-
+            </div>
+            <div class="footer-bottom text-center pt-4 mt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                <p class="mb-0">&copy; 2025 SiAkred - Sistem Akreditasi D4 SIB. All Rights Reserved.</p>
             </div>
         </div>
-
-        <div class="footer-bottom text-center pt-4 mt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
-            <p class="mb-0">&copy; 2025 SiAkred - Sistem Akreditasi D4 SIB. All Rights Reserved.</p>
-        </div>
-    </div>
-</footer>
+    </footer>
 
     <!-- Back to Top Button -->
     <a href="#" class="back-to-top"><i class="bi bi-arrow-up"></i></a>
@@ -502,8 +495,6 @@
     <script src="{{ asset('Selecao/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
 
     <!-- Main JS File -->
-
     <script src="{{ asset('assets/js/welcome.js') }}"></script>
-
 </body>
 </html>

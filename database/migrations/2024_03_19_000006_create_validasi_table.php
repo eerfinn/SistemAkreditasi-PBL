@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('validasi', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dokumen_id')->constrained('dokumen')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('user')->onDelete('cascade');
             $table->enum('status', ['diterima', 'ditolak']);
             $table->timestamps();
         });

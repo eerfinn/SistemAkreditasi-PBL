@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('user', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
             $table->string('username')->unique();
             $table->string('password');
             $table->enum('role', ['administrator', 'dosen', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
-            $table->string('path_profile')->nullable();
+            $table->string('profile_user')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('user');
     }
 }; 

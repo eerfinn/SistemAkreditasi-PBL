@@ -11,20 +11,20 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('pages.admin.users.index', compact('users'));
+        return view('pages.admin.user-management.index', compact('users'));
     }
 
     public function create()
     {
-        $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
-        return view('pages.admin.users.create', compact('roles'));
+        $roles = ['administrator', 'dosen', 'koordinator', 'kajur', 'kjm', 'kaprodi'];
+        return view('pages.admin.user-management.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'username' => 'required|string|unique:users',
+            'username' => 'required|string|unique:user',
             'password' => 'required|string|min:8',
             'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur'
         ]);
@@ -40,25 +40,25 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.user.index')->with('success', 'User created successfully.');
     }
 
     public function show(User $user)
     {
-        return view('pages.admin.users.show', compact('user'));
+        return view('pages.admin.user-management.show', compact('user'));
     }
 
     public function edit(User $user)
     {
-        $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
-        return view('pages.admin.users.edit', compact('user', 'roles'));
+        $roles = ['administrator', 'dosen', 'koordinator', 'kajur', 'kjm', 'kaprodi'];
+        return view('pages.admin.user-management.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'username' => 'required|string|unique:users,username,' . $user->id,
+            'username' => 'required|string|unique:user,username,' . $user->id,
             'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur'
         ]);
 
@@ -76,7 +76,7 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.user.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
@@ -90,13 +90,13 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.user.index')->with('success', 'User deleted successfully.');
     }
     
     public function profile()
 {
     $user = Auth::user(); // Ambil data user yang sedang login
-    return view('profil.app-profile-1', compact('user'));
+    return view('profile.profile', compact('user'));
 }
     
     public function showJson(User $user)

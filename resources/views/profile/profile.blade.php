@@ -1,6 +1,6 @@
 @extends('layouts/master')
 
-@section('title', 'Profile 1')
+@section('title', 'Profile')
 
 @section('vendor-style')
 	<link href="{{ asset('assets/vendor/lightgallery/css/lightgallery.min.css') }}" rel="stylesheet">
@@ -71,8 +71,8 @@
                     </div>
                 </div>
 
-                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-primary">Edit </a>
-                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Kembali</a>
+                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-primary">Edit </a>
+                <a href="{{ route('user.index') }}" class="btn btn-secondary">Kembali</a>
             </div>
         </div>
     </div>

@@ -48,7 +48,8 @@ class DokumenController extends Controller
 
         foreach ($request->file('dokumen', []) as $jenis => $file) {
             if ($file) {
-                $path = $file->store('dokumen_akreditasi', 'public');
+                $folder = 'dokumen-kriteria/kriteria' . $kriteriaId;
+                $path = $file->store($folder, 'public');
                 $nama_dokumen = $file->getClientOriginalName();
                 $dokumen = \App\Models\Dokumen::create([
                     'user_id' => $userId,

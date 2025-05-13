@@ -30,7 +30,7 @@ Route::middleware('auth')->group(function () {
     // Role-specific Dashboards
     Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard'])
         ->name('admin.dashboard')->middleware('role:administrator');
-    Route::get('/dosen/dashboard', [DashboardController::class, 'dosenDashboard'])
+    Route::get('/dashboard', [DashboardController::class, 'dosenDashboard'])
         ->name('dosen.dashboard')->middleware('role:dosen');
     Route::get('/kjm/dashboard', [DashboardController::class, 'kjmDashboard'])
         ->name('kjm.dashboard')->middleware('role:kjm');
@@ -43,13 +43,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
-    // Admin Routes with Admin Middleware
-    Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
-        Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
+    // =========================
+    // USER MANAGEMENT (ADMIN ONLY, NO /admin PREFIX)
+    // =========================
+    Route::middleware('role:administrator')->group(function () {
+        Route::controller(UserController::class)->prefix('user')->name('user.')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
-            Route::get('/{user}', 'show')->name('show'); // Route model binding untuk User
+            Route::get('/{user}', 'show')->name('show');
             Route::get('/{user}/edit', 'edit')->name('edit');
             Route::put('/{user}', 'update')->name('update');
             Route::delete('/{user}', 'destroy')->name('destroy');
