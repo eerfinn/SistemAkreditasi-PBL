@@ -87,7 +87,7 @@ class DokumenController extends Controller
             Dokumen::PPEPP_PENINGKATAN
         ];
         $berhasilDiproses = false;
-        $folderKriteriaUser = 'dokumen_akreditasi/kriteria_' . $kriteriaId . '/user_' . $user->id;
+        $folderKriteriaUser = 'dokumen-kriteria';
 
         foreach ($ppepp_stages as $stage) {
             $fileInputName = "dokumen.{$stage}";
