@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
-            Route::get('/{user}', 'show')->name('show'); // Route model binding untuk User
+            Route::get('/{user}', 'show')->name('show');
             Route::get('/{user}/edit', 'edit')->name('edit');
             Route::put('/{user}', 'update')->name('update');
             Route::delete('/{user}', 'destroy')->name('destroy');
@@ -57,10 +57,20 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Placeholder routes for other roles - to be implemented later
-    // Route::prefix('dokumen')->name('dokumen.')->middleware('role:dosen')->group(function () {
-    // Dosen document routes will go here, mungkin lebih baik menggunakan Route::resource di bawah
-    // });
+    // Dokumen Routes (termasuk untuk dosen)
+    Route::prefix('dokumen')->name('dokumen.')->middleware('auth')->group(function () {
+        // Route untuk menyimpan dokumen yang diunggah dari form PPEPP
+        Route::post('/store-ppepp', [DokumenController::class, 'store'])->name('store.ppepp'); // Ganti nama jika perlu
+
+        // Route untuk menghapus dokumen draft
+        // Parameter {dokumen} akan di-resolve menggunakan Route Model Binding ke instance Dokumen
+        Route::delete('/draft/{dokumen}', [DokumenController::class, 'destroyDraft'])->name('destroy.draft');
+
+        // Anda bisa menambahkan route resource untuk DokumenController di sini jika belum ada
+        // atau jika fungsionalitasnya tidak sepenuhnya dicakup oleh route lain.
+        // Contoh: Route::resource('/', DokumenController::class)->except(['store']);
+        // 'except' digunakan jika 'store' sudah ditangani oleh 'store.ppepp'
+    });
 
     Route::prefix('review')->name('review.')->middleware('role:kaprodi,kajur')->group(function () {
         // Kaprodi & Kajur review routes will go here
@@ -76,19 +86,12 @@ Route::middleware('auth')->group(function () {
 
     // Kriteria Routes
     Route::prefix('kriteria')->name('kriteria.')->group(function () {
-        // Route dinamis untuk menampilkan detail kriteria berdasarkan ID (menggunakan Route Model Binding)
         Route::get('/{kriteria}', [KriteriaController::class, 'show'])->name('show');
-
-        // Route untuk menampilkan halaman/form upload dokumen untuk kriteria tertentu
-        // Menggunakan Route Model Binding untuk $kriteria
-        // Asumsi KriteriaController memiliki method 'uploadForm'
-        Route::get('/{kriteria}/upload', [KriteriaController::class, 'uploadForm'])->name('upload.form'); // Mengganti nama route agar lebih jelas
+        Route::get('/{kriteria}/upload', [KriteriaController::class, 'uploadForm'])->name('upload.form');
+        Route::post('/{kriteria}/finalisasi', [KriteriaController::class, 'finalisasiDokumen'])->name('finalisasi');
     });
 
-    // Dokumen CRUD Routes
-    // Ini akan membuat route standar untuk index, create, store, show, edit, update, destroy
-    // untuk DokumenController.
-    // Pastikan DokumenController Anda memiliki method-method ini.
-    // Middleware untuk hak akses bisa ditambahkan di sini atau di dalam controller.
-    Route::resource('dokumen', DokumenController::class)->middleware('role:dosen'); // Contoh middleware untuk dosen
+    // Dokumen CRUD (jika Anda ingin menggunakan resource controller standar)
+    // Pastikan ini tidak berkonflik dengan route dokumen yang sudah ada di atas.
+    // Route::resource('dokumen-resource', DokumenController::class)->names('dokumen.resource');
 });
