@@ -4,7 +4,43 @@
 
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <style>
+        .modal {
+            z-index: 1060 !important;
+        }
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+    </style>
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Script untuk menangani masalah backdrop modal
+    // Diterapkan ke semua modal di halaman ini
+
+    // Hapus kelas 'modal-open' dari body dan hapus backdrop saat modal disembunyikan
+    $(document).on('hidden.bs.modal', '.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        // Pastikan semua backdrop hilang
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 50);
+    });
+
+    // Hapus backdrop saat modal sudah sepenuhnya tampil
+    $(document).on('shown.bs.modal', '.modal', function () {
+        $('.modal-backdrop').remove();
+        // Upaya tambahan untuk menghapus backdrop jika masih ada
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 100);
+    });
+});
+</script>
+@endpush
 
 @section('content')
 <div class="container-fluid">
@@ -210,6 +246,106 @@
                                                     @else
                                                         <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id]) }}" class="btn btn-xs btn-outline-primary" title="Unggah Dokumen {{ucfirst($stageKey)}}"><i class="fas fa-upload"></i> Unggah</a>
                                                     @endif
+                                                @elseif(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                                    @if ($dokumen)
+                                                        <div class="d-flex justify-content-center">
+                                                            @if ($dokumen->path)
+                                                                <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-xs btn-outline-info me-1" title="Lihat File"><i class="fas fa-eye"></i></a>
+                                                            @endif
+                                                            
+                                                            @if ($dokumen->status === \App\Models\Dokumen::STATUS_MENUNGGU || $dokumen->status === \App\Models\Dokumen::STATUS_REVISI)
+                                                                <button type="button" class="btn btn-xs btn-outline-success me-1" title="Terima Dokumen" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}_terima"><i class="fas fa-check"></i></button>
+                                                                <button type="button" class="btn btn-xs btn-outline-danger me-1" title="Revisi Dokumen" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}_revisi"><i class="fas fa-undo"></i></button>
+                                                            @endif
+                                                            
+                                                            @if ($dokumen->status === \App\Models\Dokumen::STATUS_DITERIMA)
+                                                                <button type="button" class="btn btn-xs btn-outline-primary me-1" title="Verifikasi Final" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}_verifikasi"><i class="fas fa-check-double"></i></button>
+                                                            @endif
+                                                        </div>
+                                                        
+                                                        <!-- Modal Terima -->
+                                                        <div class="modal fade" id="validasiModal{{ $dokumen->id }}_terima" tabindex="-1" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                        @csrf
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title">Terima Dokumen</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <input type="hidden" name="status" value="{{ \App\Models\Dokumen::STATUS_DITERIMA }}">
+                                                                            <div class="mb-3">
+                                                                                <label for="komentar" class="form-label">Komentar (Opsional)</label>
+                                                                                <textarea class="form-control" name="komentar" rows="3" placeholder="Tambahkan komentar atau catatan"></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                            <button type="submit" class="btn btn-success">Terima Dokumen</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Modal Revisi -->
+                                                        <div class="modal fade" id="validasiModal{{ $dokumen->id }}_revisi" tabindex="-1" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                        @csrf
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title">Revisi Dokumen</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <input type="hidden" name="status" value="{{ \App\Models\Dokumen::STATUS_REVISI }}">
+                                                                            <div class="mb-3">
+                                                                                <label for="komentar" class="form-label">Komentar Revisi <span class="text-danger">*</span></label>
+                                                                                <textarea class="form-control" name="komentar" rows="3" placeholder="Berikan alasan dan petunjuk revisi" required></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                            <button type="submit" class="btn btn-danger">Kirim untuk Revisi</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Modal Verifikasi Final -->
+                                                        <div class="modal fade" id="validasiModal{{ $dokumen->id }}_verifikasi" tabindex="-1" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                        @csrf
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title">Verifikasi Final Dokumen</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <input type="hidden" name="status" value="{{ \App\Models\Dokumen::STATUS_DIVERIFIKASI }}">
+                                                                            <div class="mb-3">
+                                                                                <label for="komentar" class="form-label">Komentar (Opsional)</label>
+                                                                                <textarea class="form-control" name="komentar" rows="3" placeholder="Tambahkan komentar atau catatan"></textarea>
+                                                                            </div>
+                                                                            <div class="alert alert-info">
+                                                                                <i class="fas fa-info-circle me-1"></i> Dokumen yang telah diverifikasi final tidak dapat diubah lagi statusnya.
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                            <button type="submit" class="btn btn-primary">Verifikasi Final</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        -
+                                                    @endif
                                                 @elseif($dokumen && $dokumen->path)
                                                      <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-xs btn-outline-info" title="Lihat File"><i class="fas fa-eye"></i></a>
                                                 @else
@@ -231,10 +367,66 @@
 </div>
 @endsection
 
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Script untuk menangani masalah backdrop modal
+    // Diterapkan ke semua modal di halaman ini
+
+    // Hapus kelas 'modal-open' dari body dan hapus backdrop saat modal disembunyikan
+    $(document).on('hidden.bs.modal', '.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        // Pastikan semua backdrop hilang
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 50);
+    });
+
+    // Hapus backdrop saat modal sudah sepenuhnya tampil
+    $(document).on('shown.bs.modal', '.modal', function () {
+        $('.modal-backdrop').remove();
+        // Upaya tambahan untuk menghapus backdrop jika masih ada
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 100);
+    });
+});
+</script>
+@endpush
+
 @section('vendor-script')
     <script src="{{ asset('assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Script untuk menangani masalah backdrop modal
+    // Diterapkan ke semua modal di halaman ini
+
+    // Hapus kelas 'modal-open' dari body dan hapus backdrop saat modal disembunyikan
+    $(document).on('hidden.bs.modal', '.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        // Pastikan semua backdrop hilang
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 50);
+    });
+
+    // Hapus backdrop saat modal sudah sepenuhnya tampil
+    $(document).on('shown.bs.modal', '.modal', function () {
+        $('.modal-backdrop').remove();
+        // Upaya tambahan untuk menghapus backdrop jika masih ada
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 100);
+    });
+});
+</script>
+@endpush
 
 @section('page-script')
 <script>
@@ -252,3 +444,59 @@
     });
 </script>
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Script untuk menangani masalah backdrop modal
+    // Diterapkan ke semua modal di halaman ini
+
+    // Hapus kelas 'modal-open' dari body dan hapus backdrop saat modal disembunyikan
+    $(document).on('hidden.bs.modal', '.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        // Pastikan semua backdrop hilang
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 50);
+    });
+
+    // Hapus backdrop saat modal sudah sepenuhnya tampil
+    $(document).on('shown.bs.modal', '.modal', function () {
+        $('.modal-backdrop').remove();
+        // Upaya tambahan untuk menghapus backdrop jika masih ada
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 100);
+    });
+});
+</script>
+@endpush
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Script untuk menangani masalah backdrop modal
+    // Diterapkan ke semua modal di halaman ini
+
+    // Hapus kelas 'modal-open' dari body dan hapus backdrop saat modal disembunyikan
+    $(document).on('hidden.bs.modal', '.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        // Pastikan semua backdrop hilang
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 50);
+    });
+
+    // Hapus backdrop saat modal sudah sepenuhnya tampil
+    $(document).on('shown.bs.modal', '.modal', function () {
+        $('.modal-backdrop').remove();
+        // Upaya tambahan untuk menghapus backdrop jika masih ada
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+        }, 100);
+    });
+});
+</script>
+@endpush

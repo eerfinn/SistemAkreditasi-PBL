@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\DokumenController; // Pastikan DokumenController diimpor
+use App\Http\Controllers\ValidasiController;
 
 // Public Routes
 Route::get('/', function () {
@@ -85,10 +86,23 @@ Route::middleware('auth')->group(function () {
     });
 
     // Kriteria Routes
-    Route::prefix('kriteria')->name('kriteria.')->group(function () {
-        Route::get('/{kriteria}', [KriteriaController::class, 'show'])->name('show');
-        Route::get('/{kriteria}/upload', [KriteriaController::class, 'uploadForm'])->name('upload.form');
-        Route::post('/{kriteria}/finalisasi', [KriteriaController::class, 'finalisasiDokumen'])->name('finalisasi');
+    Route::controller(KriteriaController::class)->prefix('kriteria')->name('kriteria.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{kriteria}', 'show')->name('show');
+        Route::get('/{kriteria}/upload', 'uploadForm')->name('upload.form');
+        Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi');
+    });
+
+    // Dokumen Routes
+    Route::controller(DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/store', 'store')->name('store');
+        Route::delete('/{dokumen}/draft', 'destroyDraft')->name('destroy.draft');
+    });
+    
+    // Validasi Routes
+    Route::controller(ValidasiController::class)->prefix('validasi')->name('validasi.')->group(function () {
+        Route::post('/{dokumen}/update-status', 'updateStatus')->name('update-status');
     });
 
     // Dokumen CRUD (jika Anda ingin menggunakan resource controller standar)
