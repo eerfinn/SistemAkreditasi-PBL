@@ -173,7 +173,26 @@ $(document).ready(function() {
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header">
-                     <h4 class="card-title">Dokumen {{ isset($kriteria) ? $kriteria->nama_kriteria : '' }} per Tahap PPEPP</h4>
+                    <h4 class="card-title">Dokumen PPEPP</h4>
+                    @php
+                        $allDrafts = true;
+                        $hasDrafts = false;
+                        foreach($dokumenPerPPEPP as $dokumen) {
+                            if($dokumen && $dokumen->status === \App\Models\Dokumen::STATUS_DRAFT) {
+                                $hasDrafts = true;
+                            } else {
+                                $allDrafts = false;
+                            }
+                        }
+                    @endphp
+                    @if($hasDrafts && $allDrafts)
+                        <form action="{{ route('dokumen.finalisasi.all', ['kriteria_id' => $kriteria->id]) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft? Status akan berubah menjadi Menunggu Validasi.')">
+                                <i class="fas fa-check-circle me-1"></i> Finalisasi Semua Draft
+                            </button>
+                        </form>
+                    @endif
                 </div>
                 <div class="card-body p-4">
                     <div class="table-responsive">
@@ -252,17 +271,17 @@ $(document).ready(function() {
                                                             @if ($dokumen->path)
                                                                 <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-xs btn-outline-info me-1" title="Lihat File"><i class="fas fa-eye"></i></a>
                                                             @endif
-                                                            
+
                                                             @if ($dokumen->status === \App\Models\Dokumen::STATUS_MENUNGGU || $dokumen->status === \App\Models\Dokumen::STATUS_REVISI)
                                                                 <button type="button" class="btn btn-xs btn-outline-success me-1" title="Terima Dokumen" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}_terima"><i class="fas fa-check"></i></button>
                                                                 <button type="button" class="btn btn-xs btn-outline-danger me-1" title="Revisi Dokumen" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}_revisi"><i class="fas fa-undo"></i></button>
                                                             @endif
-                                                            
+
                                                             @if ($dokumen->status === \App\Models\Dokumen::STATUS_DITERIMA)
                                                                 <button type="button" class="btn btn-xs btn-outline-primary me-1" title="Verifikasi Final" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}_verifikasi"><i class="fas fa-check-double"></i></button>
                                                             @endif
                                                         </div>
-                                                        
+
                                                         <!-- Modal Terima -->
                                                         <div class="modal fade" id="validasiModal{{ $dokumen->id }}_terima" tabindex="-1" aria-hidden="true">
                                                             <div class="modal-dialog">
@@ -288,7 +307,7 @@ $(document).ready(function() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        
+
                                                         <!-- Modal Revisi -->
                                                         <div class="modal fade" id="validasiModal{{ $dokumen->id }}_revisi" tabindex="-1" aria-hidden="true">
                                                             <div class="modal-dialog">
@@ -314,7 +333,7 @@ $(document).ready(function() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        
+
                                                         <!-- Modal Verifikasi Final -->
                                                         <div class="modal fade" id="validasiModal{{ $dokumen->id }}_verifikasi" tabindex="-1" aria-hidden="true">
                                                             <div class="modal-dialog">

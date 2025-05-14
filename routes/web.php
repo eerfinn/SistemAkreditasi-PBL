@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{kriteria}', 'show')->name('show');
         Route::get('/{kriteria}/upload', 'uploadForm')->name('upload.form');
-        Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi');
+        // Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi');
     });
 
     // Dokumen Routes
@@ -99,7 +99,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/store', 'store')->name('store');
         Route::delete('/{dokumen}/draft', 'destroyDraft')->name('destroy.draft');
     });
-    
+
     // Validasi Routes
     Route::controller(ValidasiController::class)->prefix('validasi')->name('validasi.')->group(function () {
         Route::post('/{dokumen}/update-status', 'updateStatus')->name('update-status');
@@ -108,4 +108,6 @@ Route::middleware('auth')->group(function () {
     // Dokumen CRUD (jika Anda ingin menggunakan resource controller standar)
     // Pastikan ini tidak berkonflik dengan route dokumen yang sudah ada di atas.
     // Route::resource('dokumen-resource', DokumenController::class)->names('dokumen.resource');
+
+    Route::post('/dokumen/finalisasi-all/{kriteria_id}', [DokumenController::class, 'finalisasiAll'])->name('dokumen.finalisasi.all');
 });
