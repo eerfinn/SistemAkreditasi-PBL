@@ -405,7 +405,8 @@
             <button type="submit" class="login-button">Log In</button>
 
             <div class="forgot-password">
-                Forgot your password? Please contact <a href="mailto:admin@polinema.ac.id">admin</a>
+                {{-- Forgot your password? Please contact <a href="mailto:admin@polinema.ac.id">admin</a> --}}
+                <p>Forgot your password? Please contact <a href="https://wa.me/6281234567890" target="_blank"> admin</a></p>
             </div>
         </form>
     </div>
