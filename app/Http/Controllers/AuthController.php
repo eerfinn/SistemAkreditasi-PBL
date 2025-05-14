@@ -14,6 +14,30 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
+        $errors = [];
+
+        // Check if username exists
+        $user = \App\Models\User::where('username', $credentials['username'])->first();
+        if (!$user) {
+            $errors['username'] = 'Username salah.';
+        }
+
+        // Check if password matches any user (independent of username)
+        $passwordMatch = false;
+        foreach (\App\Models\User::all() as $u) {
+            if (\Illuminate\Support\Facades\Hash::check($credentials['password'], $u->password)) {
+                $passwordMatch = true;
+                break;
+            }
+        }
+        if (!$passwordMatch) {
+            $errors['password'] = 'Password salah.';
+        }
+
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->onlyInput('username');
+        }
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
@@ -37,10 +61,6 @@ class AuthController extends Controller
                     return redirect()->route('dashboard');
             }
         }
-
-        return back()->withErrors([
-            'username' => 'The provided credentials do not match our records.',
-        ])->onlyInput('username');
     }
 
     public function logout(Request $request)

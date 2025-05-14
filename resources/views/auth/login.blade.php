@@ -396,10 +396,10 @@
                         placeholder="Enter your password" required autocomplete="current-password">
                     <img id="togglePassword" class="password-toggle" src="{{ asset('assets/images/EyeHide.png') }}"
                         alt="Toggle Password">
-                    @error('password')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
                 </div>
+                @error('password')
+                    <span class="error-message">{{ $message }}</span>
+                @enderror
             </div>
 
             <button type="submit" class="login-button">Log In</button>
