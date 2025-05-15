@@ -71,7 +71,6 @@
                     </div>
                 </div>
 
-                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-primary">Edit </a>
                 <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Kembali</a>
             </div>
         </div>

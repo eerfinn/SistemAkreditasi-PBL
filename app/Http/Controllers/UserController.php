@@ -96,7 +96,7 @@ class UserController extends Controller
     public function profile()
 {
     $user = Auth::user(); // Ambil data user yang sedang login
-    return view('profil.app-profile-1', compact('user'));
+    return view('profil.profile', compact('user'));
 }
     
     public function showJson(User $user)
