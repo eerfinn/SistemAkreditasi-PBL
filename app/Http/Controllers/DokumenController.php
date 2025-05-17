@@ -60,116 +60,149 @@ class DokumenController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'kriteria_id' => 'required|exists:kriteria,id',
-            'dokumen' => 'sometimes|array',
-            'dokumen.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120', // Max 5MB
-            'deskripsi' => 'sometimes|array',
-            'deskripsi.*' => 'nullable|string|max:2000',
+        // Detailed debugging of the request
+        Log::info('Document upload request details', [
+            'headers' => $request->header(),
+            'content_type' => $request->header('Content-Type'),
+            'method' => $request->method(),
+            'has_file' => $request->hasFile('dokumen'),
+            'all_files' => $request->allFiles(),
+            'all_input_keys' => array_keys($request->all()),
+            'input_fields' => $request->except(['dokumen']),
+            'route' => $request->route()->getName(),
+            'route_parameters' => $request->route()->parameters(),
         ]);
 
+        // If no file, check why
+        if (!$request->hasFile('dokumen')) {
+            Log::error('No file detected in request', [
+                'file_error' => $request->file('dokumen') ? 'File invalid' : 'No file submitted',
+                'file_error_details' => $request->file('dokumen') ? $request->file('dokumen')->getError() : 'null'
+            ]);
+        }
+
+        Log::info('Document upload started', [
+            'request_data' => $request->except(['dokumen']), // Don't log binary file data
+            'has_file' => $request->hasFile('dokumen'),
+            'route' => $request->route()->getName()
+        ]);
+
+        // Validate common fields
+        $rules = [
+            'kriteria_id' => 'required|exists:kriteria,id',
+            'jenis_ppepp' => 'required|string',
+            'deskripsi' => 'nullable|string|max:2000',
+        ];
+
+        // Add file validation rule
+        $rules['dokumen'] = 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120';
+
+        $request->validate($rules);
+
         $kriteriaId = $request->kriteria_id;
+        $jenisPpepp = $request->jenis_ppepp;
         $user = Auth::user();
         $kriteria = Kriteria::find($kriteriaId);
+        $deskripsi = $request->deskripsi;
 
         if (!$kriteria) {
+            Log::error('Kriteria not found', ['kriteria_id' => $kriteriaId]);
             return back()->with('error', 'Kriteria tidak ditemukan.')->withInput();
         }
 
-        $ppepp_stages = [
-            Dokumen::PPEPP_PENETAPAN,
-            Dokumen::PPEPP_PELAKSANAAN,
-            Dokumen::PPEPP_EVALUASI,
-            Dokumen::PPEPP_PENGENDALIAN,
-            Dokumen::PPEPP_PENINGKATAN
-        ];
-        $berhasilDiproses = false;
+        if ($request->hasFile('dokumen') && $request->file('dokumen')->isValid()) {
+            $file = $request->file('dokumen');
+            $originalNameForDisplay = $file->getClientOriginalName();
+            
+            Log::info('Processing file upload', [
+                'original_name' => $originalNameForDisplay,
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize()
+            ]);
+            
+            $folderPath = "dokumen_akreditasi/kriteria_{$kriteriaId}/{$jenisPpepp}/user_{$user->id}";
+            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) 
+                            . '.' . $file->getClientOriginalExtension();
 
-        foreach ($ppepp_stages as $stage) {
-            $fileInputName = "dokumen.{$stage}";
-            $deskripsiInputName = "deskripsi.{$stage}";
-
-            if ($request->hasFile($fileInputName) || $request->filled($deskripsiInputName)) {
-                $path = null;
-                $originalNameForDisplay = "Dokumen " . ucfirst($stage);
-
-                if ($request->hasFile($fileInputName)) {
-                    $file = $request->file($fileInputName);
-                    $originalNameForDisplay = $file->getClientOriginalName();
-
-                    // Buat struktur folder yang lebih terorganisir
-                    $folderPath = "dokumen_akreditasi/kriteria_{$kriteriaId}/user_{$user->id}";
-
-                    // Generate nama file yang unik
-                    $fileNameToStore = time() . '_' . $stage . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-
-                    // Simpan file dengan path yang baru
-                    $path = $file->storeAs($folderPath, $fileNameToStore, 'public');
-
-                    if (!$path) {
-                        Log::error('Gagal menyimpan file', [
-                            'original_name' => $originalNameForDisplay,
-                            'stage' => $stage,
-                            'user_id' => $user->id,
-                            'kriteria_id' => $kriteriaId
-                        ]);
-                        continue;
-                    }
+            try {
+                $path = $file->storeAs($folderPath, $fileNameToStore, 'public');
+                
+                if (!$path) {
+                    Log::error('Failed to save file', [
+                        'original_name' => $originalNameForDisplay,
+                        'folder_path' => $folderPath,
+                        'file_name' => $fileNameToStore
+                    ]);
+                    return back()->with('error', 'Gagal menyimpan file.')->withInput();
                 }
 
-                $namaDokumenDiDB = pathinfo($originalNameForDisplay, PATHINFO_FILENAME) . " (" . ucfirst($stage) . ")";
+                Log::info('File stored successfully', [
+                    'path' => $path,
+                    'storage_path' => storage_path('app/public/' . $path)
+                ]);
 
-                // Cek dokumen yang ada (baik draft maupun revisi)
-                $existingDokumen = Dokumen::where('user_id', $user->id)
-                                        ->where('kriteria_id', $kriteriaId)
-                                        ->where('jenis_ppepp', $stage)
-                                        ->whereIn('status', [Dokumen::STATUS_DRAFT, Dokumen::STATUS_REVISI])
-                                        ->first();
+                $namaDokumenDiDB = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
 
-                if ($existingDokumen) {
-                    // Hapus file lama jika ada
-                    if ($path && $existingDokumen->path && Storage::disk('public')->exists($existingDokumen->path)) {
-                        Storage::disk('public')->delete($existingDokumen->path);
+                // Check if a document with the same kriteria_id, user_id, and jenis_ppepp already exists
+                $existingDraft = Dokumen::where('kriteria_id', $kriteriaId)
+                                ->where('user_id', $user->id)
+                                ->where('jenis_ppepp', $jenisPpepp)
+                                ->where('status', Dokumen::STATUS_DRAFT)
+                                ->first();
+                
+                if ($existingDraft) {
+                    // Update existing draft
+                    $existingDraft->nama_dokumen = $namaDokumenDiDB;
+                    $existingDraft->deskripsi_dokumen = $deskripsi;
+                    
+                    // Delete old file if exists
+                    if ($existingDraft->path && Storage::disk('public')->exists($existingDraft->path)) {
+                        Storage::disk('public')->delete($existingDraft->path);
                     }
-
-                    $existingDokumen->update([
-                        'nama_dokumen' => $namaDokumenDiDB,
-                        'path' => $path ?? $existingDokumen->path,
-                        'deskripsi_dokumen' => $request->input($deskripsiInputName, $existingDokumen->deskripsi_dokumen),
-                        'status' => Dokumen::STATUS_DRAFT, // Reset status ke draft
+                    
+                    $existingDraft->path = $path;
+                    $existingDraft->save();
+                    
+                    Log::info('Existing document updated', [
+                        'dokumen_id' => $existingDraft->id
                     ]);
-
-                    Log::info('Dokumen diperbarui', [
-                        'dokumen_id' => $existingDokumen->id,
-                        'path' => $existingDokumen->path,
-                        'status' => $existingDokumen->status
-                    ]);
+                    
+                    $newDokumen = $existingDraft;
                 } else {
+                    // Create new document
                     $newDokumen = Dokumen::create([
                         'user_id' => $user->id,
                         'kriteria_id' => $kriteriaId,
                         'nama_dokumen' => $namaDokumenDiDB,
                         'path' => $path,
-                        'jenis_ppepp' => $stage,
-                        'deskripsi_dokumen' => $request->input($deskripsiInputName),
+                        'jenis_ppepp' => $jenisPpepp,
+                        'deskripsi_dokumen' => $deskripsi,
                         'status' => Dokumen::STATUS_DRAFT,
                     ]);
-
-                    Log::info('Dokumen baru dibuat', [
-                        'dokumen_id' => $newDokumen->id,
-                        'path' => $path
+                    
+                    Log::info('New document created', [
+                        'dokumen_id' => $newDokumen->id
                     ]);
                 }
-                $berhasilDiproses = true;
+
+                // Determine the success message and redirect
+                $message = $existingDraft ? 'Dokumen berhasil diperbarui.' : 'Dokumen berhasil diunggah.';
+                return redirect()->back()->with('success', $message);
+            } catch (\Exception $e) {
+                Log::error('Exception during file upload', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                return back()->with('error', 'Terjadi kesalahan saat mengunggah file: ' . $e->getMessage())->withInput();
             }
         }
 
-        if ($berhasilDiproses) {
-            return redirect()->route('kriteria.show', $kriteriaId)
-                             ->with('success', 'Perubahan dokumen berhasil disimpan. Silakan finalisasi dokumen jika sudah selesai.');
-        } else {
-            return back()->with('info', 'Tidak ada file atau deskripsi yang diunggah/diperbarui.');
-        }
+        Log::warning('No valid file uploaded', [
+            'has_file' => $request->hasFile('dokumen'),
+            'file_valid' => $request->hasFile('dokumen') ? $request->file('dokumen')->isValid() : false
+        ]);
+
+        return back()->with('error', 'Tidak ada file yang diunggah atau file tidak valid.')->withInput();
     }
 
     /**
@@ -218,7 +251,7 @@ class DokumenController extends Controller
 
             // Coba akses file dari storage public
             if (Storage::disk('public')->exists($dokumen->path)) {
-                $filePath = Storage::disk('public')->path($dokumen->path);
+                $filePath = storage_path('app/public/' . $dokumen->path);
 
                 // Tentukan content type berdasarkan ekstensi file
                 $extension = pathinfo($dokumen->path, PATHINFO_EXTENSION);
@@ -242,7 +275,7 @@ class DokumenController extends Controller
             Log::error('File tidak ditemukan di storage', [
                 'dokumen_id' => $dokumen->id,
                 'path' => $dokumen->path,
-                'full_path' => Storage::disk('public')->path($dokumen->path)
+                'full_path' => storage_path('app/public/' . $dokumen->path)
             ]);
 
             return back()->with('error', 'File dokumen tidak ditemukan di sistem.');
@@ -266,20 +299,69 @@ class DokumenController extends Controller
 
     public function update(Request $request, Dokumen $dokumen)
     {
-        // Logika untuk memperbarui dokumen yang sudah ada (mungkin untuk revisi dokumen final)
-        // Gate::authorize('update-dokumen-final', $dokumen);
-        // Validasi dan logika update...
-        return redirect()->route('dashboard'); // Atau halaman lain yang sesuai
+        // Validasi akses
+        if (Auth::id() !== $dokumen->user_id || !in_array($dokumen->status, [Dokumen::STATUS_DRAFT, Dokumen::STATUS_REVISI])) {
+            return back()->with('error', 'Anda tidak memiliki izin untuk mengubah dokumen ini.');
+        }
+
+        $request->validate([
+            'dokumen' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
+            'deskripsi' => 'required|string|max:2000',
+        ]);
+
+        // Update deskripsi
+        $dokumen->deskripsi_dokumen = $request->deskripsi;
+
+        // Jika ada file baru
+        if ($request->hasFile('dokumen') && $request->file('dokumen')->isValid()) {
+            $file = $request->file('dokumen');
+            $originalNameForDisplay = $file->getClientOriginalName();
+            
+            // Buat struktur folder
+            $folderPath = "dokumen_akreditasi/kriteria_{$dokumen->kriteria_id}/{$dokumen->jenis_ppepp}/user_{$dokumen->user_id}";
+            
+            // Generate nama file yang unik
+            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) 
+                             . '.' . $file->getClientOriginalExtension();
+
+            // Hapus file lama jika ada
+            if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {
+                Storage::disk('public')->delete($dokumen->path);
+            }
+
+            // Simpan file baru
+            $path = $file->storeAs($folderPath, $fileNameToStore, 'public');
+            
+            if ($path) {
+                $dokumen->path = $path;
+                $dokumen->nama_dokumen = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
+            }
+        }
+
+        $dokumen->save();
+
+        return redirect()->back()->with('success', 'Dokumen berhasil diperbarui.');
     }
 
     public function destroy(Dokumen $dokumen)
     {
-        // Logika untuk menghapus dokumen final (mungkin hanya admin)
-        // Gate::authorize('delete-dokumen-final', $dokumen);
-        // $kriteriaId = $dokumen->kriteria_id;
-        // $dokumen->delete(); // File fisik akan terhapus oleh event di model
-        // return redirect()->route('kriteria.show', $kriteriaId)->with('success', 'Dokumen berhasil dihapus.');
-        return redirect()->route('dashboard'); // Atau halaman lain yang sesuai
+        // Validasi akses
+        if (Auth::id() !== $dokumen->user_id || !in_array($dokumen->status, [Dokumen::STATUS_DRAFT, Dokumen::STATUS_REVISI])) {
+            return back()->with('error', 'Anda tidak memiliki izin untuk menghapus dokumen ini.');
+        }
+
+        $kriteriaId = $dokumen->kriteria_id;
+
+        // Hapus file fisik
+        if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {
+            Storage::disk('public')->delete($dokumen->path);
+        }
+
+        // Hapus record dari database
+        $dokumen->delete();
+
+        return redirect()->route('kriteria.show', $kriteriaId)
+                        ->with('success', 'Dokumen berhasil dihapus.');
     }
 
     public function finalisasiAll($kriteria_id)
@@ -287,11 +369,39 @@ class DokumenController extends Controller
         try {
             // Ambil semua dokumen draft untuk kriteria ini
             $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria_id)
+                ->where('user_id', Auth::id())
                 ->where('status', Dokumen::STATUS_DRAFT)
                 ->get();
 
             if ($dokumenDrafts->isEmpty()) {
                 return redirect()->back()->with('error', 'Tidak ada dokumen draft yang dapat difinalisasi.');
+            }
+
+            // Pastikan semua tahapan PPEPP memiliki setidaknya satu dokumen draft
+            $ppepp_stages = [
+                Dokumen::PPEPP_PENETAPAN,
+                Dokumen::PPEPP_PELAKSANAAN,
+                Dokumen::PPEPP_EVALUASI,
+                Dokumen::PPEPP_PENGENDALIAN,
+                Dokumen::PPEPP_PENINGKATAN
+            ];
+
+            $dokumenPerPPEPP = [];
+            foreach ($ppepp_stages as $stage) {
+                $dokumenPerPPEPP[$stage] = $dokumenDrafts->where('jenis_ppepp', $stage)->count();
+            }
+
+            // Periksa apakah semua tahap memiliki setidaknya satu dokumen
+            $missingStages = array_filter($dokumenPerPPEPP, function($count) {
+                return $count === 0;
+            });
+
+            if (!empty($missingStages)) {
+                $missingStageNames = array_map(function($stage) {
+                    return ucfirst($stage);
+                }, array_keys($missingStages));
+                
+                return redirect()->back()->with('error', 'Beberapa tahapan belum memiliki dokumen: ' . implode(', ', $missingStageNames) . '. Harap upload dokumen untuk semua tahapan sebelum finalisasi.');
             }
 
             // Update status semua dokumen menjadi menunggu

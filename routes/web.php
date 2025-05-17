@@ -90,7 +90,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{kriteria}', 'show')->name('show');
         Route::get('/{kriteria}/upload', 'uploadForm')->name('upload.form');
-        // Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi');
+        Route::get('/{kriteria}/kelola', 'kelola')->name('kelola');
+        Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi');
+        Route::put('/{kriteria}/description/{ppepp}', 'updateDescription')->name('update.description');
     });
 
     // Dokumen Routes
@@ -98,6 +100,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/store', 'store')->name('store');
         Route::delete('/{dokumen}/draft', 'destroyDraft')->name('destroy.draft');
+        Route::get('/{dokumen}', 'show')->name('show');
+        Route::put('/{dokumen}', 'update')->name('update');
+        Route::delete('/{dokumen}', 'destroy')->name('destroy');
     });
 
     // Validasi Routes

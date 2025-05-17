@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class Dokumen extends Model
 {
@@ -48,7 +49,22 @@ class Dokumen extends Model
     public function getFileUrlAttribute(): ?string
     {
         if ($this->path) {
-            return Storage::disk('public')->url($this->path);
+            // Check if the file exists in storage
+            if (Storage::disk('public')->exists($this->path)) {
+                // Generate URL manually
+                Log::info('File exists in storage', [
+                    'dokumen_id' => $this->id,
+                    'path' => $this->path
+                ]);
+                
+                return asset('storage/' . $this->path);
+            } else {
+                Log::warning('File not found in storage', [
+                    'dokumen_id' => $this->id,
+                    'path' => $this->path
+                ]);
+                return null;
+            }
         }
         return null;
     }
