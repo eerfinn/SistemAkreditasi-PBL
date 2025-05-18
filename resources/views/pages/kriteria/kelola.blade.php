@@ -15,6 +15,22 @@
             --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
 
+        /* Description section styling */
+        .description-section {
+            position: relative;
+            padding-right: 40px;
+        }
+
+        .edit-description-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-radius: 0.2rem;
+        }
+
         body {
             background-color: var(--dark);
             color: var(--light);
@@ -157,9 +173,15 @@
                                             </div>
                                         </div>
                                         <div class="card-body">
-                                            <div class="mb-3">
+                                            <div class="mb-3 description-section">
                                                 <span class="text-muted small">Deskripsi:</span>
                                                 <div class="mb-2">{{ $ppepp_descriptions[$key] ?? '-' }}</div>
+                                                <button type="button" 
+                                                        class="btn btn-light btn-sm edit-description-btn" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#descriptionModal{{ $key }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <div>

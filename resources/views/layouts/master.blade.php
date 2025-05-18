@@ -41,6 +41,27 @@
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
 
+    <!-- Global style overrides -->
+    <style>
+        /* Hide modal backdrops globally */
+        .modal-backdrop {
+            display: none !important;
+        }
+        
+        /* Ensure modals are always on top */
+        .modal {
+            padding-top: 220px;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999 !important;
+            margin-top: 0px;
+        }
+        
+        /* Ensure modal content is clickable */
+        .modal-dialog {
+            z-index: 10000 !important;
+        }
+    </style>
+
 </head>
 
 <body>

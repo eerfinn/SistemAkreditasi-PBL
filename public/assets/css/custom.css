@@ -20,3 +20,32 @@ h1 {
 .content-body {
     flex-grow: 1;
 }
+
+.modal {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-dialog {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.modal-content {
+    margin: auto;
+    max-width: 500px; /* atau sesuaikan dengan kebutuhan */
+    width: 100%;
+}
+
+/* Pastikan backdrop modal bekerja dengan benar */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+.modal {
+    z-index: 1050 !important;
+}
