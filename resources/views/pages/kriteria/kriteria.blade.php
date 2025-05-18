@@ -63,7 +63,7 @@ $(document).ready(function() {
                 \App\Models\Dokumen::PPEPP_PENGENDALIAN => 'C.4. Pengendalian',
                 \App\Models\Dokumen::PPEPP_PENINGKATAN => 'C.5. Peningkatan'
             ];
-            
+
             // Default descriptions if none are set in the kriteria table
             $default_descriptions = [
                 \App\Models\Dokumen::PPEPP_PENETAPAN => 'Dokumen terkait penetapan standar dan kebijakan dalam kriteria ini.',
@@ -72,9 +72,42 @@ $(document).ready(function() {
                 \App\Models\Dokumen::PPEPP_PENGENDALIAN => 'Dokumen terkait tindakan pengendalian berdasarkan hasil evaluasi.',
                 \App\Models\Dokumen::PPEPP_PENINGKATAN => 'Dokumen terkait perbaikan dan peningkatan kebijakan dan standar.'
             ];
-            
+
             // Use descriptions from kriteria table if available, otherwise use defaults
             $ppepp_descriptions = $ppepp_descriptions ?? $default_descriptions;
+            
+            // Check if there are any draft documents
+            $hasDraftDocuments = false;
+            foreach($dokumenPerPPEPP as $stageDocs) {
+                if(isset($stageDocs) && $stageDocs->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() > 0) {
+                    $hasDraftDocuments = true;
+                    break;
+                }
+            }
+            
+            // Check if there are documents needing revision
+            $hasRevisionDocuments = isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0;
+            
+            // Check if there are any documents at all in this kriteria
+            $hasAnyDocuments = false;
+            foreach($dokumenPerPPEPP as $stageDocs) {
+                if(isset($stageDocs) && count($stageDocs) > 0) {
+                    $hasAnyDocuments = true;
+                    break;
+                }
+            }
+            
+            // Check if there are any finalized documents (menunggu/diterima/diverifikasi)
+            $hasFinalizedDocuments = isset($statusCounts) && 
+                (($statusCounts['menunggu'] ?? 0) > 0 || 
+                 ($statusCounts['diterima'] ?? 0) > 0 || 
+                 ($statusCounts['diverifikasi'] ?? 0) > 0);
+            
+            // Only disable button if:
+            // 1. There are some documents already
+            // 2. None of them are drafts or need revision
+            // 3. Some are already finalized (menunggu/diterima/diverifikasi)
+            $disableKelola = $hasAnyDocuments && !$hasDraftDocuments && !$hasRevisionDocuments && $hasFinalizedDocuments;
         @endphp
 
         <div class="col-xl-12">
@@ -87,9 +120,16 @@ $(document).ready(function() {
                         </div>
                         @if(auth()->user() && auth()->user()->role === 'dosen')
                         <div class="col-md-4 text-end">
-                            <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
-                                <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
-                            </a>
+                            @if(!$disableKelola)
+                                <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
+                                    <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
+                                </a>
+                            @else
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
+                                </button>
+                                <small class="d-block mt-1 text-muted">Semua dokumen telah difinalisasi</small>
+                            @endif
                         </div>
                         @endif
                     </div>
@@ -404,90 +444,49 @@ $(document).ready(function() {
                         <h5 class="mb-0">Finalisasi Dokumen</h5>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-info mb-4">
-                            <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Finalisasi</h5>
-                            <p>Untuk finalisasi, Anda harus memiliki <strong>minimal satu dokumen draft</strong> untuk setiap tahap PPEPP (Penetapan, Pelaksanaan, Evaluasi, Pengendalian, dan Peningkatan).</p>
-                            <p class="mb-0">Setelah difinalisasi, dokumen akan dikirim untuk validasi dan tidak dapat diedit lagi.</p>
-                        </div>
-
-                        <div class="mb-4">
-                            <button class="btn btn-sm btn-secondary w-100 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#statusTable" aria-expanded="false">
-                                <i class="fas fa-table me-1"></i> Lihat Status Dokumen Draft
-                            </button>
-                            
-                            <div class="collapse" id="statusTable">
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Tahap PPEPP</th>
-                                                <th>Memiliki Draft</th>
-                                                <th>Jumlah Dokumen</th>
-                                                <th>Jumlah Draft</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php
-                                                $allHaveDrafts = true;
-                                                $totalDraftCount = 0;
-                                            @endphp
-                                            
-                                            @foreach(array_keys($ppepp_labels) as $key)
-                                                @php
-                                                    $docCount = isset($dokumenPerPPEPP[$key]) ? count($dokumenPerPPEPP[$key]) : 0;
-                                                    $draftCount = isset($dokumenPerPPEPP[$key]) ? 
-                                                        $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() : 0;
-                                                    $hasDraft = $draftCount > 0;
-                                                    if (!$hasDraft) $allHaveDrafts = false;
-                                                    $totalDraftCount += $draftCount;
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ $ppepp_labels[$key] }}</td>
-                                                    <td>
-                                                        @if($hasDraft)
-                                                            <span class="badge bg-success">Ya</span>
-                                                        @else
-                                                            <span class="badge bg-danger">Tidak</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $docCount }}</td>
-                                                    <td>{{ $draftCount }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <th colspan="3">Status Finalisasi:</th>
-                                                <td>
-                                                    @if($allHaveDrafts)
-                                                        <span class="badge bg-success">Siap Finalisasi</span>
-                                                    @else
-                                                        <span class="badge bg-warning">Belum Lengkap</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th colspan="3">Total Draft:</th>
-                                                <td>{{ $totalDraftCount }}</td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
+                        @if($disableKelola)
+                            <div class="alert alert-info mb-0">
+                                <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Dokumen Telah Difinalisasi</h5>
+                                <p class="mb-0">Semua dokumen untuk kriteria ini telah difinalisasi dan sedang dalam proses validasi atau telah tervalidasi. Tidak ada dokumen draft yang perlu difinalisasi.</p>
                             </div>
-                        </div>
-                        
-                        @if($allHaveDrafts)
-                            <form action="{{ route('kriteria.finalisasi', $kriteria->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi oleh Anda.')">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-lg w-100">
-                                    <i class="fas fa-check-circle me-1"></i> Finalisasi Semua Draft
-                                </button>
-                            </form>
                         @else
-                            <div class="alert alert-warning">
-                                <h6 class="alert-heading fw-bold">Belum Dapat Finalisasi</h6>
-                                <p class="mb-0">Anda perlu mengunggah minimal satu dokumen draft untuk setiap tahap PPEPP yang belum memiliki draft (berwarna merah pada tabel di atas).</p>
+                            <div class="alert alert-info mb-4">
+                                <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Finalisasi</h5>
+                                <p>Untuk finalisasi, Anda harus memiliki <strong>minimal satu dokumen draft</strong> untuk setiap tahap PPEPP (Penetapan, Pelaksanaan, Evaluasi, Pengendalian, dan Peningkatan).</p>
+                                <p class="mb-0">Setelah difinalisasi, dokumen akan dikirim untuk validasi dan tidak dapat diedit lagi.</p>
                             </div>
+                            
+                            @php
+                                $allHaveDrafts = true;
+                                $totalDraftCount = 0;
+                                
+                                foreach(array_keys($ppepp_labels) as $key) {
+                                    $draftCount = isset($dokumenPerPPEPP[$key]) ?
+                                        $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() : 0;
+                                    $hasDraft = $draftCount > 0;
+                                    if (!$hasDraft) $allHaveDrafts = false;
+                                    $totalDraftCount += $draftCount;
+                                }
+                            @endphp
+                            
+                            @if($allHaveDrafts && $totalDraftCount > 0)
+                                <form action="{{ route('kriteria.finalisasi', $kriteria->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi oleh Anda.')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-lg w-100">
+                                        <i class="fas fa-check-circle me-1"></i> Finalisasi Semua Draft
+                                    </button>
+                                </form>
+                            @elseif($totalDraftCount > 0)
+                                <div class="alert alert-warning">
+                                    <h6 class="alert-heading fw-bold">Belum Dapat Finalisasi</h6>
+                                    <p class="mb-0">Anda perlu mengunggah minimal satu dokumen draft untuk setiap tahap PPEPP.</p>
+                                </div>
+                            @else
+                                <div class="alert alert-warning">
+                                    <h6 class="alert-heading fw-bold">Belum Ada Dokumen Draft</h6>
+                                    <p class="mb-0">Anda belum memiliki dokumen draft. Silakan kelola dokumen PPEPP terlebih dahulu untuk mengunggah dokumen.</p>
+                                </div>
+                            @endif
                         @endif
                     </div>
                 </div>
