@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{kriteria}/kelola', 'kelola')->name('kelola');
         Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi');
         Route::put('/{kriteria}/description/{ppepp}', 'updateDescription')->name('update.description');
+        Route::delete('/{kriteria}/description/{ppepp}', 'deleteDescription')->name('delete.description');
     });
 
     // Dokumen Routes

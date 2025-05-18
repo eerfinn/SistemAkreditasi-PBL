@@ -64,13 +64,17 @@ $(document).ready(function() {
                 \App\Models\Dokumen::PPEPP_PENINGKATAN => 'C.5. Peningkatan'
             ];
             
-            $ppepp_descriptions = [
+            // Default descriptions if none are set in the kriteria table
+            $default_descriptions = [
                 \App\Models\Dokumen::PPEPP_PENETAPAN => 'Dokumen terkait penetapan standar dan kebijakan dalam kriteria ini.',
                 \App\Models\Dokumen::PPEPP_PELAKSANAAN => 'Dokumen terkait pelaksanaan kebijakan dan standar yang telah ditetapkan.',
                 \App\Models\Dokumen::PPEPP_EVALUASI => 'Dokumen terkait evaluasi terhadap pelaksanaan kebijakan dan standar.',
                 \App\Models\Dokumen::PPEPP_PENGENDALIAN => 'Dokumen terkait tindakan pengendalian berdasarkan hasil evaluasi.',
                 \App\Models\Dokumen::PPEPP_PENINGKATAN => 'Dokumen terkait perbaikan dan peningkatan kebijakan dan standar.'
             ];
+            
+            // Use descriptions from kriteria table if available, otherwise use defaults
+            $ppepp_descriptions = $ppepp_descriptions ?? $default_descriptions;
         @endphp
 
         <div class="col-xl-12">
@@ -83,7 +87,7 @@ $(document).ready(function() {
                         </div>
                         @if(auth()->user() && auth()->user()->role === 'dosen')
                         <div class="col-md-4 text-end">
-                            <a href="{{ route('kriteria.kelola', ['kriteria' => $kriteria->id]) }}" class="btn btn-primary">
+                            <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
                                 <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
                             </a>
                         </div>
@@ -118,7 +122,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] }}</p>
+                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                         <thead>
@@ -177,7 +181,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] }}</p>
+                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -233,7 +237,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] }}</p>
+                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -289,7 +293,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] }}</p>
+                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -345,7 +349,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] }}</p>
+                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -497,7 +501,7 @@ $(document).ready(function() {
                     <div class="alert alert-info text-center" role="alert">
                         Semua dokumen untuk {{ $kriteria->nama_kriteria }} telah difinalisasi atau sedang dalam proses validasi.
                         @if(isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0)
-                            Ada dokumen yang perlu direvisi. Silakan <a href="{{ route('kriteria.kelola', ['kriteria' => $kriteria->id]) }}">kelola dokumen PPEPP</a> untuk memperbaikinya.
+                            Ada dokumen yang perlu direvisi. Silakan <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}">kelola dokumen PPEPP</a> untuk memperbaikinya.
                         @else
                             Anda hanya dapat melihat dokumen yang telah disubmit.
                         @endif

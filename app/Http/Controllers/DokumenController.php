@@ -60,59 +60,38 @@ class DokumenController extends Controller
      */
     public function store(Request $request)
     {
-        // Detailed debugging of the request
+        // Log request information
         Log::info('Document upload request details', [
-            'headers' => $request->header(),
-            'content_type' => $request->header('Content-Type'),
-            'method' => $request->method(),
-            'has_file' => $request->hasFile('dokumen'),
-            'all_files' => $request->allFiles(),
-            'all_input_keys' => array_keys($request->all()),
-            'input_fields' => $request->except(['dokumen']),
-            'route' => $request->route()->getName(),
-            'route_parameters' => $request->route()->parameters(),
-        ]);
-
-        // If no file, check why
-        if (!$request->hasFile('dokumen')) {
-            Log::error('No file detected in request', [
-                'file_error' => $request->file('dokumen') ? 'File invalid' : 'No file submitted',
-                'file_error_details' => $request->file('dokumen') ? $request->file('dokumen')->getError() : 'null'
-            ]);
-        }
-
-        Log::info('Document upload started', [
-            'request_data' => $request->except(['dokumen']), // Don't log binary file data
-            'has_file' => $request->hasFile('dokumen'),
+            'request_data' => $request->except(['files']), // Don't log binary file data
+            'has_files' => $request->hasFile('files'),
             'route' => $request->route()->getName()
         ]);
 
         // Validate common fields
-        $rules = [
+        $validatedData = $request->validate([
             'kriteria_id' => 'required|exists:kriteria,id',
             'jenis_ppepp' => 'required|string',
-            'deskripsi' => 'nullable|string|max:2000',
-        ];
-
-        // Add file validation rule
-        $rules['dokumen'] = 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120';
-
-        $request->validate($rules);
+            'files.*' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
+        ]);
 
         $kriteriaId = $request->kriteria_id;
         $jenisPpepp = $request->jenis_ppepp;
         $user = Auth::user();
         $kriteria = Kriteria::find($kriteriaId);
-        $deskripsi = $request->deskripsi;
 
         if (!$kriteria) {
             Log::error('Kriteria not found', ['kriteria_id' => $kriteriaId]);
             return back()->with('error', 'Kriteria tidak ditemukan.')->withInput();
         }
 
-        if ($request->hasFile('dokumen') && $request->file('dokumen')->isValid()) {
-            $file = $request->file('dokumen');
-            $originalNameForDisplay = $file->getClientOriginalName();
+        // Handle file uploads
+        if ($request->hasFile('files')) {
+            $uploadedCount = 0;
+            $folderPath = "dokumen_akreditasi/kriteria_{$kriteriaId}/{$jenisPpepp}/user_{$user->id}";
+            
+            foreach ($request->file('files') as $file) {
+                if ($file->isValid()) {
+                    $originalNameForDisplay = $file->getClientOriginalName();
             
             Log::info('Processing file upload', [
                 'original_name' => $originalNameForDisplay,
@@ -120,7 +99,6 @@ class DokumenController extends Controller
                 'size' => $file->getSize()
             ]);
             
-            $folderPath = "dokumen_akreditasi/kriteria_{$kriteriaId}/{$jenisPpepp}/user_{$user->id}";
             $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) 
                             . '.' . $file->getClientOriginalExtension();
 
@@ -129,80 +107,49 @@ class DokumenController extends Controller
                 
                 if (!$path) {
                     Log::error('Failed to save file', [
-                        'original_name' => $originalNameForDisplay,
-                        'folder_path' => $folderPath,
-                        'file_name' => $fileNameToStore
+                                'original_name' => $originalNameForDisplay
                     ]);
-                    return back()->with('error', 'Gagal menyimpan file.')->withInput();
+                            continue;
                 }
 
                 Log::info('File stored successfully', [
-                    'path' => $path,
-                    'storage_path' => storage_path('app/public/' . $path)
+                            'path' => $path
                 ]);
 
                 $namaDokumenDiDB = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
 
-                // Check if a document with the same kriteria_id, user_id, and jenis_ppepp already exists
-                $existingDraft = Dokumen::where('kriteria_id', $kriteriaId)
-                                ->where('user_id', $user->id)
-                                ->where('jenis_ppepp', $jenisPpepp)
-                                ->where('status', Dokumen::STATUS_DRAFT)
-                                ->first();
-                
-                if ($existingDraft) {
-                    // Update existing draft
-                    $existingDraft->nama_dokumen = $namaDokumenDiDB;
-                    $existingDraft->deskripsi_dokumen = $deskripsi;
-                    
-                    // Delete old file if exists
-                    if ($existingDraft->path && Storage::disk('public')->exists($existingDraft->path)) {
-                        Storage::disk('public')->delete($existingDraft->path);
-                    }
-                    
-                    $existingDraft->path = $path;
-                    $existingDraft->save();
-                    
-                    Log::info('Existing document updated', [
-                        'dokumen_id' => $existingDraft->id
-                    ]);
-                    
-                    $newDokumen = $existingDraft;
-                } else {
-                    // Create new document
+                        // Create new document for each file
                     $newDokumen = Dokumen::create([
                         'user_id' => $user->id,
                         'kriteria_id' => $kriteriaId,
                         'nama_dokumen' => $namaDokumenDiDB,
                         'path' => $path,
                         'jenis_ppepp' => $jenisPpepp,
-                        'deskripsi_dokumen' => $deskripsi,
                         'status' => Dokumen::STATUS_DRAFT,
                     ]);
                     
                     Log::info('New document created', [
                         'dokumen_id' => $newDokumen->id
                     ]);
-                }
 
-                // Determine the success message and redirect
-                $message = $existingDraft ? 'Dokumen berhasil diperbarui.' : 'Dokumen berhasil diunggah.';
-                return redirect()->back()->with('success', $message);
+                        $uploadedCount++;
             } catch (\Exception $e) {
                 Log::error('Exception during file upload', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
-                return back()->with('error', 'Terjadi kesalahan saat mengunggah file: ' . $e->getMessage())->withInput();
+                    }
+                }
+            }
+            
+            if ($uploadedCount > 0) {
+                return redirect()->back()->with('success', "{$uploadedCount} dokumen berhasil diunggah.");
+            } else {
+                return back()->with('error', 'Tidak ada file yang berhasil diunggah.')->withInput();
             }
         }
 
-        Log::warning('No valid file uploaded', [
-            'has_file' => $request->hasFile('dokumen'),
-            'file_valid' => $request->hasFile('dokumen') ? $request->file('dokumen')->isValid() : false
-        ]);
-
-        return back()->with('error', 'Tidak ada file yang diunggah atau file tidak valid.')->withInput();
+        return back()->with('info', 'Tidak ada file yang dipilih untuk diunggah.')->withInput();
     }
 
     /**
@@ -225,7 +172,6 @@ class DokumenController extends Controller
         return redirect()->route('kriteria.show', $kriteriaId)
                          ->with('success', 'Dokumen draft berhasil dihapus.');
     }
-
 
     // Placeholder untuk method resource lainnya
     public function index()

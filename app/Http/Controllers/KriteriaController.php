@@ -38,6 +38,7 @@ class KriteriaController extends Controller
                 $query = Dokumen::where('kriteria_id', $kriteria->id)
                     ->where('user_id', $user->id)
                     ->where('jenis_ppepp', $stage)
+                    ->whereNotNull('path') // Only get actual documents, not descriptions
                     ->orderByRaw("FIELD(status, '".Dokumen::STATUS_DRAFT."', '".Dokumen::STATUS_REVISI."') DESC")
                     ->orderBy('updated_at', 'desc');
                 
@@ -60,6 +61,7 @@ class KriteriaController extends Controller
                 $query = Dokumen::where('kriteria_id', $kriteria->id)
                     ->where('jenis_ppepp', $stage)
                     ->whereNotIn('status', [Dokumen::STATUS_DRAFT])
+                    ->whereNotNull('path') // Only get actual documents, not descriptions
                     ->orderBy('updated_at', 'desc');
                 
                 $dokumenCollection = $query->get();
@@ -111,6 +113,7 @@ class KriteriaController extends Controller
         if ($user && $user->role !== 'dosen') {
             $daftarDokumenFinal = Dokumen::where('kriteria_id', $kriteria->id)
                                 ->where('status', '!=', Dokumen::STATUS_DRAFT)
+                                ->whereNotNull('path') // Only get actual documents, not descriptions
                                 ->with('user')
                                 ->orderBy('jenis_ppepp')->orderBy('updated_at', 'desc')->get();
         }
@@ -125,6 +128,9 @@ class KriteriaController extends Controller
             }
         }
 
+        // Get descriptions from kriteria table
+        $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
+
         return view('pages.kriteria.kriteria', [
             'kriteria'        => $kriteria,
             'dokumenPerPPEPP' => $dokumenPerPPEPP,
@@ -134,7 +140,8 @@ class KriteriaController extends Controller
             'bisaFinalisasi'  => $bisaFinalisasi,
             'daftarDokumen'   => $daftarDokumenFinal,
             'dokumenDrafts'   => $dokumenDrafts,
-            'showUploadButton'=> $user && $user->role === 'dosen'
+            'showUploadButton'=> $user && $user->role === 'dosen',
+            'ppepp_descriptions' => $ppepp_descriptions
         ]);
     }
 
@@ -159,8 +166,34 @@ class KriteriaController extends Controller
             $dokumenPerPPEPP[$stage] = Dokumen::where('user_id', $user->id)
                 ->where('kriteria_id', $kriteria->id)
                 ->where('jenis_ppepp', $stage)
+                ->whereNotNull('path') // Only get actual documents, not descriptions
                 ->orderBy('updated_at', 'desc')
                 ->get();
+        }
+
+        // Prepare data for the new view format with the needed structure for navigation
+        $allPpeppStagesWithData = [];
+        foreach ($ppepp_labels as $key => $label) {
+            $allPpeppStagesWithData[] = [
+                'key' => $key,
+                'label' => $label,
+                'route_kelola_tahap_ini' => route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => $key])
+            ];
+        }
+
+        // Get descriptions for each PPEPP stage from kriteria table
+        $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
+
+        // Check if we should use the new view or existing one
+        if (view()->exists('pages.kriteria.upload-kriteria.form')) {
+            return view('pages.kriteria.upload-kriteria.form', [
+                'kriteria' => $kriteria,
+                'stageKey' => $selected_ppepp,
+                'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
+                'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect(),
+                'allPpeppStagesWithData' => $allPpeppStagesWithData,
+                'ppepp_descriptions' => $ppepp_descriptions
+            ]);
         }
 
         if (!view()->exists('pages.kriteria.form')) {
@@ -171,7 +204,8 @@ class KriteriaController extends Controller
             'kriteria' => $kriteria,
             'selected_ppepp' => $selected_ppepp,
             'ppepp_labels' => $ppepp_labels,
-            'dokumenPerPPEPP' => $dokumenPerPPEPP
+            'dokumenPerPPEPP' => $dokumenPerPPEPP,
+            'ppepp_descriptions' => $ppepp_descriptions
         ]);
     }
 
@@ -219,6 +253,7 @@ class KriteriaController extends Controller
                     ->where('kriteria_id', $kriteria->id)
                     ->where('jenis_ppepp', $stage)
                     ->where('status', Dokumen::STATUS_DRAFT)
+                    ->whereNotNull('path') // Only count actual documents, not descriptions
                     ->count();
 
             Log::info("Checking draft for stage {$stage}", [
@@ -239,7 +274,7 @@ class KriteriaController extends Controller
                 'missing_stages' => $missingStages
             ]);
             
-            return redirect()->route('kriteria.kelola', $kriteria->id)
+            return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan'])
                             ->with('error', "Anda belum mengunggah draft untuk tahapan: {$missingStagesList}");
         }
 
@@ -247,6 +282,7 @@ class KriteriaController extends Controller
         $dokumenDrafts = Dokumen::where('user_id', $user->id)
                        ->where('kriteria_id', $kriteria->id)
                        ->where('status', Dokumen::STATUS_DRAFT)
+                       ->whereNotNull('path') // Only get actual documents, not descriptions
                        ->get();
 
         Log::info('Found drafts to finalize', [
@@ -256,23 +292,14 @@ class KriteriaController extends Controller
 
         $berhasilFinalisasi = 0;
         foreach ($dokumenDrafts as $dokumen) {
-            if ($dokumen->path || !empty($dokumen->deskripsi_dokumen)) {
-                $dokumen->status = Dokumen::STATUS_MENUNGGU;
-                $dokumen->save();
-                $berhasilFinalisasi++;
-                
-                Log::info('Document finalized successfully', [
-                    'dokumen_id' => $dokumen->id,
-                    'jenis_ppepp' => $dokumen->jenis_ppepp
-                ]);
-            } else {
-                $dokumen->delete();
-                
-                Log::info('Empty document deleted', [
-                    'dokumen_id' => $dokumen->id,
-                    'jenis_ppepp' => $dokumen->jenis_ppepp
-                ]);
-            }
+            $dokumen->status = Dokumen::STATUS_MENUNGGU;
+            $dokumen->save();
+            $berhasilFinalisasi++;
+            
+            Log::info('Document finalized successfully', [
+                'dokumen_id' => $dokumen->id,
+                'jenis_ppepp' => $dokumen->jenis_ppepp
+            ]);
         }
 
         if ($berhasilFinalisasi > 0) {
@@ -286,38 +313,13 @@ class KriteriaController extends Controller
 
         Log::warning('Finalization failed - no documents were finalized');
         
-        return redirect()->route('kriteria.kelola', $kriteria->id)
+        return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan'])
                         ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file atau deskripsi.');
     }
 
     public function kelola(Kriteria $kriteria)
     {
-        $user = Auth::user();
-        $dokumenPerPPEPP = [];
-
-        $ppepp_labels = [
-            'penetapan' => 'C1. Penetapan',
-            'pelaksanaan' => 'C2. Pelaksanaan',
-            'evaluasi' => 'C3. Evaluasi',
-            'pengendalian' => 'C4. Pengendalian',
-            'peningkatan' => 'C5. Peningkatan'
-        ];
-
-        foreach (array_keys($ppepp_labels) as $stage) {
-            $dokumenPerPPEPP[$stage] = Dokumen::where('kriteria_id', $kriteria->id)
-                ->when($user->role === 'dosen', function($query) use ($user) {
-                    return $query->where('user_id', $user->id);
-                })
-                ->where('jenis_ppepp', $stage)
-                ->orderBy('updated_at', 'desc')
-                ->get();
-        }
-
-        return view('pages.kriteria.kelola', [
-            'kriteria' => $kriteria,
-            'dokumenPerPPEPP' => $dokumenPerPPEPP,
-            'ppepp_labels' => $ppepp_labels
-        ]);
+        return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']);
     }
 
     public function updateDescription(Request $request, Kriteria $kriteria, $ppepp)
@@ -327,9 +329,23 @@ class KriteriaController extends Controller
         ]);
 
         // Update the description in the database
-        // You'll need to adjust this based on your actual database structure
         $kriteria->updatePPEPPDescription($ppepp, $request->description);
 
         return redirect()->back()->with('success', 'Deskripsi PPEPP berhasil diperbarui.');
+    }
+
+    public function deleteDescription(Kriteria $kriteria, $ppepp)
+    {
+        $descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true);
+        
+        if (isset($descriptions[$ppepp])) {
+            unset($descriptions[$ppepp]);
+            $kriteria->ppepp_descriptions = json_encode($descriptions);
+            $kriteria->save();
+            
+            return redirect()->back()->with('success', 'Deskripsi PPEPP berhasil dihapus.');
+        }
+        
+        return redirect()->back()->with('error', 'Deskripsi PPEPP tidak ditemukan.');
     }
 }

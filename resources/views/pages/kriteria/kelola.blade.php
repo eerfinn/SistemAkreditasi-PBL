@@ -5,13 +5,33 @@
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+        }
+
         .card-header-custom {
             padding: 1rem 1.5rem;
             border-bottom: 1px solid rgba(0,0,0,.125);
         }
         .card-ppepp {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
             transition: all 0.3s ease;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
         .card-ppepp:hover {
             transform: translateY(-5px);
@@ -30,6 +50,14 @@
         }
         .list-group-item:last-child {
             border-bottom: none;
+        }
+        .btn {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px var(--primary);
         }
     </style>
 @endsection
@@ -129,6 +157,10 @@
                                             </div>
                                         </div>
                                         <div class="card-body">
+                                            <div class="mb-3">
+                                                <span class="text-muted small">Deskripsi:</span>
+                                                <div class="mb-2">{{ $ppepp_descriptions[$key] ?? '-' }}</div>
+                                            </div>
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <div>
                                                     <h6 class="mb-0">Status</h6>
@@ -148,14 +180,19 @@
                                             
                                             <div class="d-flex flex-column">
                                                 <div class="btn-group mb-2">
-                                                    <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => $key]) }}" 
-                                                       class="btn btn-{{ $colors[$key] }}">
+                                                    @php
+                                                        // Misal status PPEPP per tahap ada di $ppepp_statuses[$key] dengan nilai 'finalisasi', 'revisi', atau lainnya
+                                                        $isFinal = isset($ppepp_statuses[$key]) && $ppepp_statuses[$key] === 'finalisasi';
+                                                        $isRevisi = isset($ppepp_statuses[$key]) && $ppepp_statuses[$key] === 'revisi';
+                                                    @endphp
+                                                    <a href="{{ $isFinal ? '#' : route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => $key]) }}"
+                                                       class="btn btn-{{ $colors[$key] }}{{ $isFinal ? ' disabled' : '' }}"
+                                                       {{ $isFinal ? 'tabindex="-1" aria-disabled="true"' : '' }}>
                                                         <i class="fas fa-file-alt me-1"></i> Kelola Dokumen
                                                     </a>
-                                                    <button type="button" class="btn btn-{{ $colors[$key] }}" data-bs-toggle="modal" 
-                                                            data-bs-target="#descriptionModal{{ $key }}">
-                                                        <i class="fas fa-edit me-1"></i> Edit Deskripsi
-                                                    </button>
+                                                    @if($isFinal)
+                                                        <span class="text-danger small ms-2">Sudah finalisasi, menunggu hasil</span>
+                                                    @endif
                                                 </div>
                                                 <button class="btn btn-light" type="button" data-bs-toggle="collapse" 
                                                         data-bs-target="#collapse{{ $key }}" aria-expanded="false">
@@ -170,7 +207,6 @@
                                                         <div class="list-group-item d-flex justify-content-between align-items-center">
                                                             <div>
                                                                 <strong class="d-block">{{ $dokumen->nama_dokumen }}</strong>
-                                                                <span class="d-block small text-muted">{{ Str::limit($dokumen->deskripsi_dokumen, 30) }}</span>
                                                                 @if($dokumen->status == 'draft')
                                                                     <span class="badge bg-info">Draft</span>
                                                                 @elseif($dokumen->status == 'menunggu')
@@ -256,6 +292,25 @@ $(document).ready(function() {
             $(this).removeClass('shadow-lg');
         }
     );
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true
+    });
 });
 </script>
 @endpush 
