@@ -35,11 +35,16 @@ class KriteriaController extends Controller
         // Mengambil dokumen yang dikelompokkan per tahap PPEPP
         if ($user && $user->role === 'dosen') {
             foreach ($ppepp_stages as $stage) {
+                // Important change: Include all documents for this user and kriteria,
+                // regardless of status, to ensure validated documents remain visible
+                // even when some need revision
                 $query = Dokumen::where('kriteria_id', $kriteria->id)
                     ->where('user_id', $user->id)
                     ->where('jenis_ppepp', $stage)
                     ->whereNotNull('path') // Only get actual documents, not descriptions
-                    ->orderByRaw("FIELD(status, '".Dokumen::STATUS_DRAFT."', '".Dokumen::STATUS_REVISI."') DESC")
+                    ->orderByRaw("FIELD(status, '".Dokumen::STATUS_DRAFT."', '".Dokumen::STATUS_REVISI."', 
+                               '".Dokumen::STATUS_MENUNGGU."', '".Dokumen::STATUS_DITERIMA."', 
+                               '".Dokumen::STATUS_DIVERIFIKASI."') ASC")
                     ->orderBy('updated_at', 'desc');
                 
                 $dokumenCollection = $query->get();
@@ -75,6 +80,17 @@ class KriteriaController extends Controller
                 $dokumenPerPPEPP[$stage] = $dokumenCollection;
             }
         }
+
+        // Load kriteria comments
+        $kriteriaComments = \App\Models\Komen::where('kriteria_id', $kriteria->id)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        Log::info('Loaded kriteria comments', [
+            'kriteria_id' => $kriteria->id,
+            'comment_count' => $kriteriaComments->count()
+        ]);
 
         // Log dokumen yang ditemukan untuk setiap tahap
         foreach ($ppepp_stages as $stage) {
@@ -132,16 +148,17 @@ class KriteriaController extends Controller
         $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
 
         return view('pages.kriteria.kriteria', [
-            'kriteria'        => $kriteria,
-            'dokumenPerPPEPP' => $dokumenPerPPEPP,
-            'ppepp_stages'    => $ppepp_stages,
-            'statusCounts'    => $statusCounts,
-            'user'            => $user,
-            'bisaFinalisasi'  => $bisaFinalisasi,
-            'daftarDokumen'   => $daftarDokumenFinal,
-            'dokumenDrafts'   => $dokumenDrafts,
-            'showUploadButton'=> $user && $user->role === 'dosen',
-            'ppepp_descriptions' => $ppepp_descriptions
+            'kriteria'         => $kriteria,
+            'dokumenPerPPEPP'  => $dokumenPerPPEPP,
+            'ppepp_stages'     => $ppepp_stages,
+            'statusCounts'     => $statusCounts,
+            'user'             => $user,
+            'bisaFinalisasi'   => $bisaFinalisasi,
+            'daftarDokumen'    => $daftarDokumenFinal,
+            'dokumenDrafts'    => $dokumenDrafts,
+            'showUploadButton' => $user && $user->role === 'dosen',
+            'ppepp_descriptions' => $ppepp_descriptions,
+            'kriteriaComments' => $kriteriaComments
         ]);
     }
 
@@ -246,21 +263,40 @@ class KriteriaController extends Controller
             Dokumen::PPEPP_PENINGKATAN
         ];
 
-        // Check if there's at least one draft for each PPEPP stage
+        // First get all documents for this kriteria and user
+        $allDocuments = Dokumen::where('user_id', $user->id)
+                ->where('kriteria_id', $kriteria->id)
+                ->whereNotNull('path')
+                ->get();
+        
+        // Count documents per stage
+        $docsCountByStage = [];
+        $draftCountByStage = [];
+        $validatedCountByStage = [];
+        
+        foreach ($ppepp_stages as $stage) {
+            $stageDocuments = $allDocuments->where('jenis_ppepp', $stage);
+            $docsCountByStage[$stage] = $stageDocuments->count();
+            $draftCountByStage[$stage] = $stageDocuments->where('status', Dokumen::STATUS_DRAFT)->count();
+            $validatedCountByStage[$stage] = $stageDocuments->whereIn('status', [
+                Dokumen::STATUS_MENUNGGU, 
+                Dokumen::STATUS_DITERIMA, 
+                Dokumen::STATUS_DIVERIFIKASI
+            ])->count();
+        }
+        
+        // Log document counts for debugging
+        Log::info('Document counts for kriteria by stage', [
+            'kriteria_id' => $kriteria->id,
+            'total_counts' => $docsCountByStage,
+            'draft_counts' => $draftCountByStage,
+            'validated_counts' => $validatedCountByStage,
+        ]);
+        
+        // Check if each stage has at least one document (either draft or already validated)
         $missingStages = [];
         foreach ($ppepp_stages as $stage) {
-            $count = Dokumen::where('user_id', $user->id)
-                    ->where('kriteria_id', $kriteria->id)
-                    ->where('jenis_ppepp', $stage)
-                    ->where('status', Dokumen::STATUS_DRAFT)
-                    ->whereNotNull('path') // Only count actual documents, not descriptions
-                    ->count();
-
-            Log::info("Checking draft for stage {$stage}", [
-                'draft_count' => $count
-            ]);
-            
-            if ($count === 0) {
+            if ($docsCountByStage[$stage] === 0) {
                 $missingStages[] = $stage;
             }
         }
@@ -270,19 +306,33 @@ class KriteriaController extends Controller
                 return ucfirst($stage);
             }, $missingStages));
             
-            Log::warning('Finalization failed - missing drafts', [
+            Log::warning('Finalization failed - missing document stages', [
                 'missing_stages' => $missingStages
             ]);
             
             return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan'])
-                            ->with('error', "Anda belum mengunggah draft untuk tahapan: {$missingStagesList}");
+                            ->with('error', "Anda belum mengunggah dokumen untuk tahapan: {$missingStagesList}");
+        }
+        
+        // Check if there are any drafts at all to finalize
+        $hasDrafts = false;
+        foreach ($draftCountByStage as $count) {
+            if ($count > 0) {
+                $hasDrafts = true;
+                break;
+            }
+        }
+        
+        if (!$hasDrafts) {
+            return redirect()->route('kriteria.show', $kriteria->id)
+                            ->with('info', 'Tidak ada dokumen draft yang perlu difinalisasi. Semua dokumen sudah dalam proses validasi atau sudah divalidasi.');
         }
 
-        // Get all drafts to finalize
+        // Get only draft documents to finalize
         $dokumenDrafts = Dokumen::where('user_id', $user->id)
                        ->where('kriteria_id', $kriteria->id)
                        ->where('status', Dokumen::STATUS_DRAFT)
-                       ->whereNotNull('path') // Only get actual documents, not descriptions
+                       ->whereNotNull('path')
                        ->get();
 
         Log::info('Found drafts to finalize', [
@@ -308,7 +358,7 @@ class KriteriaController extends Controller
             ]);
             
             return redirect()->route('kriteria.show', $kriteria->id)
-                            ->with('success', 'Semua dokumen draft berhasil difinalisasi dan dikirim untuk validasi.');
+                            ->with('success', "{$berhasilFinalisasi} dokumen draft berhasil difinalisasi dan dikirim untuk validasi.");
         }
 
         Log::warning('Finalization failed - no documents were finalized');

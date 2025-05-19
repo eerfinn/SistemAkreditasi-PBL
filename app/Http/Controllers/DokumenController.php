@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Models\History;
 
 class DokumenController extends Controller
 {
@@ -360,6 +361,90 @@ class DokumenController extends Controller
             return redirect()->back()->with('success', 'Semua dokumen draft berhasil difinalisasi dan status diubah menjadi Menunggu Validasi.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memfinalisasi dokumen: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle submission of document revisions.
+     * This replaces the file in an existing document that needs revision.
+     */
+    public function submitRevision(Request $request, Dokumen $dokumen)
+    {
+        $user = Auth::user();
+        
+        // Validate that the user owns this document and it needs revision
+        if ($user->id !== $dokumen->user_id) {
+            return back()->with('error', 'Anda tidak memiliki izin untuk merevisi dokumen ini.');
+        }
+        
+        if ($dokumen->status !== Dokumen::STATUS_REVISI) {
+            return back()->with('error', 'Dokumen ini tidak dalam status revisi.');
+        }
+        
+        // Validate the request
+        $request->validate([
+            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
+            'keterangan_revisi' => 'nullable|string|max:500',
+        ]);
+        
+        try {
+            // Get the uploaded file
+            $file = $request->file('file');
+            $originalNameForDisplay = $file->getClientOriginalName();
+            
+            // Create the folder structure
+            $folderPath = "dokumen_akreditasi/kriteria_{$dokumen->kriteria_id}/{$dokumen->jenis_ppepp}/user_{$user->id}";
+            
+            // Generate a unique filename
+            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) 
+                            . '.' . $file->getClientOriginalExtension();
+            
+            // Delete the old file if it exists
+            if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {
+                Storage::disk('public')->delete($dokumen->path);
+                Log::info('Deleted old revision file', ['path' => $dokumen->path]);
+            }
+            
+            // Store the new file
+            $path = $file->storeAs($folderPath, $fileNameToStore, 'public');
+            
+            if (!$path) {
+                throw new \Exception('Failed to save the file.');
+            }
+            
+            // Update the document
+            $dokumen->nama_dokumen = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
+            $dokumen->path = $path;
+            $dokumen->status = Dokumen::STATUS_MENUNGGU;
+            if ($request->filled('keterangan_revisi')) {
+                $dokumen->keterangan_revisi = $request->keterangan_revisi;
+            }
+            $dokumen->updated_at = now();
+            $dokumen->save();
+            
+            // Record the history
+            $history = new History();
+            $history->user_id = $user->id;
+            $history->dokumen_id = $dokumen->id;
+            $history->aktivitas = "Mengupload revisi dokumen {$dokumen->nama_dokumen}";
+            $history->save();
+            
+            Log::info('Document revision submitted successfully', [
+                'dokumen_id' => $dokumen->id,
+                'new_path' => $path
+            ]);
+            
+            return redirect()->route('kriteria.show', $dokumen->kriteria_id)
+                ->with('success', 'Revisi dokumen berhasil diunggah dan menunggu validasi.');
+                
+        } catch (\Exception $e) {
+            Log::error('Error submitting document revision', [
+                'dokumen_id' => $dokumen->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return back()->with('error', 'Terjadi kesalahan saat mengunggah revisi: ' . $e->getMessage())
+                ->withInput();
         }
     }
 }

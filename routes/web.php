@@ -104,11 +104,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/{dokumen}', 'show')->name('show');
         Route::put('/{dokumen}', 'update')->name('update');
         Route::delete('/{dokumen}', 'destroy')->name('destroy');
+        Route::post('/{dokumen}/submit-revision', 'submitRevision')->name('submit.revision');
     });
 
     // Validasi Routes
     Route::controller(ValidasiController::class)->prefix('validasi')->name('validasi.')->group(function () {
         Route::post('/{dokumen}/update-status', 'updateStatus')->name('update-status');
+        Route::post('/kriteria/{kriteria}/comment', 'addKriteriaComment')->name('kriteria-comment');
     });
 
     // Dokumen CRUD (jika Anda ingin menggunakan resource controller standar)

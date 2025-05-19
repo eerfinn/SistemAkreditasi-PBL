@@ -13,14 +13,14 @@ class Komen extends Model
     protected $table = 'komen';
 
     protected $fillable = [
-        'dokumen_id',
+        'kriteria_id',
         'user_id',
         'komentar',
     ];
 
-    public function dokumen(): BelongsTo
+    public function kriteria(): BelongsTo
     {
-        return $this->belongsTo(Dokumen::class, 'dokumen_id');
+        return $this->belongsTo(Kriteria::class, 'kriteria_id');
     }
 
     public function user(): BelongsTo

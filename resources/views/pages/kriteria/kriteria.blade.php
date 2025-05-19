@@ -75,7 +75,7 @@ $(document).ready(function() {
 
             // Use descriptions from kriteria table if available, otherwise use defaults
             $ppepp_descriptions = $ppepp_descriptions ?? $default_descriptions;
-            
+
             // Check if there are any draft documents
             $hasDraftDocuments = false;
             foreach($dokumenPerPPEPP as $stageDocs) {
@@ -84,10 +84,10 @@ $(document).ready(function() {
                     break;
                 }
             }
-            
+
             // Check if there are documents needing revision
             $hasRevisionDocuments = isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0;
-            
+
             // Check if there are any documents at all in this kriteria
             $hasAnyDocuments = false;
             foreach($dokumenPerPPEPP as $stageDocs) {
@@ -96,13 +96,13 @@ $(document).ready(function() {
                     break;
                 }
             }
-            
+
             // Check if there are any finalized documents (menunggu/diterima/diverifikasi)
-            $hasFinalizedDocuments = isset($statusCounts) && 
-                (($statusCounts['menunggu'] ?? 0) > 0 || 
-                 ($statusCounts['diterima'] ?? 0) > 0 || 
+            $hasFinalizedDocuments = isset($statusCounts) &&
+                (($statusCounts['menunggu'] ?? 0) > 0 ||
+                 ($statusCounts['diterima'] ?? 0) > 0 ||
                  ($statusCounts['diverifikasi'] ?? 0) > 0);
-            
+
             // Only disable button if:
             // 1. There are some documents already
             // 2. None of them are drafts or need revision
@@ -160,9 +160,9 @@ $(document).ready(function() {
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title">C1. Penetapan</h4>
                     </div>
+                    <p class="mb-2 mt-1">{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] }}</p>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                         <thead>
@@ -197,6 +197,110 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                                <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-upload"></i>
+                                                </button>
+                                                
+                                                <!-- Revision Upload Modal -->
+                                                <div class="modal fade" id="revisiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="revisiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="revisiModalLabel{{ $dokumen->id }}">Upload Revisi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('dokumen.submit.revision', $dokumen->id) }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen yang Direvisi:</label>
+                                                                        <p><strong>{{ $dokumen->nama_dokumen }}</strong></p>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="file{{ $dokumen->id }}" class="form-label">File Revisi:</label>
+                                                                        <input type="file" class="form-control" id="file{{ $dokumen->id }}" name="file" required>
+                                                                        <small class="text-muted">Format: PDF, Word, Excel, PowerPoint. Maks: 5MB</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="keterangan_revisi{{ $dokumen->id }}" class="form-label">Keterangan Revisi (opsional):</label>
+                                                                        <textarea class="form-control" id="keterangan_revisi{{ $dokumen->id }}" name="keterangan_revisi" rows="3" placeholder="Tuliskan perubahan apa yang Anda buat pada revisi ini..."></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Upload Revisi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                                <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-check-double"></i>
+                                                </button>
+                                                
+                                                <!-- Validation Modal -->
+                                                <div class="modal fade" id="validasiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="validasiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="validasiModalLabel{{ $dokumen->id }}">Validasi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen: <strong>{{ $dokumen->nama_dokumen }}</strong></label>
+                                                                        <p class="small text-muted mb-3">ID: {{ $dokumen->id }} | Status: {{ ucfirst($dokumen->status) }}</p>
+                                                                        
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diverifikasi{{ $dokumen->id }}" value="diverifikasi" {{ $dokumen->status == 'diverifikasi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diverifikasi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-primary">Terverifikasi</span> - Dokumen terverifikasi final
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="komentar{{ $dokumen->id }}" class="form-label">Komentar untuk Dokumen ini:</label>
+                                                                        <textarea class="form-control" id="komentar{{ $dokumen->id }}" name="komentar" rows="3" placeholder="Berikan komentar atau masukan untuk dokumen ini..."></textarea>
+                                                                        <small class="text-muted">Komentar ini khusus untuk dokumen yang sedang divalidasi.</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="kriteria_comment{{ $dokumen->id }}" class="form-label">Komentar untuk Kriteria Secara Keseluruhan:</label>
+                                                                        <textarea class="form-control" id="kriteria_comment{{ $dokumen->id }}" name="kriteria_comment" rows="3" placeholder="Berikan komentar untuk kriteria secara keseluruhan (opsional)..."></textarea>
+                                                                        <small class="text-muted">Komentar ini akan ditampilkan pada bagian komentar kriteria dan dapat dilihat oleh semua pengguna.</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Simpan Validasi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -206,6 +310,14 @@ $(document).ready(function() {
                                 </tr>
                                 @endforelse
                             </tbody>
+                            <tfoot>
+                                <tr class="bg-light">
+                                    <td colspan="3">
+                                        <strong>Deskripsi:</strong>
+                                        <p class="mb-0 mt-1">{{ isset($ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN]) ? $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] : '-' }}</p>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -219,9 +331,9 @@ $(document).ready(function() {
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title">C2. Pelaksanaan</h4>
                     </div>
+                    <p class="mb-2 mt-1">{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] }}</p>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -253,6 +365,110 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                                <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-upload"></i>
+                                                </button>
+                                                
+                                                <!-- Revision Upload Modal -->
+                                                <div class="modal fade" id="revisiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="revisiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="revisiModalLabel{{ $dokumen->id }}">Upload Revisi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('dokumen.submit.revision', $dokumen->id) }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen yang Direvisi:</label>
+                                                                        <p><strong>{{ $dokumen->nama_dokumen }}</strong></p>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="file{{ $dokumen->id }}" class="form-label">File Revisi:</label>
+                                                                        <input type="file" class="form-control" id="file{{ $dokumen->id }}" name="file" required>
+                                                                        <small class="text-muted">Format: PDF, Word, Excel, PowerPoint. Maks: 5MB</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="keterangan_revisi{{ $dokumen->id }}" class="form-label">Keterangan Revisi (opsional):</label>
+                                                                        <textarea class="form-control" id="keterangan_revisi{{ $dokumen->id }}" name="keterangan_revisi" rows="3" placeholder="Tuliskan perubahan apa yang Anda buat pada revisi ini..."></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Upload Revisi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                                <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-check-double"></i>
+                                                </button>
+                                                
+                                                <!-- Validation Modal -->
+                                                <div class="modal fade" id="validasiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="validasiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="validasiModalLabel{{ $dokumen->id }}">Validasi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen: <strong>{{ $dokumen->nama_dokumen }}</strong></label>
+                                                                        <p class="small text-muted mb-3">ID: {{ $dokumen->id }} | Status: {{ ucfirst($dokumen->status) }}</p>
+                                                                        
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diverifikasi{{ $dokumen->id }}" value="diverifikasi" {{ $dokumen->status == 'diverifikasi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diverifikasi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-primary">Terverifikasi</span> - Dokumen terverifikasi final
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="komentar{{ $dokumen->id }}" class="form-label">Komentar untuk Dokumen ini:</label>
+                                                                        <textarea class="form-control" id="komentar{{ $dokumen->id }}" name="komentar" rows="3" placeholder="Berikan komentar atau masukan untuk dokumen ini..."></textarea>
+                                                                        <small class="text-muted">Komentar ini khusus untuk dokumen yang sedang divalidasi.</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="kriteria_comment{{ $dokumen->id }}" class="form-label">Komentar untuk Kriteria Secara Keseluruhan:</label>
+                                                                        <textarea class="form-control" id="kriteria_comment{{ $dokumen->id }}" name="kriteria_comment" rows="3" placeholder="Berikan komentar untuk kriteria secara keseluruhan (opsional)..."></textarea>
+                                                                        <small class="text-muted">Komentar ini akan ditampilkan pada bagian komentar kriteria dan dapat dilihat oleh semua pengguna.</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Simpan Validasi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -262,6 +478,14 @@ $(document).ready(function() {
                                 </tr>
                                 @endforelse
                             </tbody>
+                            <tfoot>
+                                <tr class="bg-light">
+                                    <td colspan="3">
+                                        <strong>Deskripsi:</strong>
+                                        <p class="mb-0 mt-1">{{ isset($ppepp_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN]) ? $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] : '-' }}</p>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -275,9 +499,9 @@ $(document).ready(function() {
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title">C3. Evaluasi</h4>
                     </div>
+                    <p class="mb-2 mt-1">{{ $default_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] }}</p>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -309,6 +533,110 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                                <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-upload"></i>
+                                                </button>
+                                                
+                                                <!-- Revision Upload Modal -->
+                                                <div class="modal fade" id="revisiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="revisiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="revisiModalLabel{{ $dokumen->id }}">Upload Revisi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('dokumen.submit.revision', $dokumen->id) }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen yang Direvisi:</label>
+                                                                        <p><strong>{{ $dokumen->nama_dokumen }}</strong></p>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="file{{ $dokumen->id }}" class="form-label">File Revisi:</label>
+                                                                        <input type="file" class="form-control" id="file{{ $dokumen->id }}" name="file" required>
+                                                                        <small class="text-muted">Format: PDF, Word, Excel, PowerPoint. Maks: 5MB</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="keterangan_revisi{{ $dokumen->id }}" class="form-label">Keterangan Revisi (opsional):</label>
+                                                                        <textarea class="form-control" id="keterangan_revisi{{ $dokumen->id }}" name="keterangan_revisi" rows="3" placeholder="Tuliskan perubahan apa yang Anda buat pada revisi ini..."></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Upload Revisi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                                <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-check-double"></i>
+                                                </button>
+                                                
+                                                <!-- Validation Modal -->
+                                                <div class="modal fade" id="validasiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="validasiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="validasiModalLabel{{ $dokumen->id }}">Validasi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen: <strong>{{ $dokumen->nama_dokumen }}</strong></label>
+                                                                        <p class="small text-muted mb-3">ID: {{ $dokumen->id }} | Status: {{ ucfirst($dokumen->status) }}</p>
+                                                                        
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diverifikasi{{ $dokumen->id }}" value="diverifikasi" {{ $dokumen->status == 'diverifikasi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diverifikasi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-primary">Terverifikasi</span> - Dokumen terverifikasi final
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="komentar{{ $dokumen->id }}" class="form-label">Komentar untuk Dokumen ini:</label>
+                                                                        <textarea class="form-control" id="komentar{{ $dokumen->id }}" name="komentar" rows="3" placeholder="Berikan komentar atau masukan untuk dokumen ini..."></textarea>
+                                                                        <small class="text-muted">Komentar ini khusus untuk dokumen yang sedang divalidasi.</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="kriteria_comment{{ $dokumen->id }}" class="form-label">Komentar untuk Kriteria Secara Keseluruhan:</label>
+                                                                        <textarea class="form-control" id="kriteria_comment{{ $dokumen->id }}" name="kriteria_comment" rows="3" placeholder="Berikan komentar untuk kriteria secara keseluruhan (opsional)..."></textarea>
+                                                                        <small class="text-muted">Komentar ini akan ditampilkan pada bagian komentar kriteria dan dapat dilihat oleh semua pengguna.</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Simpan Validasi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -318,6 +646,14 @@ $(document).ready(function() {
                                 </tr>
                                 @endforelse
                             </tbody>
+                            <tfoot>
+                                <tr class="bg-light">
+                                    <td colspan="3">
+                                        <strong>Deskripsi:</strong>
+                                        <p class="mb-0 mt-1">{{ isset($ppepp_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI]) ? $ppepp_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] : '-' }}</p>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -329,11 +665,11 @@ $(document).ready(function() {
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">C4. Pengendalian</h4>
+                        <h4 class="card-title">C4. Pengendalian</h4><br>
                     </div>
+                    <p class="mb-2 mt-1">{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] }}</p>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -365,6 +701,110 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                                <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-upload"></i>
+                                                </button>
+                                                
+                                                <!-- Revision Upload Modal -->
+                                                <div class="modal fade" id="revisiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="revisiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="revisiModalLabel{{ $dokumen->id }}">Upload Revisi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('dokumen.submit.revision', $dokumen->id) }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen yang Direvisi:</label>
+                                                                        <p><strong>{{ $dokumen->nama_dokumen }}</strong></p>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="file{{ $dokumen->id }}" class="form-label">File Revisi:</label>
+                                                                        <input type="file" class="form-control" id="file{{ $dokumen->id }}" name="file" required>
+                                                                        <small class="text-muted">Format: PDF, Word, Excel, PowerPoint. Maks: 5MB</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="keterangan_revisi{{ $dokumen->id }}" class="form-label">Keterangan Revisi (opsional):</label>
+                                                                        <textarea class="form-control" id="keterangan_revisi{{ $dokumen->id }}" name="keterangan_revisi" rows="3" placeholder="Tuliskan perubahan apa yang Anda buat pada revisi ini..."></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Upload Revisi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                                <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-check-double"></i>
+                                                </button>
+                                                
+                                                <!-- Validation Modal -->
+                                                <div class="modal fade" id="validasiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="validasiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="validasiModalLabel{{ $dokumen->id }}">Validasi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen: <strong>{{ $dokumen->nama_dokumen }}</strong></label>
+                                                                        <p class="small text-muted mb-3">ID: {{ $dokumen->id }} | Status: {{ ucfirst($dokumen->status) }}</p>
+                                                                        
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diverifikasi{{ $dokumen->id }}" value="diverifikasi" {{ $dokumen->status == 'diverifikasi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diverifikasi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-primary">Terverifikasi</span> - Dokumen terverifikasi final
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="komentar{{ $dokumen->id }}" class="form-label">Komentar untuk Dokumen ini:</label>
+                                                                        <textarea class="form-control" id="komentar{{ $dokumen->id }}" name="komentar" rows="3" placeholder="Berikan komentar atau masukan untuk dokumen ini..."></textarea>
+                                                                        <small class="text-muted">Komentar ini khusus untuk dokumen yang sedang divalidasi.</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="kriteria_comment{{ $dokumen->id }}" class="form-label">Komentar untuk Kriteria Secara Keseluruhan:</label>
+                                                                        <textarea class="form-control" id="kriteria_comment{{ $dokumen->id }}" name="kriteria_comment" rows="3" placeholder="Berikan komentar untuk kriteria secara keseluruhan (opsional)..."></textarea>
+                                                                        <small class="text-muted">Komentar ini akan ditampilkan pada bagian komentar kriteria dan dapat dilihat oleh semua pengguna.</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Simpan Validasi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -374,6 +814,14 @@ $(document).ready(function() {
                                 </tr>
                                 @endforelse
                             </tbody>
+                            <tfoot>
+                                <tr class="bg-light">
+                                    <td colspan="3">
+                                        <strong>Deskripsi:</strong>
+                                        <p class="mb-0 mt-1">{{ isset($ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN]) ? $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] : '-' }}</p>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -387,9 +835,9 @@ $(document).ready(function() {
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title">C5. Peningkatan</h4>
                     </div>
+                    <p class="mb-2 mt-1">{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] }}</p>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">{{ $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] ?? $default_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] }}</p>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -421,6 +869,110 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                                <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-upload"></i>
+                                                </button>
+                                                
+                                                <!-- Revision Upload Modal -->
+                                                <div class="modal fade" id="revisiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="revisiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="revisiModalLabel{{ $dokumen->id }}">Upload Revisi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('dokumen.submit.revision', $dokumen->id) }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen yang Direvisi:</label>
+                                                                        <p><strong>{{ $dokumen->nama_dokumen }}</strong></p>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="file{{ $dokumen->id }}" class="form-label">File Revisi:</label>
+                                                                        <input type="file" class="form-control" id="file{{ $dokumen->id }}" name="file" required>
+                                                                        <small class="text-muted">Format: PDF, Word, Excel, PowerPoint. Maks: 5MB</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="keterangan_revisi{{ $dokumen->id }}" class="form-label">Keterangan Revisi (opsional):</label>
+                                                                        <textarea class="form-control" id="keterangan_revisi{{ $dokumen->id }}" name="keterangan_revisi" rows="3" placeholder="Tuliskan perubahan apa yang Anda buat pada revisi ini..."></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Upload Revisi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                                <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-check-double"></i>
+                                                </button>
+                                                
+                                                <!-- Validation Modal -->
+                                                <div class="modal fade" id="validasiModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="validasiModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="validasiModalLabel{{ $dokumen->id }}">Validasi Dokumen</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form action="{{ route('validasi.update-status', $dokumen->id) }}" method="POST">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Dokumen: <strong>{{ $dokumen->nama_dokumen }}</strong></label>
+                                                                        <p class="small text-muted mb-3">ID: {{ $dokumen->id }} | Status: {{ ucfirst($dokumen->status) }}</p>
+                                                                        
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check mb-2">
+                                                                            <input class="form-check-input" type="radio" name="status" id="status_diverifikasi{{ $dokumen->id }}" value="diverifikasi" {{ $dokumen->status == 'diverifikasi' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="status_diverifikasi{{ $dokumen->id }}">
+                                                                                <span class="badge light badge-primary">Terverifikasi</span> - Dokumen terverifikasi final
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="komentar{{ $dokumen->id }}" class="form-label">Komentar untuk Dokumen ini:</label>
+                                                                        <textarea class="form-control" id="komentar{{ $dokumen->id }}" name="komentar" rows="3" placeholder="Berikan komentar atau masukan untuk dokumen ini..."></textarea>
+                                                                        <small class="text-muted">Komentar ini khusus untuk dokumen yang sedang divalidasi.</small>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="kriteria_comment{{ $dokumen->id }}" class="form-label">Komentar untuk Kriteria Secara Keseluruhan:</label>
+                                                                        <textarea class="form-control" id="kriteria_comment{{ $dokumen->id }}" name="kriteria_comment" rows="3" placeholder="Berikan komentar untuk kriteria secara keseluruhan (opsional)..."></textarea>
+                                                                        <small class="text-muted">Komentar ini akan ditampilkan pada bagian komentar kriteria dan dapat dilihat oleh semua pengguna.</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary">Simpan Validasi</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -430,6 +982,14 @@ $(document).ready(function() {
                                 </tr>
                                 @endforelse
                             </tbody>
+                            <tfoot>
+                                <tr class="bg-light">
+                                    <td colspan="3">
+                                        <strong>Deskripsi:</strong>
+                                        <p class="mb-0 mt-1">{{ isset($ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN]) ? $ppepp_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] : '-' }}</p>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -452,34 +1012,77 @@ $(document).ready(function() {
                         @else
                             <div class="alert alert-info mb-4">
                                 <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Finalisasi</h5>
-                                <p>Untuk finalisasi, Anda harus memiliki <strong>minimal satu dokumen draft</strong> untuk setiap tahap PPEPP (Penetapan, Pelaksanaan, Evaluasi, Pengendalian, dan Peningkatan).</p>
+                                <p>Untuk finalisasi, Anda harus memiliki <strong>minimal satu dokumen</strong> untuk setiap tahap PPEPP (Penetapan, Pelaksanaan, Evaluasi, Pengendalian, dan Peningkatan).</p>
                                 <p class="mb-0">Setelah difinalisasi, dokumen akan dikirim untuk validasi dan tidak dapat diedit lagi.</p>
                             </div>
                             
                             @php
-                                $allHaveDrafts = true;
+                                // Count draft documents and check if each stage has a document (either draft or already validated)
                                 $totalDraftCount = 0;
+                                $totalValidCount = 0;
+                                $allStagesHaveDocuments = true;
+                                $stagesWithoutDocs = [];
                                 
                                 foreach(array_keys($ppepp_labels) as $key) {
-                                    $draftCount = isset($dokumenPerPPEPP[$key]) ?
-                                        $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() : 0;
-                                    $hasDraft = $draftCount > 0;
-                                    if (!$hasDraft) $allHaveDrafts = false;
+                                    // Check if this stage has any documents at all
+                                    $hasAnyDocument = isset($dokumenPerPPEPP[$key]) && $dokumenPerPPEPP[$key]->count() > 0;
+                                    
+                                    if (!$hasAnyDocument) {
+                                        $allStagesHaveDocuments = false;
+                                        $stagesWithoutDocs[] = $ppepp_labels[$key];
+                                    }
+                                    
+                                    // Count draft documents for this stage
+                                    $draftCount = isset($dokumenPerPPEPP[$key]) 
+                                        ? $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() 
+                                        : 0;
+                                    
                                     $totalDraftCount += $draftCount;
+                                    
+                                    // Count already validated documents
+                                    $validCount = isset($dokumenPerPPEPP[$key])
+                                        ? $dokumenPerPPEPP[$key]->whereIn('status', [
+                                            \App\Models\Dokumen::STATUS_MENUNGGU,
+                                            \App\Models\Dokumen::STATUS_DITERIMA,
+                                            \App\Models\Dokumen::STATUS_DIVERIFIKASI
+                                        ])->count()
+                                        : 0;
+                                    
+                                    $totalValidCount += $validCount;
                                 }
                             @endphp
                             
-                            @if($allHaveDrafts && $totalDraftCount > 0)
+                            @if($allStagesHaveDocuments && $totalDraftCount > 0)
                                 <form action="{{ route('kriteria.finalisasi', $kriteria->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi oleh Anda.')">
                                     @csrf
                                     <button type="submit" class="btn btn-success btn-lg w-100">
-                                        <i class="fas fa-check-circle me-1"></i> Finalisasi Semua Draft
+                                        <i class="fas fa-check-circle me-1"></i> Finalisasi {{ $totalDraftCount }} Dokumen Draft
                                     </button>
                                 </form>
-                            @elseif($totalDraftCount > 0)
+                                
+                                @if($totalValidCount > 0)
+                                <div class="alert alert-success mt-3 mb-0">
+                                    <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Tambahan</h6>
+                                    <p class="mb-0">{{ $totalValidCount }} dokumen lainnya sudah dalam proses validasi atau sudah divalidasi.</p>
+                                </div>
+                                @endif
+                            @elseif(!$allStagesHaveDocuments)
                                 <div class="alert alert-warning">
                                     <h6 class="alert-heading fw-bold">Belum Dapat Finalisasi</h6>
-                                    <p class="mb-0">Anda perlu mengunggah minimal satu dokumen draft untuk setiap tahap PPEPP.</p>
+                                    <p class="mb-0">
+                                        Anda perlu mengunggah dokumen untuk setiap tahap PPEPP.
+                                        <br>Tahap yang belum memiliki dokumen:
+                                        <ul class="mb-0 mt-1">
+                                            @foreach($stagesWithoutDocs as $stage)
+                                                <li>{{ $stage }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </p>
+                                </div>
+                            @elseif($totalDraftCount == 0 && $totalValidCount > 0)
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading fw-bold">Tidak Ada Draft untuk Difinalisasi</h6>
+                                    <p class="mb-0">Semua dokumen sudah dalam proses validasi atau telah divalidasi. Tidak ada dokumen draft yang perlu difinalisasi.</p>
                                 </div>
                             @else
                                 <div class="alert alert-warning">
@@ -509,6 +1112,64 @@ $(document).ready(function() {
             </div>
         </div>
         @endif
+        
+        <!-- Comments Section - Visible to all users -->
+        <div class="col-xl-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <h5 class="card-title text-white mb-0">
+                        <i class="fas fa-comments me-2"></i> Komentar untuk Kriteria {{ $kriteria->nama_kriteria }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Existing Comments -->
+                    @if(isset($kriteriaComments) && $kriteriaComments->count() > 0)
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Riwayat Komentar:</h6>
+                        @foreach($kriteriaComments as $comment)
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="avatar avatar-xs me-2">
+                                    <span class="avatar-initial rounded-circle bg-primary">
+                                        {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                    </span>
+                                </div>
+                                <h6 class="mb-0">{{ $comment->user->name ?? 'User' }}</h6>
+                                <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
+                                <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                            </div>
+                            <p class="mb-0 ps-4">{{ $comment->komentar }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i> Belum ada komentar untuk kriteria ini.
+                    </div>
+                    @endif
+
+                    <!-- Comment Form - Only visible to admins, coordinators, directors etc. -->
+                    @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                    <form action="{{ route('validasi.kriteria-comment', $kriteria->id) }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="komentar" class="form-label">Tambahkan Komentar:</label>
+                            <textarea class="form-control" id="komentar" name="komentar" rows="3" required></textarea>
+                            <small class="text-muted">Komentar ini akan terlihat oleh semua pengguna yang memiliki akses ke kriteria ini.</small>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i> Kirim Komentar
+                            </button>
+                        </div>
+                    </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+        
+        <!-- Remove the old admin-only comment section -->
+
     </div>
 </div>
 @endsection
