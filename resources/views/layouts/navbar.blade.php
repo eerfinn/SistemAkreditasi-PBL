@@ -787,7 +787,7 @@
                                 <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <div class="header-info2 d-flex align-items-center">
                                         <div class="header-media">
-                                            <img src="{{ asset('assets/images/user.jpg') }}" alt="">
+                                            <img src="{{ asset('assets/images/user.jpg') }}" alt="" class="profile-img">
                                         </div>
                                     </div>
                                 </a>
