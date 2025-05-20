@@ -25,6 +25,9 @@
 
     <!-- Main CSS File -->
     <link href="{{ asset('assets/css/welcome.css') }}" rel="stylesheet">
+    
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 
 <body>
@@ -105,6 +108,7 @@
     </header>
 
 <section id="home" class="hero" style="background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('{{ asset('assets/images/Gedung JTI.jpg') }}');">
+        <div id="particles-js" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
         <div class="container">
             <div class="hero-content" data-aos="fade-up" data-aos-delay="100">
                 <h1>Sistem Akreditasi D4 Sistem Informasi Bisnis</h1>
@@ -218,28 +222,30 @@
                 <p>Program Studi D4 Sistem Informasi Bisnis</p>
             </div>
 
-            <ul class="nav nav-pills features-tabs mb-4" id="features-tab" role="tablist" data-aos="fade-up" data-aos-delay="100">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="vision-tab" data-bs-toggle="pill" data-bs-target="#vision" type="button" role="tab" aria-controls="vision" aria-selected="true">
-                        <i class="bi bi-eye me-2"></i>Visi
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="mission-tab" data-bs-toggle="pill" data-bs-target="#mission" type="button" role="tab" aria-controls="mission" aria-selected="false">
-                        <i class="bi bi-bullseye me-2"></i>Misi
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="goals-tab" data-bs-toggle="pill" data-bs-target="#goals" type="button" role="tab" aria-controls="goals" aria-selected="false">
-                        <i class="bi bi-flag me-2"></i>Tujuan
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="targets-tab" data-bs-toggle="pill" data-bs-target="#targets" type="button" role="tab" aria-controls="targets" aria-selected="false">
-                        <i class="bi bi-bar-chart me-2"></i>Sasaran
-                    </button>
-                </li>
-            </ul>
+            <div class="features-tabs-container">
+                <ul class="nav nav-pills features-tabs mb-4" id="features-tab" role="tablist" data-aos="fade-up" data-aos-delay="100">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="vision-tab" data-bs-toggle="pill" data-bs-target="#vision" type="button" role="tab" aria-controls="vision" aria-selected="true">
+                            <i class="bi bi-eye me-2"></i>Visi
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="mission-tab" data-bs-toggle="pill" data-bs-target="#mission" type="button" role="tab" aria-controls="mission" aria-selected="false">
+                            <i class="bi bi-bullseye me-2"></i>Misi
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="goals-tab" data-bs-toggle="pill" data-bs-target="#goals" type="button" role="tab" aria-controls="goals" aria-selected="false">
+                            <i class="bi bi-flag me-2"></i>Tujuan
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="targets-tab" data-bs-toggle="pill" data-bs-target="#targets" type="button" role="tab" aria-controls="targets" aria-selected="false">
+                            <i class="bi bi-bar-chart me-2"></i>Sasaran
+                        </button>
+                    </li>
+                </ul>
+            </div>
 
             <div class="tab-content" id="features-tabContent" data-aos="fade-up" data-aos-delay="200">
                 <div class="tab-pane fade show active" id="vision" role="tabpanel" aria-labelledby="vision-tab">
