@@ -21,7 +21,8 @@ class User extends Authenticatable
         'nama',
         'username',
         'password',
-        'role'
+        'role',
+        'photo'
     ];
 
     /**
@@ -56,4 +57,6 @@ class User extends Authenticatable
     {
         return $this->role === 'dosen';
     }
+
+    
 }
