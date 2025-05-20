@@ -111,3 +111,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/dokumen/finalisasi-all/{kriteria_id}', [DokumenController::class, 'finalisasiAll'])->name('dokumen.finalisasi.all');
 });
+
+use App\Http\Controllers\ProfileController;
+Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
