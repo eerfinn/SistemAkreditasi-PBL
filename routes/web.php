@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/{dokumen}', 'update')->name('update');
         Route::delete('/{dokumen}', 'destroy')->name('destroy');
         Route::post('/{dokumen}/submit-revision', 'submitRevision')->name('submit.revision');
+        Route::get('/{id}/view', 'viewDocument')->name('view');
     });
 
     // Validasi Routes

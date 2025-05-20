@@ -94,10 +94,10 @@ class UserController extends Controller
     }
     
     public function profile()
-{
-    $user = Auth::user(); // Ambil data user yang sedang login
-    return view('profil.profile', compact('user'));
-}
+    {
+        $user = Auth::user(); // Ambil data user yang sedang login
+        return view('pages.profile.profile', compact('user'));
+    }
     
     public function showJson(User $user)
     {
