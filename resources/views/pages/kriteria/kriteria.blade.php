@@ -120,15 +120,11 @@ $(document).ready(function() {
                         </div>
                         @if(auth()->user() && auth()->user()->role === 'dosen')
                         <div class="col-md-4 text-end">
-                            @if(!$disableKelola)
-                                <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
-                                    <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
-                                </a>
-                            @else
-                                <button class="btn btn-secondary" disabled>
-                                    <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
-                                </button>
-                                <small class="d-block mt-1 text-muted">Semua dokumen telah difinalisasi</small>
+                            <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
+                                <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
+                            </a>
+                            @if($hasFinalizedDocuments)
+                            <small class="d-block mt-1 text-muted">Beberapa dokumen sudah difinalisasi</small>
                             @endif
                         </div>
                         @endif
@@ -143,10 +139,9 @@ $(document).ready(function() {
                 <div class="card-header"><h4 class="card-title">Ringkasan Dokumen</h4></div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-xl-3 col-sm-6 col-6 mb-sm-3 mb-3"><div class="widget-stat card bg-warning"><div class="card-body p-4"><div class="media"><span class="me-3"><i class="fas fa-clock text-white"></i></span><div class="media-body text-white text-end"><p class="mb-1">Menunggu Validasi</p><h3 class="text-white mb-0 count">{{ $statusCounts['menunggu'] ?? 0 }}</h3></div></div></div></div></div>
-                        <div class="col-xl-3 col-sm-6 col-6 mb-sm-3 mb-3"><div class="widget-stat card bg-danger"><div class="card-body p-4"><div class="media"><span class="me-3"><i class="fas fa-exclamation-circle text-white"></i></span><div class="media-body text-white text-end"><p class="mb-1">Perlu Revisi</p><h3 class="text-white mb-0 count">{{ $statusCounts['revisi'] ?? 0 }}</h3></div></div></div></div></div>
-                        <div class="col-xl-3 col-sm-6 col-6 mb-sm-3 mb-3"><div class="widget-stat card bg-success"><div class="card-body p-4"><div class="media"><span class="me-3"><i class="fas fa-check-circle text-white"></i></span><div class="media-body text-white text-end"><p class="mb-1">Diterima</p><h3 class="text-white mb-0 count">{{ $statusCounts['diterima'] ?? 0 }}</h3></div></div></div></div></div>
-                        <div class="col-xl-3 col-sm-6 col-6 mb-sm-3 mb-3"><div class="widget-stat card bg-primary"><div class="card-body p-4"><div class="media"><span class="me-3"><i class="fas fa-check-double text-white"></i></span><div class="media-body text-white text-end"><p class="mb-1">Terverifikasi Final</p><h3 class="text-white mb-0 count">{{ $statusCounts['diverifikasi'] ?? 0 }}</h3></div></div></div></div></div>
+                        <div class="col-xl-4 col-sm-6 col-6 mb-sm-3 mb-3"><div class="widget-stat card bg-warning"><div class="card-body p-4"><div class="media"><span class="me-3"><i class="fas fa-clock text-white"></i></span><div class="media-body text-white text-end"><p class="mb-1">Menunggu Validasi</p><h3 class="text-white mb-0 count">{{ $statusCounts['menunggu'] ?? 0 }}</h3></div></div></div></div></div>
+                        <div class="col-xl-4 col-sm-6 col-6 mb-sm-3 mb-3"><div class="widget-stat card bg-danger"><div class="card-body p-4"><div class="media"><span class="me-3"><i class="fas fa-exclamation-circle text-white"></i></span><div class="media-body text-white text-end"><p class="mb-1">Perlu Revisi</p><h3 class="text-white mb-0 count">{{ $statusCounts['revisi'] ?? 0 }}</h3></div></div></div></div></div>
+                        <div class="col-xl-4 col-sm-6 col-6 mb-sm-3 mb-3"><div class="widget-stat card bg-primary"><div class="card-body p-4"><div class="media"><span class="me-3"><i class="fas fa-check-double text-white"></i></span><div class="media-body text-white text-end"><p class="mb-1">Terverifikasi Final</p><h3 class="text-white mb-0 count">{{ $statusCounts['diverifikasi'] ?? 0 }}</h3></div></div></div></div></div>
                     </div>
                 </div>
             </div>
@@ -186,8 +181,6 @@ $(document).ready(function() {
                                             <span class="badge light badge-warning">Menunggu</span>
                                         @elseif($dokumen->status == 'revisi')
                                             <span class="badge light badge-danger">Revisi</span>
-                                        @elseif($dokumen->status == 'diterima')
-                                            <span class="badge light badge-success">Diterima</span>
                                         @elseif($dokumen->status == 'diverifikasi')
                                             <span class="badge light badge-primary">Terverifikasi</span>
                                         @endif
@@ -197,6 +190,62 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @php
+                                                // Get document comments
+                                                $dokumenComments = \App\Models\Komen::where('dokumen_id', $dokumen->id)
+                                                    ->with('user')
+                                                    ->orderBy('created_at', 'desc')
+                                                    ->get();
+                                                $commentCount = $dokumenComments->count();
+                                            @endphp
+                                            
+                                            @if($commentCount > 0)
+                                                <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat {{ $commentCount }} Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-comments"></i>
+                                                    @if($commentCount > 0)
+                                                        <span class="badge bg-danger text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px;">{{ $commentCount }}</span>
+                                                    @endif
+                                                </button>
+                                                
+                                                <!-- Comments Modal -->
+                                                <div class="modal fade" id="commentModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title text-truncate w-75" id="commentModalLabel{{ $dokumen->id }}">Komentar untuk Dokumen: {{ $dokumen->nama_dokumen }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                @if($dokumenComments->count() > 0)
+                                                                    @foreach($dokumenComments as $comment)
+                                                                    <div class="border-bottom pb-3 mb-3">
+                                                                        <div class="d-flex align-items-center mb-2">
+                                                                            <div class="avatar avatar-xs me-2">
+                                                                                <span class="avatar-initial rounded-circle bg-primary">
+                                                                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <h6 class="mb-0">{{ $comment->user->name ?? 'User' }}</h6>
+                                                                            <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
+                                                                            <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                                                                        </div>
+                                                                        <p class="mb-0 ps-4">{{ $comment->komentar }}</p>
+                                                                    </div>
+                                                                    @endforeach
+                                                                @else
+                                                                    <div class="alert alert-info mb-0">
+                                                                        <i class="fas fa-info-circle me-2"></i> Belum ada komentar untuk dokumen ini.
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             
                                             @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
@@ -264,12 +313,6 @@ $(document).ready(function() {
                                                                             <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
                                                                             <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
                                                                                 <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="form-check mb-2">
-                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
-                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
-                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check mb-2">
@@ -354,8 +397,6 @@ $(document).ready(function() {
                                             <span class="badge light badge-warning">Menunggu</span>
                                         @elseif($dokumen->status == 'revisi')
                                             <span class="badge light badge-danger">Revisi</span>
-                                        @elseif($dokumen->status == 'diterima')
-                                            <span class="badge light badge-success">Diterima</span>
                                         @elseif($dokumen->status == 'diverifikasi')
                                             <span class="badge light badge-primary">Terverifikasi</span>
                                         @endif
@@ -365,6 +406,62 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @php
+                                                // Get document comments
+                                                $dokumenComments = \App\Models\Komen::where('dokumen_id', $dokumen->id)
+                                                    ->with('user')
+                                                    ->orderBy('created_at', 'desc')
+                                                    ->get();
+                                                $commentCount = $dokumenComments->count();
+                                            @endphp
+                                            
+                                            @if($commentCount > 0)
+                                                <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat {{ $commentCount }} Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-comments"></i>
+                                                    @if($commentCount > 0)
+                                                        <span class="badge bg-danger text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px;">{{ $commentCount }}</span>
+                                                    @endif
+                                                </button>
+                                                
+                                                <!-- Comments Modal -->
+                                                <div class="modal fade" id="commentModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title text-truncate w-75" id="commentModalLabel{{ $dokumen->id }}">Komentar untuk Dokumen: {{ $dokumen->nama_dokumen }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                @if($dokumenComments->count() > 0)
+                                                                    @foreach($dokumenComments as $comment)
+                                                                    <div class="border-bottom pb-3 mb-3">
+                                                                        <div class="d-flex align-items-center mb-2">
+                                                                            <div class="avatar avatar-xs me-2">
+                                                                                <span class="avatar-initial rounded-circle bg-primary">
+                                                                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <h6 class="mb-0">{{ $comment->user->name ?? 'User' }}</h6>
+                                                                            <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
+                                                                            <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                                                                        </div>
+                                                                        <p class="mb-0 ps-4">{{ $comment->komentar }}</p>
+                                                                    </div>
+                                                                    @endforeach
+                                                                @else
+                                                                    <div class="alert alert-info mb-0">
+                                                                        <i class="fas fa-info-circle me-2"></i> Belum ada komentar untuk dokumen ini.
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             
                                             @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
@@ -432,12 +529,6 @@ $(document).ready(function() {
                                                                             <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
                                                                             <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
                                                                                 <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="form-check mb-2">
-                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
-                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
-                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check mb-2">
@@ -522,8 +613,6 @@ $(document).ready(function() {
                                             <span class="badge light badge-warning">Menunggu</span>
                                         @elseif($dokumen->status == 'revisi')
                                             <span class="badge light badge-danger">Revisi</span>
-                                        @elseif($dokumen->status == 'diterima')
-                                            <span class="badge light badge-success">Diterima</span>
                                         @elseif($dokumen->status == 'diverifikasi')
                                             <span class="badge light badge-primary">Terverifikasi</span>
                                         @endif
@@ -533,6 +622,62 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @php
+                                                // Get document comments
+                                                $dokumenComments = \App\Models\Komen::where('dokumen_id', $dokumen->id)
+                                                    ->with('user')
+                                                    ->orderBy('created_at', 'desc')
+                                                    ->get();
+                                                $commentCount = $dokumenComments->count();
+                                            @endphp
+                                            
+                                            @if($commentCount > 0)
+                                                <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat {{ $commentCount }} Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-comments"></i>
+                                                    @if($commentCount > 0)
+                                                        <span class="badge bg-danger text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px;">{{ $commentCount }}</span>
+                                                    @endif
+                                                </button>
+                                                
+                                                <!-- Comments Modal -->
+                                                <div class="modal fade" id="commentModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title text-truncate w-75" id="commentModalLabel{{ $dokumen->id }}">Komentar untuk Dokumen: {{ $dokumen->nama_dokumen }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                @if($dokumenComments->count() > 0)
+                                                                    @foreach($dokumenComments as $comment)
+                                                                    <div class="border-bottom pb-3 mb-3">
+                                                                        <div class="d-flex align-items-center mb-2">
+                                                                            <div class="avatar avatar-xs me-2">
+                                                                                <span class="avatar-initial rounded-circle bg-primary">
+                                                                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <h6 class="mb-0">{{ $comment->user->name ?? 'User' }}</h6>
+                                                                            <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
+                                                                            <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                                                                        </div>
+                                                                        <p class="mb-0 ps-4">{{ $comment->komentar }}</p>
+                                                                    </div>
+                                                                    @endforeach
+                                                                @else
+                                                                    <div class="alert alert-info mb-0">
+                                                                        <i class="fas fa-info-circle me-2"></i> Belum ada komentar untuk dokumen ini.
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             
                                             @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
@@ -600,12 +745,6 @@ $(document).ready(function() {
                                                                             <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
                                                                             <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
                                                                                 <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="form-check mb-2">
-                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
-                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
-                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check mb-2">
@@ -690,8 +829,6 @@ $(document).ready(function() {
                                             <span class="badge light badge-warning">Menunggu</span>
                                         @elseif($dokumen->status == 'revisi')
                                             <span class="badge light badge-danger">Revisi</span>
-                                        @elseif($dokumen->status == 'diterima')
-                                            <span class="badge light badge-success">Diterima</span>
                                         @elseif($dokumen->status == 'diverifikasi')
                                             <span class="badge light badge-primary">Terverifikasi</span>
                                         @endif
@@ -701,6 +838,62 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @php
+                                                // Get document comments
+                                                $dokumenComments = \App\Models\Komen::where('dokumen_id', $dokumen->id)
+                                                    ->with('user')
+                                                    ->orderBy('created_at', 'desc')
+                                                    ->get();
+                                                $commentCount = $dokumenComments->count();
+                                            @endphp
+                                            
+                                            @if($commentCount > 0)
+                                                <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat {{ $commentCount }} Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-comments"></i>
+                                                    @if($commentCount > 0)
+                                                        <span class="badge bg-danger text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px;">{{ $commentCount }}</span>
+                                                    @endif
+                                                </button>
+                                                
+                                                <!-- Comments Modal -->
+                                                <div class="modal fade" id="commentModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title text-truncate w-75" id="commentModalLabel{{ $dokumen->id }}">Komentar untuk Dokumen: {{ $dokumen->nama_dokumen }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                @if($dokumenComments->count() > 0)
+                                                                    @foreach($dokumenComments as $comment)
+                                                                    <div class="border-bottom pb-3 mb-3">
+                                                                        <div class="d-flex align-items-center mb-2">
+                                                                            <div class="avatar avatar-xs me-2">
+                                                                                <span class="avatar-initial rounded-circle bg-primary">
+                                                                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <h6 class="mb-0">{{ $comment->user->name ?? 'User' }}</h6>
+                                                                            <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
+                                                                            <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                                                                        </div>
+                                                                        <p class="mb-0 ps-4">{{ $comment->komentar }}</p>
+                                                                    </div>
+                                                                    @endforeach
+                                                                @else
+                                                                    <div class="alert alert-info mb-0">
+                                                                        <i class="fas fa-info-circle me-2"></i> Belum ada komentar untuk dokumen ini.
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             
                                             @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
@@ -768,12 +961,6 @@ $(document).ready(function() {
                                                                             <input class="form-check-input" type="radio" name="status" id="status_revisi{{ $dokumen->id }}" value="revisi" required {{ $dokumen->status == 'revisi' ? 'checked' : '' }}>
                                                                             <label class="form-check-label" for="status_revisi{{ $dokumen->id }}">
                                                                                 <span class="badge light badge-danger">Revisi</span> - Dokumen perlu direvisi
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="form-check mb-2">
-                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
-                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
-                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check mb-2">
@@ -858,8 +1045,6 @@ $(document).ready(function() {
                                             <span class="badge light badge-warning">Menunggu</span>
                                         @elseif($dokumen->status == 'revisi')
                                             <span class="badge light badge-danger">Revisi</span>
-                                        @elseif($dokumen->status == 'diterima')
-                                            <span class="badge light badge-success">Diterima</span>
                                         @elseif($dokumen->status == 'diverifikasi')
                                             <span class="badge light badge-primary">Terverifikasi</span>
                                         @endif
@@ -869,6 +1054,62 @@ $(document).ready(function() {
                                             <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            
+                                            @php
+                                                // Get document comments
+                                                $dokumenComments = \App\Models\Komen::where('dokumen_id', $dokumen->id)
+                                                    ->with('user')
+                                                    ->orderBy('created_at', 'desc')
+                                                    ->get();
+                                                $commentCount = $dokumenComments->count();
+                                            @endphp
+                                            
+                                            @if($commentCount > 0)
+                                                <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat {{ $commentCount }} Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
+                                                    <i class="fas fa-comments"></i>
+                                                    @if($commentCount > 0)
+                                                        <span class="badge bg-danger text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px;">{{ $commentCount }}</span>
+                                                    @endif
+                                                </button>
+                                                
+                                                <!-- Comments Modal -->
+                                                <div class="modal fade" id="commentModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ $dokumen->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title text-truncate w-75" id="commentModalLabel{{ $dokumen->id }}">Komentar untuk Dokumen: {{ $dokumen->nama_dokumen }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                @if($dokumenComments->count() > 0)
+                                                                    @foreach($dokumenComments as $comment)
+                                                                    <div class="border-bottom pb-3 mb-3">
+                                                                        <div class="d-flex align-items-center mb-2">
+                                                                            <div class="avatar avatar-xs me-2">
+                                                                                <span class="avatar-initial rounded-circle bg-primary">
+                                                                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <h6 class="mb-0">{{ $comment->user->name ?? 'User' }}</h6>
+                                                                            <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
+                                                                            <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                                                                        </div>
+                                                                        <p class="mb-0 ps-4">{{ $comment->komentar }}</p>
+                                                                    </div>
+                                                                    @endforeach
+                                                                @else
+                                                                    <div class="alert alert-info mb-0">
+                                                                        <i class="fas fa-info-circle me-2"></i> Belum ada komentar untuk dokumen ini.
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             
                                             @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
@@ -939,12 +1180,6 @@ $(document).ready(function() {
                                                                             </label>
                                                                         </div>
                                                                         <div class="form-check mb-2">
-                                                                            <input class="form-check-input" type="radio" name="status" id="status_diterima{{ $dokumen->id }}" value="diterima" {{ $dokumen->status == 'diterima' ? 'checked' : '' }}>
-                                                                            <label class="form-check-label" for="status_diterima{{ $dokumen->id }}">
-                                                                                <span class="badge light badge-success">Diterima</span> - Dokumen diterima
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="form-check mb-2">
                                                                             <input class="form-check-input" type="radio" name="status" id="status_diverifikasi{{ $dokumen->id }}" value="diverifikasi" {{ $dokumen->status == 'diverifikasi' ? 'checked' : '' }}>
                                                                             <label class="form-check-label" for="status_diverifikasi{{ $dokumen->id }}">
                                                                                 <span class="badge light badge-primary">Terverifikasi</span> - Dokumen terverifikasi final
@@ -1004,91 +1239,61 @@ $(document).ready(function() {
                         <h5 class="mb-0">Finalisasi Dokumen</h5>
                     </div>
                     <div class="card-body">
-                        @if($disableKelola)
-                            <div class="alert alert-info mb-0">
-                                <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Dokumen Telah Difinalisasi</h5>
-                                <p class="mb-0">Semua dokumen untuk kriteria ini telah difinalisasi dan sedang dalam proses validasi atau telah tervalidasi. Tidak ada dokumen draft yang perlu difinalisasi.</p>
+                        @php
+                            // Count draft documents
+                            $totalDraftCount = 0;
+                            $totalValidCount = 0;
+                            
+                            foreach(array_keys($ppepp_labels) as $key) {
+                                // Count draft documents for this stage
+                                $draftCount = isset($dokumenPerPPEPP[$key]) 
+                                    ? $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() 
+                                    : 0;
+                                
+                                $totalDraftCount += $draftCount;
+                                
+                                // Count already validated documents
+                                $validCount = isset($dokumenPerPPEPP[$key])
+                                    ? $dokumenPerPPEPP[$key]->whereIn('status', [
+                                        \App\Models\Dokumen::STATUS_MENUNGGU,
+                                        \App\Models\Dokumen::STATUS_DIVERIFIKASI
+                                    ])->count()
+                                    : 0;
+                                
+                                $totalValidCount += $validCount;
+                            }
+                        @endphp
+                        
+                        @if($totalDraftCount == 0)
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading fw-bold">Tidak Ada Draft untuk Difinalisasi</h6>
+                                <p class="mb-0">
+                                    @if($totalValidCount > 0)
+                                        Semua dokumen sudah dalam proses validasi atau telah divalidasi. Anda dapat menambahkan dokumen baru jika diperlukan.
+                                    @else
+                                        Belum ada dokumen draft yang perlu difinalisasi. Silakan tambahkan dokumen terlebih dahulu.
+                                    @endif
+                                </p>
                             </div>
                         @else
                             <div class="alert alert-info mb-4">
                                 <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Finalisasi</h5>
-                                <p>Untuk finalisasi, Anda harus memiliki <strong>minimal satu dokumen</strong> untuk setiap tahap PPEPP (Penetapan, Pelaksanaan, Evaluasi, Pengendalian, dan Peningkatan).</p>
+                                <p>Anda memiliki <strong>{{ $totalDraftCount }} dokumen draft</strong> yang siap difinalisasi.</p>
                                 <p class="mb-0">Setelah difinalisasi, dokumen akan dikirim untuk validasi dan tidak dapat diedit lagi.</p>
                             </div>
                             
-                            @php
-                                // Count draft documents and check if each stage has a document (either draft or already validated)
-                                $totalDraftCount = 0;
-                                $totalValidCount = 0;
-                                $allStagesHaveDocuments = true;
-                                $stagesWithoutDocs = [];
-                                
-                                foreach(array_keys($ppepp_labels) as $key) {
-                                    // Check if this stage has any documents at all
-                                    $hasAnyDocument = isset($dokumenPerPPEPP[$key]) && $dokumenPerPPEPP[$key]->count() > 0;
-                                    
-                                    if (!$hasAnyDocument) {
-                                        $allStagesHaveDocuments = false;
-                                        $stagesWithoutDocs[] = $ppepp_labels[$key];
-                                    }
-                                    
-                                    // Count draft documents for this stage
-                                    $draftCount = isset($dokumenPerPPEPP[$key]) 
-                                        ? $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() 
-                                        : 0;
-                                    
-                                    $totalDraftCount += $draftCount;
-                                    
-                                    // Count already validated documents
-                                    $validCount = isset($dokumenPerPPEPP[$key])
-                                        ? $dokumenPerPPEPP[$key]->whereIn('status', [
-                                            \App\Models\Dokumen::STATUS_MENUNGGU,
-                                            \App\Models\Dokumen::STATUS_DITERIMA,
-                                            \App\Models\Dokumen::STATUS_DIVERIFIKASI
-                                        ])->count()
-                                        : 0;
-                                    
-                                    $totalValidCount += $validCount;
-                                }
-                            @endphp
+                            <form action="{{ route('kriteria.finalisasi', $kriteria->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi oleh Anda.')">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-check-circle me-1"></i> Finalisasi {{ $totalDraftCount }} Dokumen Draft
+                                </button>
+                            </form>
                             
-                            @if($allStagesHaveDocuments && $totalDraftCount > 0)
-                                <form action="{{ route('kriteria.finalisasi', $kriteria->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi oleh Anda.')">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success btn-lg w-100">
-                                        <i class="fas fa-check-circle me-1"></i> Finalisasi {{ $totalDraftCount }} Dokumen Draft
-                                    </button>
-                                </form>
-                                
-                                @if($totalValidCount > 0)
-                                <div class="alert alert-success mt-3 mb-0">
-                                    <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Tambahan</h6>
-                                    <p class="mb-0">{{ $totalValidCount }} dokumen lainnya sudah dalam proses validasi atau sudah divalidasi.</p>
-                                </div>
-                                @endif
-                            @elseif(!$allStagesHaveDocuments)
-                                <div class="alert alert-warning">
-                                    <h6 class="alert-heading fw-bold">Belum Dapat Finalisasi</h6>
-                                    <p class="mb-0">
-                                        Anda perlu mengunggah dokumen untuk setiap tahap PPEPP.
-                                        <br>Tahap yang belum memiliki dokumen:
-                                        <ul class="mb-0 mt-1">
-                                            @foreach($stagesWithoutDocs as $stage)
-                                                <li>{{ $stage }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </p>
-                                </div>
-                            @elseif($totalDraftCount == 0 && $totalValidCount > 0)
-                                <div class="alert alert-info">
-                                    <h6 class="alert-heading fw-bold">Tidak Ada Draft untuk Difinalisasi</h6>
-                                    <p class="mb-0">Semua dokumen sudah dalam proses validasi atau telah divalidasi. Tidak ada dokumen draft yang perlu difinalisasi.</p>
-                                </div>
-                            @else
-                                <div class="alert alert-warning">
-                                    <h6 class="alert-heading fw-bold">Belum Ada Dokumen Draft</h6>
-                                    <p class="mb-0">Anda belum memiliki dokumen draft. Silakan kelola dokumen PPEPP terlebih dahulu untuk mengunggah dokumen.</p>
-                                </div>
+                            @if($totalValidCount > 0)
+                            <div class="alert alert-success mt-3 mb-0">
+                                <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Tambahan</h6>
+                                <p class="mb-0">{{ $totalValidCount }} dokumen lainnya sudah dalam proses validasi atau sudah divalidasi.</p>
+                            </div>
                             @endif
                         @endif
                     </div>

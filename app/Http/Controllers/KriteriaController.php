@@ -110,7 +110,6 @@ class KriteriaController extends Controller
         $statusCounts = [
             'menunggu'     => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_MENUNGGU)->count(),
             'revisi'       => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_REVISI)->count(),
-            'diterima'     => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_DITERIMA)->count(),
             'diverifikasi' => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_DIVERIFIKASI)->count(),
         ];
 
@@ -147,6 +146,36 @@ class KriteriaController extends Controller
         // Get descriptions from kriteria table
         $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
 
+        // Check if there are any draft documents
+        $hasDraftDocuments = false;
+        foreach($dokumenPerPPEPP as $stageDocs) {
+            if(isset($stageDocs) && $stageDocs->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() > 0) {
+                $hasDraftDocuments = true;
+                break;
+            }
+        }
+
+        // Check if there are documents needing revision
+        $hasRevisionDocuments = isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0;
+
+        // Check if there are any documents at all in this kriteria
+        $hasAnyDocuments = false;
+        foreach($dokumenPerPPEPP as $stageDocs) {
+            if(isset($stageDocs) && count($stageDocs) > 0) {
+                $hasAnyDocuments = true;
+                break;
+            }
+        }
+
+        // Check if there are any finalized documents (menunggu/diverifikasi)
+        $hasFinalizedDocuments = isset($statusCounts) &&
+            (($statusCounts['menunggu'] ?? 0) > 0 ||
+             ($statusCounts['diverifikasi'] ?? 0) > 0);
+
+        // For dosen, we'll always allow them to manage documents
+        // The old logic that disabled the button is removed
+        $disableKelola = false;
+
         return view('pages.kriteria.kriteria', [
             'kriteria'         => $kriteria,
             'dokumenPerPPEPP'  => $dokumenPerPPEPP,
@@ -158,7 +187,8 @@ class KriteriaController extends Controller
             'dokumenDrafts'    => $dokumenDrafts,
             'showUploadButton' => $user && $user->role === 'dosen',
             'ppepp_descriptions' => $ppepp_descriptions,
-            'kriteriaComments' => $kriteriaComments
+            'kriteriaComments' => $kriteriaComments,
+            'disableKelola' => $disableKelola
         ]);
     }
 
@@ -254,80 +284,6 @@ class KriteriaController extends Controller
             abort(403, 'Anda tidak berwenang memfinalisasi dokumen untuk kriteria ini.');
         }
 
-        // Define PPEPP stages
-        $ppepp_stages = [
-            Dokumen::PPEPP_PENETAPAN,
-            Dokumen::PPEPP_PELAKSANAAN,
-            Dokumen::PPEPP_EVALUASI,
-            Dokumen::PPEPP_PENGENDALIAN,
-            Dokumen::PPEPP_PENINGKATAN
-        ];
-
-        // First get all documents for this kriteria and user
-        $allDocuments = Dokumen::where('user_id', $user->id)
-                ->where('kriteria_id', $kriteria->id)
-                ->whereNotNull('path')
-                ->get();
-        
-        // Count documents per stage
-        $docsCountByStage = [];
-        $draftCountByStage = [];
-        $validatedCountByStage = [];
-        
-        foreach ($ppepp_stages as $stage) {
-            $stageDocuments = $allDocuments->where('jenis_ppepp', $stage);
-            $docsCountByStage[$stage] = $stageDocuments->count();
-            $draftCountByStage[$stage] = $stageDocuments->where('status', Dokumen::STATUS_DRAFT)->count();
-            $validatedCountByStage[$stage] = $stageDocuments->whereIn('status', [
-                Dokumen::STATUS_MENUNGGU, 
-                Dokumen::STATUS_DITERIMA, 
-                Dokumen::STATUS_DIVERIFIKASI
-            ])->count();
-        }
-        
-        // Log document counts for debugging
-        Log::info('Document counts for kriteria by stage', [
-            'kriteria_id' => $kriteria->id,
-            'total_counts' => $docsCountByStage,
-            'draft_counts' => $draftCountByStage,
-            'validated_counts' => $validatedCountByStage,
-        ]);
-        
-        // Check if each stage has at least one document (either draft or already validated)
-        $missingStages = [];
-        foreach ($ppepp_stages as $stage) {
-            if ($docsCountByStage[$stage] === 0) {
-                $missingStages[] = $stage;
-            }
-        }
-
-        if (!empty($missingStages)) {
-            $missingStagesList = implode(', ', array_map(function($stage) {
-                return ucfirst($stage);
-            }, $missingStages));
-            
-            Log::warning('Finalization failed - missing document stages', [
-                'missing_stages' => $missingStages
-            ]);
-            
-            return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan'])
-                            ->with('error', "Anda belum mengunggah dokumen untuk tahapan: {$missingStagesList}");
-        }
-        
-        // Check if there are any drafts at all to finalize
-        $hasDrafts = false;
-        foreach ($draftCountByStage as $count) {
-            if ($count > 0) {
-                $hasDrafts = true;
-                break;
-            }
-        }
-        
-        if (!$hasDrafts) {
-            return redirect()->route('kriteria.show', $kriteria->id)
-                            ->with('info', 'Tidak ada dokumen draft yang perlu difinalisasi. Semua dokumen sudah dalam proses validasi atau sudah divalidasi.');
-        }
-
         // Get only draft documents to finalize
         $dokumenDrafts = Dokumen::where('user_id', $user->id)
                        ->where('kriteria_id', $kriteria->id)
@@ -339,6 +295,12 @@ class KriteriaController extends Controller
             'draft_count' => $dokumenDrafts->count(),
             'draft_ids' => $dokumenDrafts->pluck('id')->toArray()
         ]);
+
+        // If no draft documents found, inform the user
+        if ($dokumenDrafts->count() === 0) {
+            return redirect()->route('kriteria.show', $kriteria->id)
+                            ->with('info', 'Tidak ada dokumen draft yang perlu difinalisasi.');
+        }
 
         $berhasilFinalisasi = 0;
         foreach ($dokumenDrafts as $dokumen) {

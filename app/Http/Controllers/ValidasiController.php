@@ -32,7 +32,7 @@ class ValidasiController extends Controller
 
         // Validasi request
         $request->validate([
-            'status' => 'required|in:' . implode(',', [Dokumen::STATUS_REVISI, Dokumen::STATUS_DITERIMA, Dokumen::STATUS_DIVERIFIKASI]),
+            'status' => 'required|in:' . implode(',', [Dokumen::STATUS_REVISI, Dokumen::STATUS_DIVERIFIKASI]),
             'komentar' => 'nullable|string|max:1000',
             'kriteria_comment' => 'nullable|string|max:1000',
         ]);
@@ -61,6 +61,12 @@ class ValidasiController extends Controller
             $dokumenKomen->user_id = $user->id;
             $dokumenKomen->komentar = $request->komentar;
             $dokumenKomen->save();
+            
+            Log::info('Document comment saved', [
+                'dokumen_id' => $dokumen->id,
+                'user_id' => $user->id,
+                'comment' => $request->komentar
+            ]);
         }
 
         // Jika ada komentar untuk kriteria, simpan juga
@@ -94,7 +100,6 @@ class ValidasiController extends Controller
 
         $statusMessages = [
             Dokumen::STATUS_REVISI => 'Dokumen dikembalikan untuk revisi.',
-            Dokumen::STATUS_DITERIMA => 'Dokumen telah diterima.',
             Dokumen::STATUS_DIVERIFIKASI => 'Dokumen telah diverifikasi final.'
         ];
 
