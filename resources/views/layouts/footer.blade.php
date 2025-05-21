@@ -1,9 +1,9 @@
 <!--**********************************
     Footer start
 ***********************************-->
-<div class="footer">
-    <div class="copyright">
-        <p>Copyright © Developed by Group 4 2025</p>
+<div class="footer" padding: 15px 0; text-align: center;">
+    <div class="copyright" style="color: #333; font-weight: bold;">
+        <p>© 2025 SiAkred - Sistem Akreditasi D4 SIB. All Rights Reserved.</p>
     </div>
 </div>
 <!--**********************************
