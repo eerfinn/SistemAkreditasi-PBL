@@ -372,8 +372,8 @@ class DokumenController extends Controller
     {
         $user = Auth::user();
         
-        // Validate that the user owns this document and it needs revision
-        if ($user->id !== $dokumen->user_id) {
+        // Validate that the user owns this document or is an admin, and document needs revision
+        if ($user->id !== $dokumen->user_id && $user->role !== 'administrator') {
             return back()->with('error', 'Anda tidak memiliki izin untuk merevisi dokumen ini.');
         }
         
