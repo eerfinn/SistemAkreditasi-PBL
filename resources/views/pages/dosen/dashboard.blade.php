@@ -760,6 +760,15 @@
                 return;
             }
 
+            // Cek apakah ada data
+            const totalDocs = {{ $totalDocuments }};
+            
+            // Jika tidak ada data, tampilkan pesan "Tidak ada data"
+            if (totalDocs === 0) {
+                $('#documentStatusChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>');
+                return;
+            }
+
             const documentStatusOptions = {
                 series: [
                     {{ $verifiedDocuments }}, 
@@ -868,6 +877,16 @@
                 return;
             }
 
+            // Cek apakah ada data
+            const ppepp_total = {!! json_encode($ppepp_total) !!};
+            const hasData = ppepp_total.some(value => value > 0);
+            
+            // Jika tidak ada data, tampilkan pesan "Tidak ada data"
+            if (!hasData) {
+                $('#documentProgressChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>');
+                return;
+            }
+
             const documentProgressOptions = {
                 series: [{
                     name: 'Dokumen Terverifikasi',
@@ -923,8 +942,8 @@
                         text: 'Jumlah Dokumen'
                     },
                     min: 0,
-                    max: {{ max($ppepp_total) + 1 }},
-                    tickAmount: {{ max($ppepp_total) + 1 }}
+                    max: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...{!! json_encode($ppepp_total) !!}) + 1 : 5,
+                    tickAmount: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...{!! json_encode($ppepp_total) !!}) + 1 : 5
                 },
                 fill: {
                     opacity: 1,

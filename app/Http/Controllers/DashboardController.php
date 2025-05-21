@@ -63,11 +63,11 @@ class DashboardController extends Controller
         
         // Ensure we have at least some data for the charts
         if ($totalDocuments == 0) {
-            $totalDocuments = 10;
-            $verifiedDocuments = 4;
-            $pendingDocuments = 3;
-            $revisionDocuments = 2;
-            $draftDocuments = 1;
+            $totalDocuments = 0;
+            $verifiedDocuments = 0;
+            $pendingDocuments = 0;
+            $revisionDocuments = 0;
+            $draftDocuments = 0;
         }
         
         // Get PPEPP statistics for charts
@@ -102,10 +102,10 @@ class DashboardController extends Controller
             $ppepp_total[] = $total;
         }
         
-        // If no data exists, provide sample data for visualization
+        // If no data exists, provide empty data for visualization
         if (!$hasData) {
-            $ppepp_verified = [3, 2, 1, 1, 2];
-            $ppepp_total = [5, 4, 3, 3, 4];
+            $ppepp_verified = [0, 0, 0, 0, 0];
+            $ppepp_total = [0, 0, 0, 0, 0];
         }
         
         // Create calendar events
