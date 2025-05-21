@@ -253,9 +253,7 @@
                         </a>
                     </li>
                 </ul>
-<<<<<<< HEAD
             </li> --}}
-=======
             </li>
             <li>
                 <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
@@ -281,7 +279,6 @@
                 </ul>
             </li>
 
->>>>>>> c2b1d553401aac48d9157a40f66bcc014da37e23
             @endif
             
             <li>
