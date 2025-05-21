@@ -30,7 +30,7 @@
             display: flex;
             min-height: 100vh;
             overflow-x: hidden;
-            background-color: var(--background);
+            background-color: rgb(255, 255, 255);
         }
 
         .login-form-section {
@@ -394,7 +394,7 @@
                 <div class="input-wrapper">
                     <input type="password" id="password" name="password" class="form-input"
                         placeholder="Enter your password" required autocomplete="current-password">
-                    <img id="togglePassword" class="password-toggle" src="{{ asset('assets/images/EyeHide.png') }}"
+                    <img id="togglePassword" class="password-toggle" src="{{ asset('assets/images/EyeHidee.png') }}"
                         alt="Toggle Password">
                 </div>
                 @error('password')
@@ -428,8 +428,8 @@
             const isPassword = password.type === 'password';
             password.type = isPassword ? 'text' : 'password';
             this.src = isPassword ?
-                "{{ asset('assets/images/EyePassword.png') }}" :
-                "{{ asset('assets/images/EyeHide.png') }}";
+                "{{ asset('assets/images/EyeUnhide.png') }}" :
+                "{{ asset('assets/images/EyeHidee.png') }}";
         });
 
         // Add focus effect when clicking on form inputs

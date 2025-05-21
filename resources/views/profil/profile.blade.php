@@ -24,6 +24,12 @@
 @endsection
 
 @section('content')
+
+<nav class="nav flex-column sidebar-nav">
+    <a class="nav-link" href="{{ route('dashboard') }}">
+<i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+</a>
+</nav>
 <div class="container-fluid px-4 py-4">
     <div class="row">
         <!-- Sidebar -->
@@ -33,21 +39,19 @@
                     <div class="profile-sidebar text-center py-4">
                         <div class="avatar-wrapper mx-auto mb-3">
                             <img src="{{ asset('assets/images/profile/profile.png') }}" 
-                                 class="rounded-circle shadow" 
-                                 width="250" 
-                                 height="250"
-                                 alt="Admin Avatar">
+                            class="rounded-circle shadow" 
+                            width="200" 
+                            height="200"
+                            alt="Admin Avatar">
                             <div class="status-indicator bg-success"></div>
                         </div>
-                        <h5 class="mb-1">Administrator</h5>
-                        <p class="text-muted small mb-3">Super Admin</p>
+                        {{-- <h5 class="mb-1">Administrator</h5>
+                        <p class="text-muted small mb-3">Super Admin</p> --}}
+                        <h5 class="mb-1">{{ $user->nama }}</h5>
+                        <p class="text-muted small mb-3">{{ ucfirst($user->role) }}</p>
+
                     </div>
                     
-                    <nav class="nav flex-column sidebar-nav">
-                        <a class="nav-link" href="{{ route('admin.users.index') }}">
-                            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-                        </a>
-                    </nav>
                 </div>
             </div>
         </div>
@@ -112,9 +116,9 @@
                                         <h6 class="mb-0 text-muted small">Password</h6>
                                         <div class="d-flex align-items-center">
                                             <h5 class="mb-0 me-3">{{ str_repeat('•', 10) }}</h5>
-                                            <button class="btn btn-sm btn-outline-primary rounded-pill">
+                                            {{-- <button class="btn btn-sm btn-outline-primary rounded-pill">
                                                 Change
-                                            </button>
+                                            </button> --}}
                                         </div>
                                     </div>
                                 </div>

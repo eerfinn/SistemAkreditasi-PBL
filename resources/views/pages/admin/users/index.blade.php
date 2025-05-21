@@ -98,7 +98,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save User</button>
                 </div>
             </form>
@@ -112,9 +112,7 @@
       <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
+              <!-- Tombol X dihapus, hanya tombol close teks yang berfungsi -->
           </div>
           <form id="editUserForm">
               @csrf
@@ -150,8 +148,8 @@
                       <span class="invalid-feedback" role="alert" id="edit-role-error"></span>
                   </div>
               </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                   <button type="submit" class="btn btn-primary">Update User</button>
               </div>
           </form>

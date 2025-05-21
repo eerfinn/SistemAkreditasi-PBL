@@ -10,7 +10,7 @@
 @section('content')
     <div class="welcome-container">
         <div class="welcome-card">
-            <h1 class="mb-0">Selamat Datang, {{ $user->name }}!</h1>
+            <h1 class="mb-0">Selamat Datang, {{ $user->nama }}!</h1>
             <p class="mt-3">Dashboard Ketua Jurusan</p>
         </div>
     </div>
