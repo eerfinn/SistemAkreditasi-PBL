@@ -118,7 +118,7 @@ $(document).ready(function() {
                             <h4 class="mb-1">{{ isset($kriteria) ? $kriteria->nama_kriteria : 'Nama Kriteria Tidak Ditemukan' }}</h4>
                             <p class="mb-0">{{ isset($kriteria) ? $kriteria->deskripsi : 'Deskripsi kriteria tidak tersedia.' }}</p>
                         </div>
-                        @if(auth()->user() && auth()->user()->role === 'dosen')
+                        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
                         <div class="col-md-4 text-end">
                             <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
                                 <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
@@ -247,7 +247,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                            @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-upload"></i>
                                                 </button>
@@ -289,7 +289,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
                                                 <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
@@ -463,7 +463,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                            @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-upload"></i>
                                                 </button>
@@ -505,7 +505,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
                                                 <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
@@ -679,7 +679,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                            @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-upload"></i>
                                                 </button>
@@ -721,7 +721,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
                                                 <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
@@ -895,7 +895,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                            @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-upload"></i>
                                                 </button>
@@ -937,7 +937,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
                                                 <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
@@ -1111,7 +1111,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && auth()->user()->role === 'dosen' && $dokumen->status === 'revisi')
+                                            @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-upload"></i>
                                                 </button>
@@ -1153,7 +1153,7 @@ $(document).ready(function() {
                                                 </div>
                                             @endif
                                             
-                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                                            @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
                                                 <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
@@ -1232,7 +1232,7 @@ $(document).ready(function() {
         </div>
 
         <!-- Finalization Section for Dosen -->
-        @if(auth()->user() && auth()->user()->role === 'dosen')
+        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
             <div class="col-xl-12 mb-4">
                 <div class="card">
                     <div class="card-header bg-light">
@@ -1301,7 +1301,7 @@ $(document).ready(function() {
             </div>
         @endif
 
-        @if(isset($kriteria) && auth()->user() && auth()->user()->role == 'dosen' && (!isset($showUploadButton) || !$showUploadButton))
+        @if(isset($kriteria) && auth()->user() && (auth()->user()->role == 'dosen' || auth()->user()->role == 'administrator') && (!isset($showUploadButton) || !$showUploadButton))
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">
@@ -1353,8 +1353,8 @@ $(document).ready(function() {
                     </div>
                     @endif
 
-                    <!-- Comment Form - Only visible to admins, coordinators, directors etc. -->
-                    @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi']))
+                    <!-- Comment Form - Visible to admins, coordinators, kajur, and kaprodi -->
+                    @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'kajur', 'kaprodi']))
                     <form action="{{ route('validasi.kriteria-comment', $kriteria->id) }}" method="POST">
                         @csrf
                         <div class="mb-3">

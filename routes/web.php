@@ -89,9 +89,9 @@ Route::middleware('auth')->group(function () {
     Route::controller(KriteriaController::class)->prefix('kriteria')->name('kriteria.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{kriteria}', 'show')->name('show');
-        Route::get('/{kriteria}/upload', 'uploadForm')->name('upload.form');
-        Route::get('/{kriteria}/kelola', 'kelola')->name('kelola');
-        Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi');
+        Route::get('/{kriteria}/upload', 'uploadForm')->name('upload.form')->middleware('kriteria.access');
+        Route::get('/{kriteria}/kelola', 'kelola')->name('kelola')->middleware('kriteria.access');
+        Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi')->middleware('kriteria.access');
         Route::put('/{kriteria}/description/{ppepp}', 'updateDescription')->name('update.description');
         Route::delete('/{kriteria}/description/{ppepp}', 'deleteDescription')->name('delete.description');
     });
@@ -108,7 +108,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Validasi Routes
-    Route::controller(ValidasiController::class)->prefix('validasi')->name('validasi.')->group(function () {
+    Route::controller(ValidasiController::class)->prefix('validasi')->name('validasi.')->middleware('kriteria.access')->group(function () {
         Route::post('/{dokumen}/update-status', 'updateStatus')->name('update-status');
         Route::post('/kriteria/{kriteria}/comment', 'addKriteriaComment')->name('kriteria-comment');
     });

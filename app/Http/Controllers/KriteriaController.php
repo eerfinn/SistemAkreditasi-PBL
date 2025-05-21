@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Log;
 
 class KriteriaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('kriteria.access')->only(['uploadForm', 'finalisasiDokumen']);
+    }
+
     public function show(Kriteria $kriteria)
     {
         $user = Auth::user();
@@ -210,12 +216,18 @@ class KriteriaController extends Controller
         // Get existing documents for all PPEPP stages
         $dokumenPerPPEPP = [];
         foreach (array_keys($ppepp_labels) as $stage) {
-            $dokumenPerPPEPP[$stage] = Dokumen::where('user_id', $user->id)
-                ->where('kriteria_id', $kriteria->id)
+            $query = Dokumen::where('kriteria_id', $kriteria->id)
                 ->where('jenis_ppepp', $stage)
                 ->whereNotNull('path') // Only get actual documents, not descriptions
-                ->orderBy('updated_at', 'desc')
-                ->get();
+                ->with('user'); // Eager load the user relationship
+
+            // For dosen, only show their own documents
+            // For admin, show all documents
+            if ($user->role === 'dosen') {
+                $query->where('user_id', $user->id);
+            }
+
+            $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
         // Prepare data for the new view format with the needed structure for navigation

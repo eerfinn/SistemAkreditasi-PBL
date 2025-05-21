@@ -109,6 +109,9 @@
                         <tr>
                             <th width="50">No</th>
                             <th>Nama Dokumen</th>
+                            @if(auth()->user()->role === 'administrator')
+                            <th>Dosen</th>
+                            @endif
                             <th>Status</th>
                             <th>Tanggal Update</th>
                             <th>Aksi</th>
@@ -123,6 +126,9 @@
                                     <i class="fas fa-file-alt me-1"></i> {{ $doc->nama_dokumen }}
                                 </a>
                             </td>
+                            @if(auth()->user()->role === 'administrator')
+                            <td>{{ $doc->user->name ?? 'Unknown' }}</td>
+                            @endif
                             <td>
                                 @if($doc->status == 'draft')
                                     <span class="badge bg-secondary">Draft</span>
@@ -157,10 +163,14 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-3">
+                            <td colspan="{{ auth()->user()->role === 'administrator' ? '6' : '5' }}" class="text-center py-3">
                                 <div class="text-muted">
                                     <i class="fas fa-folder-open me-2 fa-2x"></i><br>
-                                    Belum ada dokumen untuk tahap {{ $stageLabel }}
+                                    @if(auth()->user()->role === 'administrator')
+                                        Belum ada dokumen yang diunggah untuk tahap {{ $stageLabel }}
+                                    @else
+                                        Belum ada dokumen untuk tahap {{ $stageLabel }}
+                                    @endif
                                 </div>
                             </td>
                         </tr>
