@@ -9,34 +9,31 @@
     <link href="{{ asset('assets/vendor/apexchart/apexcharts.css') }}" rel="stylesheet">
     <style>
         .welcome-container {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, #1a2151, #3a3f87);
             border-radius: 15px;
-            padding: 30px;
+            padding: 50px 30px;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 10px 30px rgba(26, 33, 81, 0.3);
             width: 100%;
             display: flex;
             align-items: center;
-            min-height: 120px;
+            min-height: 180px;
         }
 
-        .welcome-container::before {
-            content: '';
+        .welcome-container canvas {
             position: absolute;
-            top: -50%;
-            right: -50%;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(30deg);
+            height: 100%;
             z-index: 0;
         }
 
         .welcome-card {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             width: 100%;
         }
 
@@ -44,7 +41,7 @@
             color: #fff;
             font-size: 2.2rem;
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             margin-bottom: 0;
         }
 
@@ -340,97 +337,155 @@
         .dashboard-calendar {
             padding: 10px;
         }
-        
+
         .fc .fc-toolbar {
             padding: 10px;
             margin-bottom: 5px !important;
         }
-        
+
         .fc .fc-toolbar-title {
             font-size: 18px !important;
             font-weight: 600;
         }
-        
+
         .fc .fc-view-harness {
             background-color: #fff;
             border-radius: 0 0 15px 15px;
         }
-        
+
         .fc .fc-col-header-cell {
             padding: 8px 0 !important;
             background-color: #f8fafc;
         }
-        
+
         .fc .fc-col-header-cell-cushion {
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
             color: #333;
-            text-decoration: none;
+            text-decoration: none !important;
         }
-        
+
         .fc .fc-daygrid-day-number {
-            padding: 5px 10px !important;
+            padding: 8px 12px !important;
             font-weight: 500;
-            text-decoration: none;
+            font-size: 14px;
+            text-decoration: none !important;
             color: #333;
         }
-        
+
         .fc .fc-day-today {
             background-color: rgba(99, 102, 241, 0.1) !important;
         }
-        
+
         .fc-event {
             margin: 2px 5px;
             border-radius: 4px;
             border: none !important;
             background-color: #6366f1;
             color: white !important;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s ease;
+            padding: 5px 8px;
         }
-        
+
         .fc-event:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .fc-event.deadline {
             background-color: #ef4444 !important;
             border-color: #ef4444 !important;
         }
-        
+
         .fc-event.meeting {
             background-color: #f59e0b !important;
             border-color: #f59e0b !important;
         }
-        
+
         .fc-event.submission {
             background-color: #10b981 !important;
             border-color: #10b981 !important;
         }
-        
+
         .fc .fc-button {
             background-color: #f8fafc !important;
             color: #64748b !important;
             border: 1px solid #e2e8f0 !important;
             box-shadow: none !important;
-            height: 30px !important;
-            padding: 0 10px !important;
-            font-size: 13px !important;
+            height: 36px !important;
+            padding: 0 12px !important;
+            font-size: 14px !important;
+            font-weight: 500;
         }
-        
+
         .fc .fc-button:hover {
             background-color: #e2e8f0 !important;
         }
-        
+
         .fc .fc-button-primary:not(:disabled).fc-button-active,
         .fc .fc-button-primary:not(:disabled):active {
             background-color: #6366f1 !important;
             color: white !important;
             border-color: #6366f1 !important;
         }
-        
+
+        /* Responsive calendar fixes */
+        @media (max-width: 768px) {
+            .fc .fc-toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .fc .fc-toolbar-title {
+                font-size: 16px !important;
+            }
+
+            .fc .fc-daygrid-day-number {
+                padding: 5px !important;
+                font-size: 12px;
+            }
+
+            .fc-event {
+                font-size: 11px;
+                padding: 3px 5px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .fc .fc-view-harness {
+                background-color: #1e293b;
+            }
+
+            .fc .fc-col-header-cell {
+                background-color: #0f172a;
+            }
+
+            .fc .fc-col-header-cell-cushion {
+                color: #e2e8f0;
+            }
+
+            .fc .fc-daygrid-day-number {
+                color: #e2e8f0;
+            }
+
+            .fc .fc-day-today {
+                background-color: rgba(99, 102, 241, 0.2) !important;
+            }
+
+            .fc .fc-button {
+                background-color: #334155 !important;
+                color: #e2e8f0 !important;
+                border-color: #475569 !important;
+            }
+
+            .fc .fc-button:hover {
+                background-color: #475569 !important;
+            }
+        }
+
         .tooltip {
             z-index: 10000;
         }
@@ -439,6 +494,7 @@
 
 @section('content')
     <div class="welcome-container">
+        <canvas id="networkCanvas"></canvas>
         <div class="welcome-card">
             <h1 class="mb-0">Selamat Datang, {{ $user->nama }}!</h1>
             <p class="mt-3">Dashboard Dosen</p>
@@ -652,6 +708,13 @@
 
 @section('vendor-script')
     <script src="{{ asset('assets/vendor/apexchart/apexchart.js') }}"></script>
+    <!-- Fallback to CDN if local ApexCharts fails to load -->
+    <script>
+        if (typeof ApexCharts === 'undefined') {
+            console.log('Loading ApexCharts from CDN as fallback');
+            document.write('<script src="https://cdn.jsdelivr.net/npm/apexcharts"><\/script>');
+        }
+    </script>
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/fullcalendar-5.11.0/lib/main.min.js') }}"></script>
     <link href="{{ asset('assets/vendor/fullcalendar-5.11.0/lib/main.min.css') }}" rel="stylesheet">
@@ -660,6 +723,170 @@
 @section('page-script')
 <script>
     $(document).ready(function() {
+        // Network Animation for Welcome Container
+        const canvas = document.getElementById('networkCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = canvas.offsetWidth;
+            let height = canvas.height = canvas.offsetHeight;
+
+            // Resize handler
+            window.addEventListener('resize', function() {
+                width = canvas.width = canvas.offsetWidth;
+                height = canvas.height = canvas.offsetHeight;
+            });
+
+            // Network nodes
+            const particleCount = 30;
+            const particles = [];
+            const connectionDistance = 100;
+            const mouseRadius = 120;
+
+            let mouse = {
+                x: width / 2,
+                y: height / 2,
+                active: false
+            };
+
+            // Mouse move handler
+            canvas.addEventListener('mousemove', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = e.clientX - rect.left;
+                mouse.y = e.clientY - rect.top;
+                mouse.active = true;
+            });
+
+            // Mouse leave handler
+            canvas.addEventListener('mouseleave', function() {
+                mouse.active = false;
+            });
+
+            // Particle class
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.8;
+                    this.vy = (Math.random() - 0.5) * 0.8;
+                    this.radius = Math.random() * 2 + 1;
+                    this.color = 'rgba(255, 255, 255, 0.6)';
+                }
+
+                update() {
+                    // Update position
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Bounce off edges
+                    if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                    if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+                    // Mouse interaction
+                    if (mouse.active) {
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < mouseRadius) {
+                            const angle = Math.atan2(dy, dx);
+                            const force = (mouseRadius - dist) / mouseRadius;
+
+                            this.vx -= Math.cos(angle) * force * 0.2;
+                            this.vy -= Math.sin(angle) * force * 0.2;
+                        }
+                    }
+
+                    // Keep velocity in bounds
+                    this.vx = Math.max(Math.min(this.vx, 2), -2);
+                    this.vy = Math.max(Math.min(this.vy, 2), -2);
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+            }
+
+            // Create particles
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                // Update and draw particles
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                // Draw connections
+                ctx.beginPath();
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < connectionDistance) {
+                            const opacity = 1 - (dist / connectionDistance);
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.5})`;
+                            ctx.lineWidth = 1;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                        }
+                    }
+                }
+                ctx.stroke();
+
+                requestAnimationFrame(animate);
+            }
+
+            // Start animation
+            animate();
+        }
+
+        // Variabel untuk menyimpan data tugas
+        let tasks = {!! json_encode($tasks) !!};
+        let calendar;
+        let nextTaskId = tasks.length;
+
+        // Coba memuat tugas dari localStorage
+        const savedTasks = loadTasksFromLocalStorage();
+        if (savedTasks && savedTasks.length > 0) {
+            // Gunakan tugas yang disimpan jika ada
+            tasks = savedTasks;
+            nextTaskId = Math.max(...savedTasks.map(task => task.id)) + 1;
+
+            // Bersihkan daftar tugas UI dan muat ulang dari localStorage
+            $('#taskList').empty();
+            savedTasks.forEach(task => {
+                addTaskToUI(task);
+
+                // Tambahkan ke kalender jika ada rawDate
+                if (task.rawDate && calendar) {
+                    const eventId = 'task-' + task.id;
+                    const eventDate = task.rawDate + 'T' + (task.rawTime || '00:00');
+
+                    calendar.addEvent({
+                        id: eventId,
+                        title: task.title,
+                        start: eventDate,
+                        allDay: !task.rawTime || task.rawTime === '00:00',
+                        className: 'deadline',
+                        extendedProps: {
+                            type: 'task',
+                            description: 'Tugas: ' + task.title
+                        }
+                    });
+                }
+            });
+        }
+
         // Function to check if charts are rendered and retry if not
         function ensureChartsRendered() {
             // Check document status chart
@@ -667,18 +894,18 @@
                 console.log('Retrying document status chart rendering...');
                 renderDocumentStatusChart();
             }
-            
+
             // Check document progress chart
             if ($('#documentProgressChart').is(':empty') && typeof ApexCharts !== 'undefined') {
                 console.log('Retrying document progress chart rendering...');
                 renderDocumentProgressChart();
             }
         }
-        
+
         // Initialize Calendar with FullCalendar 5
         if (document.getElementById('calendar')) {
             var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -699,7 +926,7 @@
                     if (info.event.extendedProps.type) {
                         info.el.classList.add(info.event.extendedProps.type);
                     }
-                    
+
                     // Add event type classes based on title
                     const eventTitle = info.event.title.toLowerCase();
                     if (eventTitle.includes('deadline') || eventTitle.includes('tenggat')) {
@@ -709,7 +936,7 @@
                     } else if (eventTitle.includes('submit') || eventTitle.includes('kumpul') || eventTitle.includes('serah')) {
                         info.el.classList.add('submission');
                     }
-                    
+
                     // Add tooltip
                     if (info.event.extendedProps.description) {
                         $(info.el).tooltip({
@@ -737,22 +964,25 @@
         } else {
             console.error("ApexCharts not loaded or progress chart container not found");
         }
-        
-        // Todo list functionality
-        $('.todo-checkbox input').change(function() {
+
+        // Todo list functionality - Mark as completed
+        $('.task-checkbox').change(function() {
+            const taskId = $(this).data('id');
             if($(this).is(':checked')) {
                 $(this).closest('.todo-item').find('.todo-text').addClass('completed');
+                tasks[taskId].status = 'completed';
             } else {
                 $(this).closest('.todo-item').find('.todo-text').removeClass('completed');
+                tasks[taskId].status = 'pending';
             }
+
+            // Simpan perubahan ke localStorage
+            saveTasksToLocalStorage();
         });
 
-        // Initialize tooltips
-        $('[data-toggle="tooltip"]').tooltip();
-        
         // Check if charts are rendered after a delay
         setTimeout(ensureChartsRendered, 1000);
-        
+
         // Function to render document status chart
         function renderDocumentStatusChart() {
             if (typeof ApexCharts === 'undefined') {
@@ -762,7 +992,7 @@
 
             // Cek apakah ada data
             const totalDocs = {{ $totalDocuments }};
-            
+
             // Jika tidak ada data, tampilkan pesan "Tidak ada data"
             if (totalDocs === 0) {
                 $('#documentStatusChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>');
@@ -771,9 +1001,9 @@
 
             const documentStatusOptions = {
                 series: [
-                    {{ $verifiedDocuments }}, 
-                    {{ $pendingDocuments }}, 
-                    {{ $revisionDocuments }}, 
+                    {{ $verifiedDocuments }},
+                    {{ $pendingDocuments }},
+                    {{ $revisionDocuments }},
                     {{ $draftDocuments }}
                 ],
                 chart: {
@@ -869,7 +1099,7 @@
                 console.error("Error rendering document status chart:", error);
             }
         }
-        
+
         // Function to render document progress chart
         function renderDocumentProgressChart() {
             if (typeof ApexCharts === 'undefined') {
@@ -880,7 +1110,7 @@
             // Cek apakah ada data
             const ppepp_total = {!! json_encode($ppepp_total) !!};
             const hasData = ppepp_total.some(value => value > 0);
-            
+
             // Jika tidak ada data, tampilkan pesan "Tidak ada data"
             if (!hasData) {
                 $('#documentProgressChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>');
@@ -978,6 +1208,249 @@
             } catch (error) {
                 console.error("Error rendering document progress chart:", error);
             }
+        }
+
+        // Add new task
+        $('#saveTaskBtn').click(function() {
+            const title = $('#taskTitle').val().trim();
+            const date = $('#taskDate').val();
+            const time = $('#taskTime').val() || '00:00';
+            const addToCalendar = $('#addToCalendar').is(':checked');
+
+            if (!title || !date) {
+                alert('Judul dan tanggal harus diisi!');
+                return;
+            }
+
+            // Format tanggal untuk tampilan
+            const displayDate = formatDate(date);
+
+            // Buat objek tugas baru
+            const newTask = {
+                id: nextTaskId++,
+                title: title,
+                date: displayDate,
+                rawDate: date,
+                rawTime: time,
+                status: 'pending'
+            };
+
+            // Tambahkan ke array tugas
+            tasks.push(newTask);
+
+            // Tambahkan ke daftar tugas di UI
+            addTaskToUI(newTask);
+
+            // Tambahkan ke kalender jika dipilih
+            if (addToCalendar && calendar) {
+                const eventId = 'task-' + (newTask.id);
+                const eventDate = date + 'T' + time;
+
+                calendar.addEvent({
+                    id: eventId,
+                    title: title,
+                    start: eventDate,
+                    allDay: time === '00:00',
+                    className: 'deadline',
+                    extendedProps: {
+                        type: 'task',
+                        description: 'Tugas: ' + title
+                    }
+                });
+            }
+
+            // Simpan ke localStorage
+            saveTasksToLocalStorage();
+
+            // Reset form dan tutup modal
+            $('#addTaskForm')[0].reset();
+            $('#addTaskModal').modal('hide');
+        });
+
+        // Edit task - open modal with data
+        $(document).on('click', '.edit-task', function() {
+            const taskId = $(this).data('id');
+            const task = tasks[taskId];
+
+            $('#editTaskId').val(taskId);
+            $('#editTaskTitle').val(task.title);
+            $('#editTaskDate').val(task.rawDate || formatDateForInput(task.date));
+            $('#editTaskTime').val(task.rawTime || '00:00');
+
+            $('#editTaskModal').modal('show');
+        });
+
+        // Update task
+        $('#updateTaskBtn').click(function() {
+            const taskId = $('#editTaskId').val();
+            const title = $('#editTaskTitle').val().trim();
+            const date = $('#editTaskDate').val();
+            const time = $('#editTaskTime').val() || '00:00';
+            const updateCalendar = $('#updateCalendar').is(':checked');
+
+            if (!title || !date) {
+                alert('Judul dan tanggal harus diisi!');
+                return;
+            }
+
+            // Format tanggal untuk tampilan
+            const displayDate = formatDate(date);
+
+            // Update objek tugas
+            tasks[taskId].title = title;
+            tasks[taskId].date = displayDate;
+            tasks[taskId].rawDate = date;
+            tasks[taskId].rawTime = time;
+
+            // Update tampilan UI
+            const $taskItem = $(`.todo-item[data-id="${taskId}"]`);
+            $taskItem.find('.todo-text').html(title + '<div class="text-muted small">' + displayDate + '</div>');
+
+            // Update kalender jika dipilih
+            if (updateCalendar && calendar) {
+                const eventId = 'task-' + taskId;
+                const eventDate = date + 'T' + time;
+
+                // Hapus event lama jika ada
+                const existingEvent = calendar.getEventById(eventId);
+                if (existingEvent) {
+                    existingEvent.remove();
+                }
+
+                // Tambahkan event baru
+                calendar.addEvent({
+                    id: eventId,
+                    title: title,
+                    start: eventDate,
+                    allDay: time === '00:00',
+                    className: 'deadline',
+                    extendedProps: {
+                        type: 'task',
+                        description: 'Tugas: ' + title
+                    }
+                });
+            }
+
+            // Simpan ke localStorage
+            saveTasksToLocalStorage();
+
+            // Tutup modal
+            $('#editTaskModal').modal('hide');
+        });
+
+        // Delete task
+        $(document).on('click', '.delete-task', function() {
+            if (!confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
+                return;
+            }
+
+            const taskId = $(this).data('id');
+
+            // Hapus dari UI
+            $(`.todo-item[data-id="${taskId}"]`).remove();
+
+            // Hapus dari array (set null agar tidak mengubah indeks)
+            tasks[taskId] = null;
+
+            // Hapus dari kalender
+            if (calendar) {
+                const eventId = 'task-' + taskId;
+                const existingEvent = calendar.getEventById(eventId);
+                if (existingEvent) {
+                    existingEvent.remove();
+                }
+            }
+
+            // Simpan ke localStorage
+            saveTasksToLocalStorage();
+        });
+
+        // Helper function to add task to UI
+        function addTaskToUI(task) {
+            const taskHtml = `
+                <div class="todo-item" data-id="${task.id}">
+                    <div class="todo-checkbox">
+                        <div class="form-check custom-checkbox">
+                            <input type="checkbox" class="form-check-input task-checkbox" id="todo${task.id}" ${task.status === 'completed' ? 'checked' : ''} data-id="${task.id}">
+                            <label class="form-check-label" for="todo${task.id}"></label>
+                        </div>
+                    </div>
+                    <div class="todo-text ${task.status === 'completed' ? 'completed' : ''}">
+                        ${task.title}
+                        <div class="text-muted small">${task.date}</div>
+                    </div>
+                    <div class="todo-actions">
+                        <button type="button" class="edit-task" data-id="${task.id}"><i class="fas fa-edit"></i></button>
+                        <button type="button" class="delete-task" data-id="${task.id}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            `;
+
+            $('#taskList').append(taskHtml);
+
+            // Reattach event handler for the new checkbox
+            $(`#todo${task.id}`).change(function() {
+                const taskId = $(this).data('id');
+                if($(this).is(':checked')) {
+                    $(this).closest('.todo-item').find('.todo-text').addClass('completed');
+                    tasks[taskId].status = 'completed';
+                } else {
+                    $(this).closest('.todo-item').find('.todo-text').removeClass('completed');
+                    tasks[taskId].status = 'pending';
+                }
+
+                // Simpan perubahan ke localStorage
+                saveTasksToLocalStorage();
+            });
+        }
+
+        // Helper function to format date for display
+        function formatDate(dateString) {
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+
+        // Helper function to format date for input field
+        function formatDateForInput(dateString) {
+            try {
+                // Parse the date string (e.g., "15 Jan 2023")
+                const parts = dateString.split(' ');
+                const day = parseInt(parts[0]);
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                const month = monthNames.indexOf(parts[1]);
+                const year = parseInt(parts[2]);
+
+                if (isNaN(day) || month === -1 || isNaN(year)) {
+                    return '';
+                }
+
+                // Format as YYYY-MM-DD
+                return `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            } catch (e) {
+                console.error('Error parsing date:', e);
+                return '';
+            }
+        }
+
+        // Helper function to save tasks to localStorage
+        function saveTasksToLocalStorage() {
+            // Filter out null entries (deleted tasks)
+            const filteredTasks = tasks.filter(task => task !== null);
+            localStorage.setItem('dosenTasks', JSON.stringify(filteredTasks));
+        }
+
+        // Helper function to load tasks from localStorage
+        function loadTasksFromLocalStorage() {
+            const savedTasks = localStorage.getItem('dosenTasks');
+            if (savedTasks) {
+                try {
+                    return JSON.parse(savedTasks);
+                } catch (e) {
+                    console.error('Error parsing saved tasks:', e);
+                    return [];
+                }
+            }
+            return [];
         }
     });
 </script>
