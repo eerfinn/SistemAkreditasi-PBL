@@ -243,29 +243,29 @@ class KriteriaController extends Controller
         // Get descriptions for each PPEPP stage from kriteria table
         $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
 
+        // Common data array for both views
+        $viewData = [
+            'kriteria' => $kriteria,
+            'selected_ppepp' => $selected_ppepp,
+            'ppepp_labels' => $ppepp_labels,
+            'dokumenPerPPEPP' => $dokumenPerPPEPP,
+            'ppepp_descriptions' => $ppepp_descriptions,
+            'allPpeppStagesWithData' => $allPpeppStagesWithData,
+            'stageKey' => $selected_ppepp,
+            'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
+            'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect()
+        ];
+
         // Check if we should use the new view or existing one
         if (view()->exists('pages.kriteria.upload-kriteria.form')) {
-            return view('pages.kriteria.upload-kriteria.form', [
-                'kriteria' => $kriteria,
-                'stageKey' => $selected_ppepp,
-                'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
-                'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect(),
-                'allPpeppStagesWithData' => $allPpeppStagesWithData,
-                'ppepp_descriptions' => $ppepp_descriptions
-            ]);
+            return view('pages.kriteria.upload-kriteria.form', $viewData);
         }
 
         if (!view()->exists('pages.kriteria.form')) {
             abort(404, "View untuk form upload dokumen tidak ditemukan.");
         }
 
-        return view('pages.kriteria.form', [
-            'kriteria' => $kriteria,
-            'selected_ppepp' => $selected_ppepp,
-            'ppepp_labels' => $ppepp_labels,
-            'dokumenPerPPEPP' => $dokumenPerPPEPP,
-            'ppepp_descriptions' => $ppepp_descriptions
-        ]);
+        return view('pages.kriteria.form', $viewData);
     }
 
     public function finalisasiDokumen(Request $request, Kriteria $kriteria)

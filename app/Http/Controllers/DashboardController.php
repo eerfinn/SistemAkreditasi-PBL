@@ -9,68 +9,94 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    /**
+     * Dashboard view mapping for different roles
+     */
+    protected $dashboardViews = [
+        'administrator' => 'admin',
+        'dosen' => 'dosen',
+        'koordinator' => 'koordinator',
+        'kjm' => 'kjm',
+        'kaprodi' => 'kaprodi',
+        'kajur' => 'kajur'
+    ];
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         $user = auth()->user();
+        $role = $user->role;
         
-        // Check user role and redirect to appropriate dashboard
-        switch($user->role) {
-            case 'administrator':
-                return $this->adminDashboard();
-            case 'dosen':
-                return $this->dosenDashboard();
-            case 'koordinator':
-                return $this->koordinatorDashboard();
-            case 'kjm':
-                return $this->kjmDashboard();
-            case 'kaprodi':
-                return $this->kaprodiDashboard();
-            case 'kajur':
-                return $this->kajurDashboard();
-            default:
-                return redirect()->route('login')->with('error', 'Unauthorized access');
+        if (!array_key_exists($role, $this->dashboardViews)) {
+            return redirect()->route('login')->with('error', 'Unauthorized access');
         }
+
+        $method = $role . 'Data';
+        $data = method_exists($this, $method) ? $this->{$method}() : ['user' => $user];
+        
+        return view('pages.dashboard.' . $this->dashboardViews[$role], $data);
     }
 
-    public function adminDashboard()
+    /**
+     * Get data for administrator dashboard
+     */
+    protected function administratorData()
     {
-        $data = [
+        return [
             'total_users' => User::count(),
             'user' => auth()->user()
         ];
-        
-        return view('pages.admin.dashboard', $data);
     }
 
-    public function dosenDashboard()
+    /**
+     * Get data for dosen dashboard
+     */
+    protected function dosenData()
     {
         $user = auth()->user();
         
         // Get document statistics
-        $totalDocuments = Dokumen::where('user_id', $user->id)->count();
-        $verifiedDocuments = Dokumen::where('user_id', $user->id)
-                                ->where('status', Dokumen::STATUS_DIVERIFIKASI)
-                                ->count();
-        $pendingDocuments = Dokumen::where('user_id', $user->id)
-                                ->where('status', Dokumen::STATUS_MENUNGGU)
-                                ->count();
-        $revisionDocuments = Dokumen::where('user_id', $user->id)
-                                ->where('status', Dokumen::STATUS_REVISI)
-                                ->count();
-        $draftDocuments = Dokumen::where('user_id', $user->id)
-                                ->where('status', Dokumen::STATUS_DRAFT)
-                                ->count();
+        $documentStats = $this->getDocumentStatistics($user);
         
-        // Ensure we have at least some data for the charts
-        if ($totalDocuments == 0) {
-            $totalDocuments = 0;
-            $verifiedDocuments = 0;
-            $pendingDocuments = 0;
-            $revisionDocuments = 0;
-            $draftDocuments = 0;
-        }
+        // Get PPEPP statistics
+        $ppeppStats = $this->getPPEPPStatistics($user);
         
-        // Get PPEPP statistics for charts
+        // Get calendar events and tasks
+        $calendarData = $this->getCalendarData($user);
+        
+        return array_merge(
+            ['user' => $user],
+            $documentStats,
+            $ppeppStats,
+            $calendarData
+        );
+    }
+
+    /**
+     * Get document statistics for a user
+     */
+    protected function getDocumentStatistics($user)
+    {
+        $baseQuery = Dokumen::where('user_id', $user->id);
+        
+        return [
+            'totalDocuments' => $baseQuery->count(),
+            'verifiedDocuments' => (clone $baseQuery)->where('status', Dokumen::STATUS_DIVERIFIKASI)->count(),
+            'pendingDocuments' => (clone $baseQuery)->where('status', Dokumen::STATUS_MENUNGGU)->count(),
+            'revisionDocuments' => (clone $baseQuery)->where('status', Dokumen::STATUS_REVISI)->count(),
+            'draftDocuments' => (clone $baseQuery)->where('status', Dokumen::STATUS_DRAFT)->count(),
+        ];
+    }
+
+    /**
+     * Get PPEPP statistics for a user
+     */
+    protected function getPPEPPStatistics($user)
+    {
         $ppepp_stages = [
             Dokumen::PPEPP_PENETAPAN,
             Dokumen::PPEPP_PELAKSANAAN,
@@ -82,8 +108,6 @@ class DashboardController extends Controller
         $ppepp_verified = [];
         $ppepp_total = [];
         
-        $hasData = false;
-        
         foreach ($ppepp_stages as $stage) {
             $verified = Dokumen::where('user_id', $user->id)
                         ->where('jenis_ppepp', $stage)
@@ -94,25 +118,21 @@ class DashboardController extends Controller
                     ->where('jenis_ppepp', $stage)
                     ->count();
             
-            if ($total > 0) {
-                $hasData = true;
-            }
-            
             $ppepp_verified[] = $verified;
             $ppepp_total[] = $total;
         }
         
-        // If no data exists, provide empty data for visualization
-        if (!$hasData) {
-            $ppepp_verified = [0, 0, 0, 0, 0];
-            $ppepp_total = [0, 0, 0, 0, 0];
-        }
-        
-        // Create calendar events
-        $now = Carbon::now();
-        $calendarEvents = [];
-        
-        // Get tasks from database
+        return [
+            'ppepp_verified' => $ppepp_verified ?: [0, 0, 0, 0, 0],
+            'ppepp_total' => $ppepp_total ?: [0, 0, 0, 0, 0]
+        ];
+    }
+
+    /**
+     * Get calendar events and tasks for a user
+     */
+    protected function getCalendarData($user)
+    {
         $tasks = \App\Models\DaftarTugas::where('user_id', $user->id)
             ->orderBy('tanggal', 'asc')
             ->get()
@@ -128,77 +148,48 @@ class DashboardController extends Controller
                     'show_in_calendar' => $task->show_in_calendar
                 ];
             });
-        
-        // Provide empty array if no tasks exist
-        if ($tasks->isEmpty()) {
-            $tasks = [];
-        }
-        
-        // Add tasks with show_in_calendar=true to calendar events
-        foreach ($tasks as $task) {
-            if (isset($task['show_in_calendar']) && $task['show_in_calendar']) {
-                $calendarEvents[] = [
-                    'id' => 'task-' . $task['id'],
-                    'title' => $task['title'],
-                    'start' => $task['rawDate'] . 'T' . $task['rawTime'],
-                    'className' => 'deadline',
-                    'extendedProps' => [
-                        'type' => 'task',
-                        'description' => 'Tugas: ' . $task['title']
-                    ]
-                ];
-            }
-        }
-        
-        $data = [
-            'user' => $user,
-            'totalDocuments' => $totalDocuments,
-            'verifiedDocuments' => $verifiedDocuments,
-            'pendingDocuments' => $pendingDocuments,
-            'revisionDocuments' => $revisionDocuments,
-            'draftDocuments' => $draftDocuments,
-            'ppepp_verified' => $ppepp_verified,
-            'ppepp_total' => $ppepp_total,
+
+        $calendarEvents = $tasks->filter(function($task) {
+            return $task['show_in_calendar'] ?? false;
+        })->map(function($task) {
+            return [
+                'id' => 'task-' . $task['id'],
+                'title' => $task['title'],
+                'start' => $task['rawDate'] . 'T' . $task['rawTime'],
+                'className' => 'deadline',
+                'extendedProps' => [
+                    'type' => 'task',
+                    'description' => 'Tugas: ' . $task['title']
+                ]
+            ];
+        })->values()->all();
+
+        return [
             'calendarEvents' => $calendarEvents,
-            'tasks' => $tasks
+            'tasks' => $tasks->isEmpty() ? [] : $tasks
         ];
-        
-        return view('pages.dosen.dashboard', $data);
     }
 
-    public function koordinatorDashboard()
+    /**
+     * Get data for other role dashboards
+     */
+    protected function koordinatorData()
     {
-        $data = [
-            'user' => auth()->user()
-        ];
-        
-        return view('pages.koordinator.dashboard', $data);
+        return ['user' => auth()->user()];
     }
 
-    public function kjmDashboard()
+    protected function kjmData()
     {
-        $data = [
-            'user' => auth()->user()
-        ];
-        
-        return view('pages.kjm.dashboard', $data);
+        return ['user' => auth()->user()];
     }
 
-    public function kaprodiDashboard()
+    protected function kaprodiData()
     {
-        $data = [
-            'user' => auth()->user()
-        ];
-        
-        return view('pages.kaprodi.dashboard', $data);
+        return ['user' => auth()->user()];
     }
 
-    public function kajurDashboard()
+    protected function kajurData()
     {
-        $data = [
-            'user' => auth()->user()
-        ];
-        
-        return view('pages.kajur.dashboard', $data);
+        return ['user' => auth()->user()];
     }
 } 
