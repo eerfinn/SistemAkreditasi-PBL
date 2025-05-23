@@ -537,7 +537,8 @@
             margin-bottom: 5px !important;
         }
 
-        .apexcharts-title-text, .apexcharts-subtitle-text {
+        .apexcharts-title-text,
+        .apexcharts-subtitle-text {
             margin-bottom: 0 !important;
         }
 
@@ -655,22 +656,22 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 15px 20px;
         }
-        
+
         .my-calendar .card-header .card-title {
             font-weight: 600;
             color: white;
         }
-        
+
         .my-calendar .card-header .btn-primary {
             background-color: rgba(255, 255, 255, 0.2);
             border-color: transparent;
         }
-        
+
         .my-calendar .card-header .btn-primary:hover {
             background-color: rgba(255, 255, 255, 0.3);
             border-color: transparent;
         }
-        
+
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             .my-calendar .card-header {
@@ -807,12 +808,15 @@
                             <h3>{{ $pendingDocuments + $revisionDocuments }}</h3>
                         </div>
                         <div class="icon-box bg-secondary">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.9497 4.00001C17.3402 3.60948 17.3402 2.97632 16.9497 2.58579C16.5591 2.19527 15.926 2.19527 15.5355 2.58579L11.7071 6.41422L9.82843 4.53553C9.4379 4.14501 8.80474 4.14501 8.41421 4.53553C8.02369 4.92606 8.02369 5.55922 8.41421 5.94975L10.2929 7.82843C10.6834 8.21895 11.3166 8.21895 11.7071 7.82843L16.9497 2.58579C16.5591 2.19527 15.926 2.19527 15.5355 2.58579L11.7071 6.41422L9.82843 4.53553C9.4379 4.14501 8.80474 4.14501 8.41421 4.53553C8.02369 4.92606 8.02369 5.55922 8.41421 5.94975L10.2929 7.82843C10.6834 8.21895 11.3166 8.21895 11.7071 7.82843L15.5355 4.00001C15.926 3.60948 16.5591 3.60948 16.9497 4.00001Z" fill="#FF9F00"/>
-                                <path d="M16.9497 11C17.3402 10.6095 17.3402 9.97632 16.9497 9.58579C16.5591 9.19527 15.926 9.19527 15.5355 9.58579L11.7071 13.4142L9.82843 11.5355C9.4379 11.145 8.80474 11.145 8.41421 11.5355C8.02369 11.9261 8.02369 12.5592 8.41421 12.9497L10.2929 14.8284C10.6834 15.219 11.3166 15.219 11.7071 14.8284L15.5355 11C15.926 10.6095 16.5591 10.6095 16.9497 11Z" fill="#FF9F00"/>
-                                <path d="M8.41421 18.9497C8.02369 19.3403 8.02369 19.9734 8.41421 20.364C8.80474 20.7545 9.4379 20.7545 9.82843 20.364L11.7071 18.4853L15.5355 22.3137C15.926 22.7042 16.5591 22.7042 16.9497 22.3137C17.3402 21.9232 17.3402 21.29 16.9497 20.8995L13.1213 17.0711L16.9497 13.2426C17.3402 12.8521 17.3402 12.219 16.9497 11.8284C16.5591 11.4379 15.926 11.4379 15.5355 11.8284L11.7071 15.6569L9.82843 13.7782C9.4379 13.3876 8.80474 13.3876 8.41421 13.7782C8.02369 14.1687 8.02369 14.8018 8.41421 15.1924L10.2929 17.0711C10.6834 17.4616 11.3166 17.4616 11.7071 17.0711C11.3166 17.4616 10.6834 17.4616 10.2929 17.0711L8.41421 18.9497Z" fill="#FF9F00"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"
+                                    fill="#FF9F00" />
+                                <path d="M10 8h4v2h-4zm0 4h4v2h-4z" fill="#FF9F00" />
                             </svg>
                         </div>
+
                     </div>
                     <div class="progress-box mt-0">
                         <div class="d-flex justify-content-between">
@@ -820,7 +824,9 @@
                             <p class="mb-0">{{ $verifiedDocuments }}/{{ $totalDocuments }}</p>
                         </div>
                         <div class="progress">
-                            <div class="progress-bar bg-secondary" style="width:{{ ($totalDocuments > 0) ? ($verifiedDocuments/$totalDocuments*100) : 0 }}%; height:5px; border-radius:4px;" role="progressbar"></div>
+                            <div class="progress-bar bg-secondary"
+                                style="width:{{ $totalDocuments > 0 ? ($verifiedDocuments / $totalDocuments) * 100 : 0 }}%; height:5px; border-radius:4px;"
+                                role="progressbar"></div>
                         </div>
                     </div>
                 </div>
@@ -859,7 +865,8 @@
             <div class="card my-calendar h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Events</h4>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">+ Tambah Event</a>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#addTaskModal">+ Tambah Event</a>
                 </div>
                 <div class="card-body schedules-cal">
                     <input type="text" class="form-control d-none" id="datetimepicker1">
@@ -872,7 +879,8 @@
 
                             <!-- Pesan jika tidak ada tugas -->
                             <div id="noTasksMessage" class="text-center p-3 {{ count($tasks) > 0 ? 'd-none' : '' }}">
-                                <p class="text-muted mb-0">Belum ada events. Klik tombol "Tambah Event" untuk membuat event baru.</p>
+                                <p class="text-muted mb-0">Belum ada events. Klik tombol "Tambah Event" untuk membuat event
+                                    baru.</p>
                             </div>
                         </div>
                     </div>
@@ -887,13 +895,15 @@
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="addTaskModalLabel">Tambah Event Baru</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addTaskForm">
                         <div class="mb-3">
                             <label for="taskTitle" class="form-label">Judul Event</label>
-                            <input type="text" class="form-control" id="taskTitle" required placeholder="Masukkan judul event">
+                            <input type="text" class="form-control" id="taskTitle" required
+                                placeholder="Masukkan judul event">
                         </div>
                         <div class="mb-3">
                             <label for="taskDate" class="form-label">Tanggal</label>
@@ -923,14 +933,16 @@
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="editTaskModalLabel">Edit Event</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editTaskForm">
                         <input type="hidden" id="editTaskId">
                         <div class="mb-3">
                             <label for="editTaskTitle" class="form-label">Judul Event</label>
-                            <input type="text" class="form-control" id="editTaskTitle" required placeholder="Masukkan judul event">
+                            <input type="text" class="form-control" id="editTaskTitle" required
+                                placeholder="Masukkan judul event">
                         </div>
                         <div class="mb-3">
                             <label for="editTaskDate" class="form-label">Tanggal</label>
@@ -970,270 +982,272 @@
 @endsection
 
 @section('page-script')
-<script>
-    $(document).ready(function() {
-        // Initialize datetimepicker
-        if($("#datetimepicker1").length > 0) {
-            $('#datetimepicker1').datetimepicker({
-                inline: true,
-                format: 'YYYY-MM-DD',
-                defaultDate: moment(),
-                icons: {
-                    time: "fa fa-clock-o",
-                    date: "fa fa-calendar",
-                    up: "fa fa-arrow-up",
-                    down: "fa fa-arrow-down",
-                    previous: 'fa fa-chevron-left',
-                    next: 'fa fa-chevron-right',
-                    today: 'fa fa-screenshot',
-                    clear: 'fa fa-trash',
-                    close: 'fa fa-remove'
-                }
-            });
-        }
-
-        // Load tasks from database - use the tasks variable from PHP
-        const tasksData = {!! json_encode($tasks) !!};
-
-        // Add tasks to UI only if they have valid IDs (from database)
-        if (tasksData && tasksData.length > 0) {
-            tasksData.forEach(task => {
-                // Only add tasks that have numeric IDs (from database)
-                if (typeof task.id === 'number' && task.id > 0) {
-                    addTaskToUI(task);
-                }
-            });
-            // Sembunyikan pesan "tidak ada tugas" jika ada tugas
-            $('#noTasksMessage').addClass('d-none');
-        } else {
-            // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas
-            $('#noTasksMessage').removeClass('d-none');
-        }
-
-        // Network Animation for Welcome Container
-        const canvas = document.getElementById('networkCanvas');
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-            let width = canvas.width = canvas.offsetWidth;
-            let height = canvas.height = canvas.offsetHeight;
-
-            // Resize handler
-            window.addEventListener('resize', function() {
-                width = canvas.width = canvas.offsetWidth;
-                height = canvas.height = canvas.offsetHeight;
-            });
-
-            // Network nodes
-            const particleCount = 30;
-            const particles = [];
-            const connectionDistance = 100;
-            const mouseRadius = 120;
-
-            let mouse = {
-                x: width / 2,
-                y: height / 2,
-                active: false
-            };
-
-            // Mouse move handler
-            canvas.addEventListener('mousemove', function(e) {
-                const rect = canvas.getBoundingClientRect();
-                mouse.x = e.clientX - rect.left;
-                mouse.y = e.clientY - rect.top;
-                mouse.active = true;
-            });
-
-            // Mouse leave handler
-            canvas.addEventListener('mouseleave', function() {
-                mouse.active = false;
-            });
-
-            // Particle class
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * width;
-                    this.y = Math.random() * height;
-                    this.vx = (Math.random() - 0.5) * 0.8;
-                    this.vy = (Math.random() - 0.5) * 0.8;
-                    this.radius = Math.random() * 2 + 1;
-                    this.color = 'rgba(255, 255, 255, 0.6)';
-                }
-
-                update() {
-                    // Update position
-                    this.x += this.vx;
-                    this.y += this.vy;
-
-                    // Bounce off edges
-                    if (this.x < 0 || this.x > width) this.vx = -this.vx;
-                    if (this.y < 0 || this.y > height) this.vy = -this.vy;
-
-                    // Mouse interaction
-                    if (mouse.active) {
-                        const dx = mouse.x - this.x;
-                        const dy = mouse.y - this.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-
-                        if (dist < mouseRadius) {
-                            const angle = Math.atan2(dy, dx);
-                            const force = (mouseRadius - dist) / mouseRadius;
-
-                            this.vx -= Math.cos(angle) * force * 0.2;
-                            this.vy -= Math.sin(angle) * force * 0.2;
-                        }
+    <script>
+        $(document).ready(function() {
+            // Initialize datetimepicker
+            if ($("#datetimepicker1").length > 0) {
+                $('#datetimepicker1').datetimepicker({
+                    inline: true,
+                    format: 'YYYY-MM-DD',
+                    defaultDate: moment(),
+                    icons: {
+                        time: "fa fa-clock-o",
+                        date: "fa fa-calendar",
+                        up: "fa fa-arrow-up",
+                        down: "fa fa-arrow-down",
+                        previous: 'fa fa-chevron-left',
+                        next: 'fa fa-chevron-right',
+                        today: 'fa fa-screenshot',
+                        clear: 'fa fa-trash',
+                        close: 'fa fa-remove'
                     }
-
-                    // Keep velocity in bounds
-                    this.vx = Math.max(Math.min(this.vx, 2), -2);
-                    this.vy = Math.max(Math.min(this.vy, 2), -2);
-                }
-
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.fill();
-                }
+                });
             }
 
-            // Create particles
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
+            // Load tasks from database - use the tasks variable from PHP
+            const tasksData = {!! json_encode($tasks) !!};
+
+            // Add tasks to UI only if they have valid IDs (from database)
+            if (tasksData && tasksData.length > 0) {
+                tasksData.forEach(task => {
+                    // Only add tasks that have numeric IDs (from database)
+                    if (typeof task.id === 'number' && task.id > 0) {
+                        addTaskToUI(task);
+                    }
+                });
+                // Sembunyikan pesan "tidak ada tugas" jika ada tugas
+                $('#noTasksMessage').addClass('d-none');
+            } else {
+                // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas
+                $('#noTasksMessage').removeClass('d-none');
             }
 
-            // Animation loop
-            function animate() {
-                ctx.clearRect(0, 0, width, height);
+            // Network Animation for Welcome Container
+            const canvas = document.getElementById('networkCanvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let width = canvas.width = canvas.offsetWidth;
+                let height = canvas.height = canvas.offsetHeight;
 
-                // Update and draw particles
-                particles.forEach(particle => {
-                    particle.update();
-                    particle.draw();
+                // Resize handler
+                window.addEventListener('resize', function() {
+                    width = canvas.width = canvas.offsetWidth;
+                    height = canvas.height = canvas.offsetHeight;
                 });
 
-                // Draw connections
-                ctx.beginPath();
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
+                // Network nodes
+                const particleCount = 30;
+                const particles = [];
+                const connectionDistance = 100;
+                const mouseRadius = 120;
 
-                        if (dist < connectionDistance) {
-                            const opacity = 1 - (dist / connectionDistance);
-                            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.5})`;
-                            ctx.lineWidth = 1;
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
+                let mouse = {
+                    x: width / 2,
+                    y: height / 2,
+                    active: false
+                };
+
+                // Mouse move handler
+                canvas.addEventListener('mousemove', function(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    mouse.x = e.clientX - rect.left;
+                    mouse.y = e.clientY - rect.top;
+                    mouse.active = true;
+                });
+
+                // Mouse leave handler
+                canvas.addEventListener('mouseleave', function() {
+                    mouse.active = false;
+                });
+
+                // Particle class
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.vx = (Math.random() - 0.5) * 0.8;
+                        this.vy = (Math.random() - 0.5) * 0.8;
+                        this.radius = Math.random() * 2 + 1;
+                        this.color = 'rgba(255, 255, 255, 0.6)';
+                    }
+
+                    update() {
+                        // Update position
+                        this.x += this.vx;
+                        this.y += this.vy;
+
+                        // Bounce off edges
+                        if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                        if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+                        // Mouse interaction
+                        if (mouse.active) {
+                            const dx = mouse.x - this.x;
+                            const dy = mouse.y - this.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+
+                            if (dist < mouseRadius) {
+                                const angle = Math.atan2(dy, dx);
+                                const force = (mouseRadius - dist) / mouseRadius;
+
+                                this.vx -= Math.cos(angle) * force * 0.2;
+                                this.vy -= Math.sin(angle) * force * 0.2;
+                            }
+                        }
+
+                        // Keep velocity in bounds
+                        this.vx = Math.max(Math.min(this.vx, 2), -2);
+                        this.vy = Math.max(Math.min(this.vy, 2), -2);
+                    }
+
+                    draw() {
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = this.color;
+                        ctx.fill();
+                    }
+                }
+
+                // Create particles
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+
+                // Animation loop
+                function animate() {
+                    ctx.clearRect(0, 0, width, height);
+
+                    // Update and draw particles
+                    particles.forEach(particle => {
+                        particle.update();
+                        particle.draw();
+                    });
+
+                    // Draw connections
+                    ctx.beginPath();
+                    for (let i = 0; i < particles.length; i++) {
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+
+                            if (dist < connectionDistance) {
+                                const opacity = 1 - (dist / connectionDistance);
+                                ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.5})`;
+                                ctx.lineWidth = 1;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                            }
                         }
                     }
-                }
-                ctx.stroke();
+                    ctx.stroke();
 
-                requestAnimationFrame(animate);
+                    requestAnimationFrame(animate);
+                }
+
+                // Start animation
+                animate();
             }
 
-            // Start animation
-            animate();
-        }
+            // Variabel untuk menyimpan data tugas
+            let tasks = {!! json_encode($tasks) !!};
+            let calendar;
 
-        // Variabel untuk menyimpan data tugas
-        let tasks = {!! json_encode($tasks) !!};
-        let calendar;
+            // Function to check if charts are rendered and retry if not
+            function ensureChartsRendered() {
+                // Check document status chart
+                if ($('#documentStatusChart').is(':empty') && typeof ApexCharts !== 'undefined') {
+                    console.log('Retrying document status chart rendering...');
+                    renderDocumentStatusChart();
+                }
 
-        // Function to check if charts are rendered and retry if not
-        function ensureChartsRendered() {
-            // Check document status chart
-            if ($('#documentStatusChart').is(':empty') && typeof ApexCharts !== 'undefined') {
-                console.log('Retrying document status chart rendering...');
+                // Check document progress chart
+                if ($('#documentProgressChart').is(':empty') && typeof ApexCharts !== 'undefined') {
+                    console.log('Retrying document progress chart rendering...');
+                    renderDocumentProgressChart();
+                }
+            }
+
+            // Initialize Calendar with FullCalendar 5
+            if (document.getElementById('calendar')) {
+                var calendarEl = document.getElementById('calendar');
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    initialView: 'dayGridMonth',
+                    locale: 'id',
+                    height: 450,
+                    buttonText: {
+                        today: 'Hari Ini',
+                        month: 'Bulan',
+                        week: 'Minggu',
+                        day: 'Hari'
+                    },
+                    events: {!! json_encode($calendarEvents) !!},
+                    eventDidMount: function(info) {
+                        // Add custom classes based on event type
+                        if (info.event.extendedProps.type) {
+                            info.el.classList.add(info.event.extendedProps.type);
+                        }
+
+                        // Add event type classes based on title
+                        const eventTitle = info.event.title.toLowerCase();
+                        if (eventTitle.includes('deadline') || eventTitle.includes('tenggat')) {
+                            info.el.classList.add('deadline');
+                        } else if (eventTitle.includes('meeting') || eventTitle.includes('rapat') ||
+                            eventTitle.includes('pertemuan')) {
+                            info.el.classList.add('meeting');
+                        } else if (eventTitle.includes('submit') || eventTitle.includes('kumpul') ||
+                            eventTitle.includes('serah')) {
+                            info.el.classList.add('submission');
+                        }
+
+                        // Add tooltip
+                        if (info.event.extendedProps.description) {
+                            $(info.el).tooltip({
+                                title: info.event.extendedProps.description,
+                                placement: 'top',
+                                trigger: 'hover',
+                                container: 'body'
+                            });
+                        }
+                    }
+                });
+                calendar.render();
+            }
+
+            // Make sure the charts containers exist before rendering
+            if (document.getElementById('documentStatusChart') && typeof ApexCharts !== 'undefined') {
                 renderDocumentStatusChart();
+            } else {
+                console.error("ApexCharts not loaded or chart container not found");
             }
 
-            // Check document progress chart
-            if ($('#documentProgressChart').is(':empty') && typeof ApexCharts !== 'undefined') {
-                console.log('Retrying document progress chart rendering...');
+            // Document Progress Chart
+            if (document.getElementById('documentProgressChart') && typeof ApexCharts !== 'undefined') {
                 renderDocumentProgressChart();
+            } else {
+                console.error("ApexCharts not loaded or progress chart container not found");
             }
-        }
 
-        // Initialize Calendar with FullCalendar 5
-        if (document.getElementById('calendar')) {
-            var calendarEl = document.getElementById('calendar');
-            calendar = new FullCalendar.Calendar(calendarEl, {
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                initialView: 'dayGridMonth',
-                locale: 'id',
-                height: 450,
-                buttonText: {
-                    today: 'Hari Ini',
-                    month: 'Bulan',
-                    week: 'Minggu',
-                    day: 'Hari'
-                },
-                events: {!! json_encode($calendarEvents) !!},
-                eventDidMount: function(info) {
-                    // Add custom classes based on event type
-                    if (info.event.extendedProps.type) {
-                        info.el.classList.add(info.event.extendedProps.type);
-                    }
+            // Helper function to add task to UI
+            function addTaskToUI(task) {
+                // Format tanggal untuk tampilan event
+                const date = new Date(task.rawDate);
+                const day = date.getDate().toString().padStart(2, '0');
+                const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+                const dayName = dayNames[date.getDay()];
+                const time = task.rawTime || '00:00';
+                const timeDisplay = time === '00:00' ? 'Sepanjang hari' : time;
 
-                    // Add event type classes based on title
-                    const eventTitle = info.event.title.toLowerCase();
-                    if (eventTitle.includes('deadline') || eventTitle.includes('tenggat')) {
-                        info.el.classList.add('deadline');
-                    } else if (eventTitle.includes('meeting') || eventTitle.includes('rapat') || eventTitle.includes('pertemuan')) {
-                        info.el.classList.add('meeting');
-                    } else if (eventTitle.includes('submit') || eventTitle.includes('kumpul') || eventTitle.includes('serah')) {
-                        info.el.classList.add('submission');
-                    }
+                // Tentukan kelas warna berdasarkan status
+                let statusClass = task.status === 'completed' ? 'success' : 'warning';
 
-                    // Add tooltip
-                    if (info.event.extendedProps.description) {
-                        $(info.el).tooltip({
-                            title: info.event.extendedProps.description,
-                            placement: 'top',
-                            trigger: 'hover',
-                            container: 'body'
-                        });
-                    }
-                }
-            });
-            calendar.render();
-        }
-
-        // Make sure the charts containers exist before rendering
-        if (document.getElementById('documentStatusChart') && typeof ApexCharts !== 'undefined') {
-            renderDocumentStatusChart();
-        } else {
-            console.error("ApexCharts not loaded or chart container not found");
-        }
-
-        // Document Progress Chart
-        if (document.getElementById('documentProgressChart') && typeof ApexCharts !== 'undefined') {
-            renderDocumentProgressChart();
-        } else {
-            console.error("ApexCharts not loaded or progress chart container not found");
-        }
-
-        // Helper function to add task to UI
-        function addTaskToUI(task) {
-            // Format tanggal untuk tampilan event
-            const date = new Date(task.rawDate);
-            const day = date.getDate().toString().padStart(2, '0');
-            const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-            const dayName = dayNames[date.getDay()];
-            const time = task.rawTime || '00:00';
-            const timeDisplay = time === '00:00' ? 'Sepanjang hari' : time;
-
-            // Tentukan kelas warna berdasarkan status
-            let statusClass = task.status === 'completed' ? 'success' : 'warning';
-
-            // Buat HTML untuk event
-            const eventHtml = `
+                // Buat HTML untuk event
+                const eventHtml = `
                 <div class="event-media" data-id="${task.id}" data-raw-date="${task.rawDate}" data-raw-time="${task.rawTime}">
                     <div class="d-flex align-items-center">
                         <div class="event-box">
@@ -1265,178 +1279,62 @@
                 </div>
             `;
 
-            $('#eventsList').append(eventHtml);
+                $('#eventsList').append(eventHtml);
 
-            // Sembunyikan pesan "tidak ada tugas" jika ada tugas
-            $('#noTasksMessage').addClass('d-none');
-        }
-
-        // Add new task
-        $('#saveTaskBtn').click(function() {
-            const title = $('#taskTitle').val().trim();
-            const date = $('#taskDate').val();
-            const time = $('#taskTime').val() || '00:00';
-            const addToCalendar = $('#addToCalendar').is(':checked');
-
-            if (!title || !date) {
-                alert('Judul dan tanggal harus diisi!');
-                return;
+                // Sembunyikan pesan "tidak ada tugas" jika ada tugas
+                $('#noTasksMessage').addClass('d-none');
             }
 
-            // Kirim data ke server menggunakan AJAX
-            $.ajax({
-                url: '{{ route("tugas.store") }}',
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                data: JSON.stringify({
-                    judul: title,
-                    tanggal: date,
-                    waktu: time,
-                    show_in_calendar: addToCalendar
-                }),
-                processData: false,
-                success: function(response) {
-                    console.log('Success response:', response);
-                    // Format tanggal untuk tampilan
-                    const displayDate = formatDate(date);
+            // Add new task
+            $('#saveTaskBtn').click(function() {
+                const title = $('#taskTitle').val().trim();
+                const date = $('#taskDate').val();
+                const time = $('#taskTime').val() || '00:00';
+                const addToCalendar = $('#addToCalendar').is(':checked');
 
-                    // Tambahkan ke daftar tugas di UI
-                    const newTask = {
-                        id: response.id,
-                        title: title,
-                        date: displayDate,
-                        rawDate: date,
-                        rawTime: time,
-                        status: 'pending',
-                        show_in_calendar: addToCalendar
-                    };
-
-                    // Tambahkan ke daftar events
-                    addTaskToUI(newTask);
-
-                    // Tambahkan ke kalender jika dipilih
-                    if (addToCalendar && typeof calendar !== 'undefined') {
-                        const eventId = 'task-' + newTask.id;
-                        const eventDate = date + 'T' + time;
-
-                        calendar.addEvent({
-                            id: eventId,
-                            title: title,
-                            start: eventDate,
-                            allDay: time === '00:00',
-                            className: 'deadline',
-                            extendedProps: {
-                                type: 'task',
-                                description: 'Tugas: ' + title
-                            }
-                        });
-                    }
-
-                    // Reset form dan tutup modal
-                    $('#addTaskForm')[0].reset();
-                    $('#addTaskModal').modal('hide');
-                },
-                error: function(xhr) {
-                    console.error('Error response:', xhr);
-                    if (xhr.status === 422) {
-                        const errors = xhr.responseJSON.errors;
-                        let errorMessage = 'Terjadi kesalahan:';
-                        for (const key in errors) {
-                            errorMessage += '\n- ' + errors[key][0];
-                        }
-                        alert(errorMessage);
-                    } else {
-                        alert('Terjadi kesalahan saat menyimpan tugas.');
-                    }
+                if (!title || !date) {
+                    alert('Judul dan tanggal harus diisi!');
+                    return;
                 }
-            });
-        });
 
-        // Edit task - open modal with data
-        $(document).on('click', '.edit-task', function() {
-            const taskId = $(this).data('id');
-            console.log('Editing task ID:', taskId);
-            const taskItem = $(`.event-media[data-id="${taskId}"]`);
-            const title = taskItem.find('.event-data h5 a').text().trim();
-            const date = taskItem.data('raw-date');
-            const time = taskItem.data('raw-time') || '00:00';
+                // Kirim data ke server menggunakan AJAX
+                $.ajax({
+                    url: '{{ route('tugas.store') }}',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    data: JSON.stringify({
+                        judul: title,
+                        tanggal: date,
+                        waktu: time,
+                        show_in_calendar: addToCalendar
+                    }),
+                    processData: false,
+                    success: function(response) {
+                        console.log('Success response:', response);
+                        // Format tanggal untuk tampilan
+                        const displayDate = formatDate(date);
 
-            $('#editTaskId').val(taskId);
-            $('#editTaskTitle').val(title);
-            $('#editTaskDate').val(date);
-            $('#editTaskTime').val(time);
+                        // Tambahkan ke daftar tugas di UI
+                        const newTask = {
+                            id: response.id,
+                            title: title,
+                            date: displayDate,
+                            rawDate: date,
+                            rawTime: time,
+                            status: 'pending',
+                            show_in_calendar: addToCalendar
+                        };
 
-            $('#editTaskModal').modal('show');
-        });
+                        // Tambahkan ke daftar events
+                        addTaskToUI(newTask);
 
-        // Update task
-        $('#updateTaskBtn').click(function() {
-            const taskId = $('#editTaskId').val();
-            const title = $('#editTaskTitle').val().trim();
-            const date = $('#editTaskDate').val();
-            const time = $('#editTaskTime').val() || '00:00';
-            const updateCalendar = $('#updateCalendar').is(':checked');
-
-            if (!title || !date) {
-                alert('Judul dan tanggal harus diisi!');
-                return;
-            }
-
-            console.log('Updating task ID:', taskId, 'with data:', { title, date, time, updateCalendar });
-
-            // Kirim data ke server menggunakan AJAX
-            $.ajax({
-                url: `/tugas/${taskId}`,
-                type: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                data: JSON.stringify({
-                    judul: title,
-                    tanggal: date,
-                    waktu: time,
-                    show_in_calendar: updateCalendar
-                }),
-                processData: false,
-                success: function(response) {
-                    console.log('Update success response:', response);
-                    // Hapus task lama dari UI
-                    $(`.event-media[data-id="${taskId}"]`).remove();
-
-                    // Format tanggal untuk tampilan
-                    const displayDate = formatDate(date);
-
-                    // Tambahkan task yang diupdate ke UI
-                    const updatedTask = {
-                        id: taskId,
-                        title: title,
-                        date: displayDate,
-                        rawDate: date,
-                        rawTime: time,
-                        status: response.status,
-                        show_in_calendar: updateCalendar
-                    };
-
-                    addTaskToUI(updatedTask);
-
-                    // Update kalender jika dipilih
-                    if (typeof calendar !== 'undefined') {
-                        const eventId = 'task-' + taskId;
-
-                        // Hapus event lama jika ada
-                        const existingEvent = calendar.getEventById(eventId);
-                        if (existingEvent) {
-                            existingEvent.remove();
-                        }
-
-                        // Tambahkan event baru jika dicentang
-                        if (updateCalendar) {
+                        // Tambahkan ke kalender jika dipilih
+                        if (addToCalendar && typeof calendar !== 'undefined') {
+                            const eventId = 'task-' + newTask.id;
                             const eventDate = date + 'T' + time;
 
                             calendar.addEvent({
@@ -1451,365 +1349,500 @@
                                 }
                             });
                         }
-                    }
 
-                    // Tutup modal
-                    $('#editTaskModal').modal('hide');
-                },
-                error: function(xhr) {
-                    console.error('Update error response:', xhr);
-                    if (xhr.status === 422) {
-                        const errors = xhr.responseJSON.errors;
-                        let errorMessage = 'Terjadi kesalahan:';
-                        for (const key in errors) {
-                            errorMessage += '\n- ' + errors[key][0];
-                        }
-                        alert(errorMessage);
-                    } else {
-                        alert('Terjadi kesalahan saat memperbarui tugas.');
-                    }
-                }
-            });
-        });
-
-        // Delete task
-        $(document).on('click', '.delete-task', function() {
-            if (!confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
-                return;
-            }
-
-            const taskId = $(this).data('id');
-            console.log('Deleting task ID:', taskId);
-
-            // Kirim data ke server menggunakan AJAX
-            $.ajax({
-                url: `/tugas/${taskId}`,
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                processData: false,
-                success: function(response) {
-                    console.log('Delete success response:', response);
-                    // Hapus dari UI
-                    $(`.event-media[data-id="${taskId}"]`).remove();
-
-                    // Hapus dari kalender
-                    if (typeof calendar !== 'undefined') {
-                        const eventId = 'task-' + taskId;
-                        const existingEvent = calendar.getEventById(eventId);
-                        if (existingEvent) {
-                            existingEvent.remove();
+                        // Reset form dan tutup modal
+                        $('#addTaskForm')[0].reset();
+                        $('#addTaskModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        console.error('Error response:', xhr);
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            let errorMessage = 'Terjadi kesalahan:';
+                            for (const key in errors) {
+                                errorMessage += '\n- ' + errors[key][0];
+                            }
+                            alert(errorMessage);
+                        } else {
+                            alert('Terjadi kesalahan saat menyimpan tugas.');
                         }
                     }
-
-                    // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas lagi
-                    if ($('#eventsList .event-media').length === 0) {
-                        $('#noTasksMessage').removeClass('d-none');
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Delete error response:', xhr);
-                    alert('Terjadi kesalahan saat menghapus tugas.');
-                }
+                });
             });
-        });
 
-        // Toggle task completion
-        $(document).on('change', '.task-checkbox', function() {
-            const taskId = $(this).data('id');
-            const isCompleted = $(this).is(':checked');
-            const status = isCompleted ? 'completed' : 'pending';
+            // Edit task - open modal with data
+            $(document).on('click', '.edit-task', function() {
+                const taskId = $(this).data('id');
+                console.log('Editing task ID:', taskId);
+                const taskItem = $(`.event-media[data-id="${taskId}"]`);
+                const title = taskItem.find('.event-data h5 a').text().trim();
+                const date = taskItem.data('raw-date');
+                const time = taskItem.data('raw-time') || '00:00';
 
-            console.log('Toggling task ID:', taskId, 'to status:', status);
+                $('#editTaskId').val(taskId);
+                $('#editTaskTitle').val(title);
+                $('#editTaskDate').val(date);
+                $('#editTaskTime').val(time);
 
-            // Kirim data ke server menggunakan AJAX
-            $.ajax({
-                url: `/tugas/${taskId}/status`,
-                type: 'PATCH',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                data: JSON.stringify({
-                    status: status
-                }),
-                processData: false,
-                success: function(response) {
-                    console.log('Toggle status success response:', response);
-                    // Update UI
-                    const $eventMedia = $(`.event-media[data-id="${taskId}"]`);
-                    const $taskTitle = $eventMedia.find('.event-data h5 a');
-                    const $statusBadge = $eventMedia.find('.bg-warning, .bg-success');
-
-                    if (isCompleted) {
-                        $taskTitle.addClass('text-decoration-line-through');
-                        $statusBadge.removeClass('bg-warning').addClass('bg-success');
-                    } else {
-                        $taskTitle.removeClass('text-decoration-line-through');
-                        $statusBadge.removeClass('bg-success').addClass('bg-warning');
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Toggle status error response:', xhr);
-                    // Kembalikan status checkbox jika gagal
-                    $(this).prop('checked', !isCompleted);
-                    alert('Terjadi kesalahan saat memperbarui status tugas.');
-                }
+                $('#editTaskModal').modal('show');
             });
-        });
 
-        // Check if charts are rendered after a delay
-        setTimeout(ensureChartsRendered, 1000);
+            // Update task
+            $('#updateTaskBtn').click(function() {
+                const taskId = $('#editTaskId').val();
+                const title = $('#editTaskTitle').val().trim();
+                const date = $('#editTaskDate').val();
+                const time = $('#editTaskTime').val() || '00:00';
+                const updateCalendar = $('#updateCalendar').is(':checked');
 
-        // Function to render document status chart
-        function renderDocumentStatusChart() {
-            if (typeof ApexCharts === 'undefined') {
-                console.error("ApexCharts is not defined");
-                return;
-            }
+                if (!title || !date) {
+                    alert('Judul dan tanggal harus diisi!');
+                    return;
+                }
 
-            // Cek apakah ada data
-            const totalDocs = {{ $totalDocuments }};
+                console.log('Updating task ID:', taskId, 'with data:', {
+                    title,
+                    date,
+                    time,
+                    updateCalendar
+                });
 
-            // Jika tidak ada data, tampilkan pesan "Tidak ada data"
-            if (totalDocs === 0) {
-                $('#documentStatusChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>');
-                return;
-            }
+                // Kirim data ke server menggunakan AJAX
+                $.ajax({
+                    url: `/tugas/${taskId}`,
+                    type: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    data: JSON.stringify({
+                        judul: title,
+                        tanggal: date,
+                        waktu: time,
+                        show_in_calendar: updateCalendar
+                    }),
+                    processData: false,
+                    success: function(response) {
+                        console.log('Update success response:', response);
+                        // Hapus task lama dari UI
+                        $(`.event-media[data-id="${taskId}"]`).remove();
 
-            const documentStatusOptions = {
-                series: [
-                    {{ $verifiedDocuments }},
-                    {{ $pendingDocuments }},
-                    {{ $revisionDocuments }},
-                    {{ $draftDocuments }}
-                ],
-                chart: {
-                    type: 'donut',
-                    height: 300,
-                    fontFamily: 'inherit',
-                    parentHeightOffset: 0,
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800,
-                        animateGradually: {
+                        // Format tanggal untuk tampilan
+                        const displayDate = formatDate(date);
+
+                        // Tambahkan task yang diupdate ke UI
+                        const updatedTask = {
+                            id: taskId,
+                            title: title,
+                            date: displayDate,
+                            rawDate: date,
+                            rawTime: time,
+                            status: response.status,
+                            show_in_calendar: updateCalendar
+                        };
+
+                        addTaskToUI(updatedTask);
+
+                        // Update kalender jika dipilih
+                        if (typeof calendar !== 'undefined') {
+                            const eventId = 'task-' + taskId;
+
+                            // Hapus event lama jika ada
+                            const existingEvent = calendar.getEventById(eventId);
+                            if (existingEvent) {
+                                existingEvent.remove();
+                            }
+
+                            // Tambahkan event baru jika dicentang
+                            if (updateCalendar) {
+                                const eventDate = date + 'T' + time;
+
+                                calendar.addEvent({
+                                    id: eventId,
+                                    title: title,
+                                    start: eventDate,
+                                    allDay: time === '00:00',
+                                    className: 'deadline',
+                                    extendedProps: {
+                                        type: 'task',
+                                        description: 'Tugas: ' + title
+                                    }
+                                });
+                            }
+                        }
+
+                        // Tutup modal
+                        $('#editTaskModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        console.error('Update error response:', xhr);
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            let errorMessage = 'Terjadi kesalahan:';
+                            for (const key in errors) {
+                                errorMessage += '\n- ' + errors[key][0];
+                            }
+                            alert(errorMessage);
+                        } else {
+                            alert('Terjadi kesalahan saat memperbarui tugas.');
+                        }
+                    }
+                });
+            });
+
+            // Delete task
+            $(document).on('click', '.delete-task', function() {
+                if (!confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
+                    return;
+                }
+
+                const taskId = $(this).data('id');
+                console.log('Deleting task ID:', taskId);
+
+                // Kirim data ke server menggunakan AJAX
+                $.ajax({
+                    url: `/tugas/${taskId}`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    processData: false,
+                    success: function(response) {
+                        console.log('Delete success response:', response);
+                        // Hapus dari UI
+                        $(`.event-media[data-id="${taskId}"]`).remove();
+
+                        // Hapus dari kalender
+                        if (typeof calendar !== 'undefined') {
+                            const eventId = 'task-' + taskId;
+                            const existingEvent = calendar.getEventById(eventId);
+                            if (existingEvent) {
+                                existingEvent.remove();
+                            }
+                        }
+
+                        // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas lagi
+                        if ($('#eventsList .event-media').length === 0) {
+                            $('#noTasksMessage').removeClass('d-none');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Delete error response:', xhr);
+                        alert('Terjadi kesalahan saat menghapus tugas.');
+                    }
+                });
+            });
+
+            // Toggle task completion
+            $(document).on('change', '.task-checkbox', function() {
+                const taskId = $(this).data('id');
+                const isCompleted = $(this).is(':checked');
+                const status = isCompleted ? 'completed' : 'pending';
+
+                console.log('Toggling task ID:', taskId, 'to status:', status);
+
+                // Kirim data ke server menggunakan AJAX
+                $.ajax({
+                    url: `/tugas/${taskId}/status`,
+                    type: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    data: JSON.stringify({
+                        status: status
+                    }),
+                    processData: false,
+                    success: function(response) {
+                        console.log('Toggle status success response:', response);
+                        // Update UI
+                        const $eventMedia = $(`.event-media[data-id="${taskId}"]`);
+                        const $taskTitle = $eventMedia.find('.event-data h5 a');
+                        const $statusBadge = $eventMedia.find('.bg-warning, .bg-success');
+
+                        if (isCompleted) {
+                            $taskTitle.addClass('text-decoration-line-through');
+                            $statusBadge.removeClass('bg-warning').addClass('bg-success');
+                        } else {
+                            $taskTitle.removeClass('text-decoration-line-through');
+                            $statusBadge.removeClass('bg-success').addClass('bg-warning');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Toggle status error response:', xhr);
+                        // Kembalikan status checkbox jika gagal
+                        $(this).prop('checked', !isCompleted);
+                        alert('Terjadi kesalahan saat memperbarui status tugas.');
+                    }
+                });
+            });
+
+            // Check if charts are rendered after a delay
+            setTimeout(ensureChartsRendered, 1000);
+
+            // Function to render document status chart
+            function renderDocumentStatusChart() {
+                if (typeof ApexCharts === 'undefined') {
+                    console.error("ApexCharts is not defined");
+                    return;
+                }
+
+                // Cek apakah ada data
+                const totalDocs = {{ $totalDocuments }};
+
+                // Jika tidak ada data, tampilkan pesan "Tidak ada data"
+                if (totalDocs === 0) {
+                    $('#documentStatusChart').html(
+                        '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>'
+                        );
+                    return;
+                }
+
+                const documentStatusOptions = {
+                    series: [
+                        {{ $verifiedDocuments }},
+                        {{ $pendingDocuments }},
+                        {{ $revisionDocuments }},
+                        {{ $draftDocuments }}
+                    ],
+                    chart: {
+                        type: 'donut',
+                        height: 300,
+                        fontFamily: 'inherit',
+                        parentHeightOffset: 0,
+                        animations: {
                             enabled: true,
-                            delay: 150
-                        },
-                        dynamicAnimation: {
-                            enabled: true,
-                            speed: 350
+                            easing: 'easeinout',
+                            speed: 800,
+                            animateGradually: {
+                                enabled: true,
+                                delay: 150
+                            },
+                            dynamicAnimation: {
+                                enabled: true,
+                                speed: 350
+                            }
                         }
-                    }
-                },
-                labels: ['Terverifikasi', 'Menunggu', 'Perlu Revisi', 'Draft'],
-                colors: ['#10b981', '#f59e0b', '#ef4444', '#6366f1'],
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '65%',
-                            background: 'transparent',
-                            labels: {
-                                show: true,
-                                name: {
+                    },
+                    labels: ['Terverifikasi', 'Menunggu', 'Perlu Revisi', 'Draft'],
+                    colors: ['#10b981', '#f59e0b', '#ef4444', '#6366f1'],
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '65%',
+                                background: 'transparent',
+                                labels: {
                                     show: true,
-                                    fontSize: '16px',
-                                    fontWeight: 600,
-                                    offsetY: 20
-                                },
-                                value: {
-                                    show: true,
-                                    fontSize: '20px',
-                                    fontWeight: 700,
-                                    offsetY: -10
-                                },
-                                total: {
-                                    show: true,
-                                    label: 'Total',
-                                    fontSize: '16px',
-                                    fontWeight: 600,
-                                    formatter: function (w) {
-                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    name: {
+                                        show: true,
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        offsetY: 20
+                                    },
+                                    value: {
+                                        show: true,
+                                        fontSize: '20px',
+                                        fontWeight: 700,
+                                        offsetY: -10
+                                    },
+                                    total: {
+                                        show: true,
+                                        label: 'Total',
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        formatter: function(w) {
+                                            return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                legend: {
-                    position: 'bottom',
-                    horizontalAlign: 'center',
-                    fontSize: '14px',
-                    markers: {
-                        width: 12,
-                        height: 12,
-                        radius: 6,
                     },
-                    itemMargin: {
-                        horizontal: 10,
-                        vertical: 0
-                    }
-                },
-                responsive: [{
-                    breakpoint: 480,
-                    options: {
-                        chart: {
-                            height: 280
+                    dataLabels: {
+                        enabled: false
+                    },
+                    legend: {
+                        position: 'bottom',
+                        horizontalAlign: 'center',
+                        fontSize: '14px',
+                        markers: {
+                            width: 12,
+                            height: 12,
+                            radius: 6,
                         },
-                        legend: {
-                            position: 'bottom'
+                        itemMargin: {
+                            horizontal: 10,
+                            vertical: 0
                         }
+                    },
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                height: 280
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }],
+                    tooltip: {
+                        enabled: true,
+                        fillSeriesColor: false
                     }
-                }],
-                tooltip: {
-                    enabled: true,
-                    fillSeriesColor: false
+                };
+
+                try {
+                    const documentStatusChart = new ApexCharts(document.querySelector("#documentStatusChart"),
+                        documentStatusOptions);
+                    documentStatusChart.render();
+                } catch (error) {
+                    console.error("Error rendering document status chart:", error);
                 }
-            };
-
-            try {
-                const documentStatusChart = new ApexCharts(document.querySelector("#documentStatusChart"), documentStatusOptions);
-                documentStatusChart.render();
-            } catch (error) {
-                console.error("Error rendering document status chart:", error);
-            }
-        }
-
-        // Function to render document progress chart
-        function renderDocumentProgressChart() {
-            if (typeof ApexCharts === 'undefined') {
-                console.error("ApexCharts is not defined");
-                return;
             }
 
-            // Cek apakah ada data
-            const ppepp_total = {!! json_encode($ppepp_total) !!};
-            const hasData = ppepp_total.some(value => value > 0);
-
-            // Jika tidak ada data, tampilkan pesan "Tidak ada data"
-            if (!hasData) {
-                $('#documentProgressChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>');
-                return;
-            }
-
-            const documentProgressOptions = {
-                series: [{
-                    name: 'Total Dokumen',
-                    data: {!! json_encode($ppepp_total) !!}
-                }, {
-                    name: 'Dokumen Terverifikasi',
-                    data: {!! json_encode($ppepp_verified) !!}
-                }],
-                chart: {
-                    type: 'bar',
-                    height: 350,
-                    stacked: false,
-                    toolbar: {
-                        show: false
-                    },
-                    fontFamily: 'inherit',
-                    animations: {
-                        enabled: true
-                    },
-                    parentHeightOffset: 0,
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: false,
-                        columnWidth: '70%',
-                        borderRadius: 5,
-                        dataLabels: {
-                            position: 'top',
-                        },
-                    }
-                },
-                dataLabels: {
-                    enabled: true,
-                    offsetY: -20,
-                    style: {
-                        fontSize: '12px',
-                        colors: ["#304758"]
-                    }
-                },
-                stroke: {
-                    show: true,
-                    width: 2,
-                    colors: ['transparent']
-                },
-                xaxis: {
-                    categories: ['C1. Penetapan', 'C2. Pelaksanaan', 'C3. Evaluasi', 'C4. Pengendalian', 'C5. Peningkatan'],
-                    labels: {
-                        rotate: -45,
-                        rotateAlways: false,
-                    }
-                },
-                yaxis: {
-                    title: {
-                        text: 'Jumlah Dokumen'
-                    },
-                    min: 0,
-                    max: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...{!! json_encode($ppepp_total) !!}) + 1 : 5,
-                    tickAmount: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...{!! json_encode($ppepp_total) !!}) + 1 : 5
-                },
-                colors: ['#6366f1', '#10b981'],
-                fill: {
-                    opacity: 1
-                },
-                legend: {
-                    position: 'top',
-                    horizontalAlign: 'center',
-                    fontSize: '14px',
-                    markers: {
-                        width: 12,
-                        height: 12,
-                        radius: 6,
-                    },
-                    itemMargin: {
-                        horizontal: 10,
-                        vertical: 0
-                    }
-                },
-                responsive: [{
-                    breakpoint: 480,
-                    options: {
-                        chart: {
-                            height: 280
-                        },
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }],
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return val + " dokumen"
-                        }
-                    }
+            // Function to render document progress chart
+            function renderDocumentProgressChart() {
+                if (typeof ApexCharts === 'undefined') {
+                    console.error("ApexCharts is not defined");
+                    return;
                 }
-            };
 
-            try {
-                const documentProgressChart = new ApexCharts(document.querySelector("#documentProgressChart"), documentProgressOptions);
-                documentProgressChart.render();
-            } catch (error) {
-                console.error("Error rendering document progress chart:", error);
+                // Cek apakah ada data
+                const ppepp_total = {!! json_encode($ppepp_total) !!};
+                const hasData = ppepp_total.some(value => value > 0);
+
+                // Jika tidak ada data, tampilkan pesan "Tidak ada data"
+                if (!hasData) {
+                    $('#documentProgressChart').html(
+                        '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>'
+                        );
+                    return;
+                }
+
+                const documentProgressOptions = {
+                    series: [{
+                        name: 'Total Dokumen',
+                        data: {!! json_encode($ppepp_total) !!}
+                    }, {
+                        name: 'Dokumen Terverifikasi',
+                        data: {!! json_encode($ppepp_verified) !!}
+                    }],
+                    chart: {
+                        type: 'bar',
+                        height: 350,
+                        stacked: false,
+                        toolbar: {
+                            show: false
+                        },
+                        fontFamily: 'inherit',
+                        animations: {
+                            enabled: true
+                        },
+                        parentHeightOffset: 0,
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            columnWidth: '70%',
+                            borderRadius: 5,
+                            dataLabels: {
+                                position: 'top',
+                            },
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        offsetY: -20,
+                        style: {
+                            fontSize: '12px',
+                            colors: ["#304758"]
+                        }
+                    },
+                    stroke: {
+                        show: true,
+                        width: 2,
+                        colors: ['transparent']
+                    },
+                    xaxis: {
+                        categories: ['C1. Penetapan', 'C2. Pelaksanaan', 'C3. Evaluasi', 'C4. Pengendalian',
+                            'C5. Peningkatan'
+                        ],
+                        labels: {
+                            rotate: -45,
+                            rotateAlways: false,
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Jumlah Dokumen'
+                        },
+                        min: 0,
+                        max: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...{!! json_encode($ppepp_total) !!}) +
+                            1 : 5,
+                        tickAmount: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...
+                            {!! json_encode($ppepp_total) !!}) + 1 : 5
+                    },
+                    colors: ['#6366f1', '#10b981'],
+                    fill: {
+                        opacity: 1
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'center',
+                        fontSize: '14px',
+                        markers: {
+                            width: 12,
+                            height: 12,
+                            radius: 6,
+                        },
+                        itemMargin: {
+                            horizontal: 10,
+                            vertical: 0
+                        }
+                    },
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                height: 280
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }],
+                    tooltip: {
+                        y: {
+                            formatter: function(val) {
+                                return val + " dokumen"
+                            }
+                        }
+                    }
+                };
+
+                try {
+                    const documentProgressChart = new ApexCharts(document.querySelector("#documentProgressChart"),
+                        documentProgressOptions);
+                    documentProgressChart.render();
+                } catch (error) {
+                    console.error("Error rendering document progress chart:", error);
+                }
             }
-        }
 
-        // Helper function to format date for display
-        function formatDate(dateString) {
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
-        }
-    });
-</script>
+            // Helper function to format date for display
+            function formatDate(dateString) {
+                const options = {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            }
+        });
+    </script>
 @endsection
