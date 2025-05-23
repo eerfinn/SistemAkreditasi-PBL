@@ -524,44 +524,44 @@
         #documentProgressChart {
             margin-bottom: 0 !important;
         }
-        
+
         .card-body .ttl-project {
             margin-top: -15px;
         }
-        
+
         .card .apexcharts-canvas {
             margin: 0 auto;
         }
-        
+
         .apexcharts-legend {
             margin-bottom: 5px !important;
         }
-        
+
         .apexcharts-title-text, .apexcharts-subtitle-text {
             margin-bottom: 0 !important;
         }
-        
+
         /* Fix for PPEPP chart bottom space */
         .card-body {
             padding-bottom: 1rem;
         }
-        
+
         #documentProgressChart .apexcharts-canvas {
             padding-bottom: 0 !important;
             margin-bottom: 0 !important;
         }
-        
+
         .card.h-100 {
             display: flex;
             flex-direction: column;
         }
-        
+
         .card.h-100 .card-body {
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
         }
-        
+
         #documentProgressChart {
             flex: 1;
         }
@@ -579,19 +579,19 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
             margin-right: 15px;
         }
-        
+
         .event-box h5 {
             font-size: 16px;
             font-weight: 700;
             margin: 0;
             color: #333;
         }
-        
+
         .event-box span {
             font-size: 11px;
             color: #666;
         }
-        
+
         .event-media {
             display: flex;
             justify-content: space-between;
@@ -603,110 +603,129 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
-        
+
         .event-media:hover {
             transform: translateY(-2px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .event-data {
             flex-grow: 1;
             margin-right: 10px;
         }
-        
+
         .event-data h5 {
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 2px;
         }
-        
+
         .event-data span {
             font-size: 12px;
             color: #666;
         }
-        
+
         .event-scroll {
             max-height: 350px;
             overflow-y: auto;
             padding-right: 5px;
         }
-        
+
         .event-scroll::-webkit-scrollbar {
             width: 5px;
         }
-        
+
         .event-scroll::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
-        
+
         .event-scroll::-webkit-scrollbar-thumb {
             background: #ddd;
             border-radius: 10px;
         }
-        
+
         .event-scroll::-webkit-scrollbar-thumb:hover {
             background: #ccc;
         }
-        
+
         .my-calendar .card-header {
-            background-color: #f8f9fa;
-            color: #333;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 15px 20px;
         }
         
-        .my-calendar .card-body {
-            padding: 15px;
+        .my-calendar .card-header .card-title {
+            font-weight: 600;
+            color: white;
         }
-
+        
+        .my-calendar .card-header .btn-primary {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: transparent;
+        }
+        
+        .my-calendar .card-header .btn-primary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: transparent;
+        }
+        
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             .my-calendar .card-header {
-                background-color: #1e2235;
-                color: #e2e8f0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                background: linear-gradient(135deg, #4f46e5, #7e57c2);
+                color: #ffffff;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
+
             .event-box {
                 background: #2a2f45;
                 border: 1px solid rgba(255, 255, 255, 0.05);
             }
-            
+
             .event-box h5 {
                 color: #e2e8f0;
             }
-            
+
             .event-box span {
                 color: #a0aec0;
             }
-            
+
             .event-media {
                 background: #2a2f45;
             }
-            
+
             .event-data h5 a {
                 color: #e2e8f0;
             }
-            
+
             .event-data span {
                 color: #a0aec0;
             }
         }
-        
+
         .event-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
-        
+
         .event-time {
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 500;
             min-width: 70px;
             text-align: center;
+        }
+
+        .card-body.schedules-cal {
+            padding: 15px !important;
+        }
+
+        .dz-scroll.event-scroll {
+            padding: 0 5px;
         }
     </style>
 @endsection
@@ -842,7 +861,7 @@
                     <h4 class="card-title mb-0">Events</h4>
                     <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">+ Tambah Event</a>
                 </div>
-                <div class="card-body schedules-cal p-2">
+                <div class="card-body schedules-cal">
                     <input type="text" class="form-control d-none" id="datetimepicker1">
                     <div class="events">
                         <h6 class="mb-3">Daftar Events</h6>
@@ -850,7 +869,7 @@
                             <div id="eventsList">
                                 <!-- Dynamic events will be added here -->
                             </div>
-                            
+
                             <!-- Pesan jika tidak ada tugas -->
                             <div id="noTasksMessage" class="text-center p-3 {{ count($tasks) > 0 ? 'd-none' : '' }}">
                                 <p class="text-muted mb-0">Belum ada events. Klik tombol "Tambah Event" untuk membuat event baru.</p>
@@ -975,7 +994,7 @@
 
         // Load tasks from database - use the tasks variable from PHP
         const tasksData = {!! json_encode($tasks) !!};
-        
+
         // Add tasks to UI only if they have valid IDs (from database)
         if (tasksData && tasksData.length > 0) {
             tasksData.forEach(task => {
@@ -1209,10 +1228,10 @@
             const dayName = dayNames[date.getDay()];
             const time = task.rawTime || '00:00';
             const timeDisplay = time === '00:00' ? 'Sepanjang hari' : time;
-            
+
             // Tentukan kelas warna berdasarkan status
             let statusClass = task.status === 'completed' ? 'success' : 'warning';
-            
+
             // Buat HTML untuk event
             const eventHtml = `
                 <div class="event-media" data-id="${task.id}" data-raw-date="${task.rawDate}" data-raw-time="${task.rawTime}">
@@ -1236,7 +1255,7 @@
                             <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item edit-task" href="javascript:void(0);" data-id="${task.id}"><i class="fas fa-edit me-2"></i>Edit</a></li>
                                 <li><a class="dropdown-item delete-task" href="javascript:void(0);" data-id="${task.id}"><i class="fas fa-trash me-2"></i>Hapus</a></li>
                             </ul>
@@ -1245,9 +1264,9 @@
                     </div>
                 </div>
             `;
-            
+
             $('#eventsList').append(eventHtml);
-            
+
             // Sembunyikan pesan "tidak ada tugas" jika ada tugas
             $('#noTasksMessage').addClass('d-none');
         }
@@ -1284,7 +1303,7 @@
                     console.log('Success response:', response);
                     // Format tanggal untuk tampilan
                     const displayDate = formatDate(date);
-                    
+
                     // Tambahkan ke daftar tugas di UI
                     const newTask = {
                         id: response.id,
@@ -1295,15 +1314,15 @@
                         status: 'pending',
                         show_in_calendar: addToCalendar
                     };
-                    
+
                     // Tambahkan ke daftar events
                     addTaskToUI(newTask);
-                    
+
                     // Tambahkan ke kalender jika dipilih
                     if (addToCalendar && typeof calendar !== 'undefined') {
                         const eventId = 'task-' + newTask.id;
                         const eventDate = date + 'T' + time;
-                        
+
                         calendar.addEvent({
                             id: eventId,
                             title: title,
@@ -1316,7 +1335,7 @@
                             }
                         });
                     }
-                    
+
                     // Reset form dan tutup modal
                     $('#addTaskForm')[0].reset();
                     $('#addTaskModal').modal('hide');
@@ -1345,15 +1364,15 @@
             const title = taskItem.find('.event-data h5 a').text().trim();
             const date = taskItem.data('raw-date');
             const time = taskItem.data('raw-time') || '00:00';
-            
+
             $('#editTaskId').val(taskId);
             $('#editTaskTitle').val(title);
             $('#editTaskDate').val(date);
             $('#editTaskTime').val(time);
-            
+
             $('#editTaskModal').modal('show');
         });
-        
+
         // Update task
         $('#updateTaskBtn').click(function() {
             const taskId = $('#editTaskId').val();
@@ -1361,14 +1380,14 @@
             const date = $('#editTaskDate').val();
             const time = $('#editTaskTime').val() || '00:00';
             const updateCalendar = $('#updateCalendar').is(':checked');
-            
+
             if (!title || !date) {
                 alert('Judul dan tanggal harus diisi!');
                 return;
             }
-            
+
             console.log('Updating task ID:', taskId, 'with data:', { title, date, time, updateCalendar });
-            
+
             // Kirim data ke server menggunakan AJAX
             $.ajax({
                 url: `/tugas/${taskId}`,
@@ -1389,10 +1408,10 @@
                     console.log('Update success response:', response);
                     // Hapus task lama dari UI
                     $(`.event-media[data-id="${taskId}"]`).remove();
-                    
+
                     // Format tanggal untuk tampilan
                     const displayDate = formatDate(date);
-                    
+
                     // Tambahkan task yang diupdate ke UI
                     const updatedTask = {
                         id: taskId,
@@ -1403,23 +1422,23 @@
                         status: response.status,
                         show_in_calendar: updateCalendar
                     };
-                    
+
                     addTaskToUI(updatedTask);
-                    
+
                     // Update kalender jika dipilih
                     if (typeof calendar !== 'undefined') {
                         const eventId = 'task-' + taskId;
-                        
+
                         // Hapus event lama jika ada
                         const existingEvent = calendar.getEventById(eventId);
                         if (existingEvent) {
                             existingEvent.remove();
                         }
-                        
+
                         // Tambahkan event baru jika dicentang
                         if (updateCalendar) {
                             const eventDate = date + 'T' + time;
-                            
+
                             calendar.addEvent({
                                 id: eventId,
                                 title: title,
@@ -1433,7 +1452,7 @@
                             });
                         }
                     }
-                    
+
                     // Tutup modal
                     $('#editTaskModal').modal('hide');
                 },
@@ -1452,16 +1471,16 @@
                 }
             });
         });
-        
+
         // Delete task
         $(document).on('click', '.delete-task', function() {
             if (!confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
                 return;
             }
-            
+
             const taskId = $(this).data('id');
             console.log('Deleting task ID:', taskId);
-            
+
             // Kirim data ke server menggunakan AJAX
             $.ajax({
                 url: `/tugas/${taskId}`,
@@ -1476,7 +1495,7 @@
                     console.log('Delete success response:', response);
                     // Hapus dari UI
                     $(`.event-media[data-id="${taskId}"]`).remove();
-                    
+
                     // Hapus dari kalender
                     if (typeof calendar !== 'undefined') {
                         const eventId = 'task-' + taskId;
@@ -1485,7 +1504,7 @@
                             existingEvent.remove();
                         }
                     }
-                    
+
                     // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas lagi
                     if ($('#eventsList .event-media').length === 0) {
                         $('#noTasksMessage').removeClass('d-none');
@@ -1497,15 +1516,15 @@
                 }
             });
         });
-        
+
         // Toggle task completion
         $(document).on('change', '.task-checkbox', function() {
             const taskId = $(this).data('id');
             const isCompleted = $(this).is(':checked');
             const status = isCompleted ? 'completed' : 'pending';
-            
+
             console.log('Toggling task ID:', taskId, 'to status:', status);
-            
+
             // Kirim data ke server menggunakan AJAX
             $.ajax({
                 url: `/tugas/${taskId}/status`,
@@ -1525,7 +1544,7 @@
                     const $eventMedia = $(`.event-media[data-id="${taskId}"]`);
                     const $taskTitle = $eventMedia.find('.event-data h5 a');
                     const $statusBadge = $eventMedia.find('.bg-warning, .bg-success');
-                    
+
                     if (isCompleted) {
                         $taskTitle.addClass('text-decoration-line-through');
                         $statusBadge.removeClass('bg-warning').addClass('bg-success');
