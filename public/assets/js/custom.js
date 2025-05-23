@@ -326,6 +326,19 @@ var YashAdmin = function(){
 		if(jQuery("#datetimepicker1").length>0) {
 			$('#datetimepicker1').datetimepicker({
 				inline: true,
+				format: 'YYYY-MM-DD',
+				defaultDate: moment(),
+				icons: {
+					time: "fa fa-clock-o",
+					date: "fa fa-calendar",
+					up: "fa fa-arrow-up",
+					down: "fa fa-arrow-down",
+					previous: 'fa fa-chevron-left',
+					next: 'fa fa-chevron-right',
+					today: 'fa fa-screenshot',
+					clear: 'fa fa-trash',
+					close: 'fa fa-remove'
+				}
 			});
 		}
 	}

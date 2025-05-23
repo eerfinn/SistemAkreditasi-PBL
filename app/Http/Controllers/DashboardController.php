@@ -110,65 +110,45 @@ class DashboardController extends Controller
         
         // Create calendar events
         $now = Carbon::now();
-        $calendarEvents = [
-            [
-                'title' => 'Deadline Revisi Dokumen',
-                'start' => $now->copy()->addDays(5)->format('Y-m-d'),
-                'color' => '#f59e0b'
-            ],
-            [
-                'title' => 'Upload Dokumen C2',
-                'start' => $now->copy()->format('Y-m-d'),
-                'color' => '#10b981'
-            ],
-            [
-                'title' => 'Deadline Finalisasi',
-                'start' => $now->copy()->subDays(5)->format('Y-m-d'),
-                'color' => '#ef4444'
-            ],
-            [
-                'title' => 'Persiapan Dokumen C4',
-                'start' => $now->copy()->addDays(10)->format('Y-m-d'),
-                'color' => '#6366f1'
-            ],
-            [
-                'title' => 'Rapat Koordinasi Akreditasi',
-                'start' => $now->copy()->addDays(8)->format('Y-m-d'),
-                'color' => '#8b5cf6'
-            ]
-        ];
+        $calendarEvents = [];
         
-        // Create tasks
-        $tasks = [
-            [
-                'title' => 'Revisi dokumen C1. Penetapan',
-                'status' => 'pending',
-                'status_label' => 'Menunggu',
-                'date' => $now->copy()->addDays(5)->format('d M Y'),
-                'time_remaining' => '5 hari lagi'
-            ],
-            [
-                'title' => 'Upload dokumen C2. Pelaksanaan',
-                'status' => 'completed',
-                'status_label' => 'Selesai',
-                'date' => $now->copy()->format('d M Y'),
-                'time_remaining' => 'Selesai'
-            ],
-            [
-                'title' => 'Finalisasi dokumen C3. Evaluasi',
-                'status' => 'overdue',
-                'status_label' => 'Terlambat',
-                'date' => $now->copy()->subDays(5)->format('d M Y'),
-                'time_remaining' => 'Terlambat 5 hari'
-            ],
-            [
-                'title' => 'Persiapan dokumen C4. Pengendalian',
-                'status' => 'pending',
-                'status_label' => 'Menunggu',
-                'date' => $now->copy()->addDays(10)->format('d M Y'),
-                'time_remaining' => '10 hari lagi'
-            ]
-        ];
+        // Get tasks from database
+        $tasks = \App\Models\DaftarTugas::where('user_id', $user->id)
+            ->orderBy('tanggal', 'asc')
+            ->get()
+            ->map(function($task) {
+                $tanggal = Carbon::parse($task->tanggal);
+                return [
+                    'id' => $task->id,
+                    'title' => $task->judul,
+                    'status' => $task->status,
+                    'date' => $tanggal->format('d M Y'),
+                    'rawDate' => $tanggal->format('Y-m-d'),
+                    'rawTime' => substr($task->waktu, 0, 5),
+                    'show_in_calendar' => $task->show_in_calendar
+                ];
+            });
+        
+        // Provide empty array if no tasks exist
+        if ($tasks->isEmpty()) {
+            $tasks = [];
+        }
+        
+        // Add tasks with show_in_calendar=true to calendar events
+        foreach ($tasks as $task) {
+            if (isset($task['show_in_calendar']) && $task['show_in_calendar']) {
+                $calendarEvents[] = [
+                    'id' => 'task-' . $task['id'],
+                    'title' => $task['title'],
+                    'start' => $task['rawDate'] . 'T' . $task['rawTime'],
+                    'className' => 'deadline',
+                    'extendedProps' => [
+                        'type' => 'task',
+                        'description' => 'Tugas: ' . $task['title']
+                    ]
+                ];
+            }
+        }
         
         $data = [
             'user' => $user,

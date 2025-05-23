@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\DokumenController; // Pastikan DokumenController diimpor
 use App\Http\Controllers\ValidasiController;
+use App\Http\Controllers\DaftarTugasController;
 
 // Public Routes
 Route::get('/', function () {
@@ -118,6 +119,15 @@ Route::middleware('auth')->group(function () {
     // Route::resource('dokumen-resource', DokumenController::class)->names('dokumen.resource');
 
     Route::post('/dokumen/finalisasi-all/{kriteria_id}', [DokumenController::class, 'finalisasiAll'])->name('dokumen.finalisasi.all');
+
+    // Daftar Tugas Routes
+    Route::prefix('tugas')->name('tugas.')->group(function () {
+        Route::get('/', [DaftarTugasController::class, 'index'])->name('index');
+        Route::post('/', [DaftarTugasController::class, 'store'])->name('store');
+        Route::put('/{id}', [DaftarTugasController::class, 'update'])->name('update');
+        Route::patch('/{id}/status', [DaftarTugasController::class, 'updateStatus'])->name('update.status');
+        Route::delete('/{id}', [DaftarTugasController::class, 'destroy'])->name('destroy');
+    });
 });
 
 use App\Http\Controllers\ProfileController;

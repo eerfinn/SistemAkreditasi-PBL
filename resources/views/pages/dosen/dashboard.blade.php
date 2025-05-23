@@ -5,8 +5,9 @@
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/swiper/css/swiper-bundle.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/fullcalendar/css/fullcalendar.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/apexchart/apexcharts.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
+    <!-- Tambahkan CDN ApexCharts jika file lokal tidak ditemukan -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.css">
     <style>
         .welcome-container {
             background: linear-gradient(135deg, #1a2151, #3a3f87);
@@ -254,31 +255,41 @@
             background-color: #f59e0b !important;
         }
 
+        /* Custom Todo List */
         .custom-todo-list {
             background: #f9fafb;
             border-radius: 15px;
             padding: 20px;
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
         }
 
         .todo-item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px;
             border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .todo-item:hover {
+            background-color: #f1f5f9;
         }
 
         .todo-item:last-child {
             border-bottom: none;
+            margin-bottom: 0;
         }
 
         .todo-checkbox {
-            margin-right: 10px;
+            margin-right: 15px;
         }
 
         .todo-text {
             flex-grow: 1;
+            font-size: 0.95rem;
         }
 
         .todo-text.completed {
@@ -288,18 +299,37 @@
 
         .todo-actions {
             display: flex;
+            gap: 5px;
         }
 
         .todo-actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #64748b;
-            margin-left: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
         }
 
         .todo-actions button:hover {
-            color: #1e293b;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-primary {
+            color: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #6366f1;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #ef4444;
+            color: white;
         }
 
         .ttl-project {
@@ -489,6 +519,195 @@
         .tooltip {
             z-index: 10000;
         }
+
+        /* Document Progress Chart Styles */
+        #documentProgressChart {
+            margin-bottom: 0 !important;
+        }
+        
+        .card-body .ttl-project {
+            margin-top: -15px;
+        }
+        
+        .card .apexcharts-canvas {
+            margin: 0 auto;
+        }
+        
+        .apexcharts-legend {
+            margin-bottom: 5px !important;
+        }
+        
+        .apexcharts-title-text, .apexcharts-subtitle-text {
+            margin-bottom: 0 !important;
+        }
+        
+        /* Fix for PPEPP chart bottom space */
+        .card-body {
+            padding-bottom: 1rem;
+        }
+        
+        #documentProgressChart .apexcharts-canvas {
+            padding-bottom: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .card.h-100 {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card.h-100 .card-body {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #documentProgressChart {
+            flex: 1;
+        }
+
+        .event-box {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-right: 15px;
+        }
+        
+        .event-box h5 {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            color: #333;
+        }
+        
+        .event-box span {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .event-media {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .event-media:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .event-data {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        
+        .event-data h5 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .event-data span {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .event-scroll {
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .event-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .event-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .event-scroll::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 10px;
+        }
+        
+        .event-scroll::-webkit-scrollbar-thumb:hover {
+            background: #ccc;
+        }
+        
+        .my-calendar .card-header {
+            background-color: #f8f9fa;
+            color: #333;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+        }
+        
+        .my-calendar .card-body {
+            padding: 15px;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .my-calendar .card-header {
+                background-color: #1e2235;
+                color: #e2e8f0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .event-box {
+                background: #2a2f45;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .event-box h5 {
+                color: #e2e8f0;
+            }
+            
+            .event-box span {
+                color: #a0aec0;
+            }
+            
+            .event-media {
+                background: #2a2f45;
+            }
+            
+            .event-data h5 a {
+                color: #e2e8f0;
+            }
+            
+            .event-data span {
+                color: #a0aec0;
+            }
+        }
+        
+        .event-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .event-time {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 70px;
+            text-align: center;
+        }
     </style>
 @endsection
 
@@ -560,7 +779,7 @@
     <!-- Main Content Row 1 -->
     <div class="row">
         <!-- Tasks Not Finished -->
-        <div class="col-xl-3 col-lg-6 col-sm-6 mb-4">
+        <div class="col-xl-4 col-lg-6 col-sm-6 mb-4">
             <div class="card h-100">
                 <div class="card-body depostit-card">
                     <div class="depostit-card-media d-flex justify-content-between style-1">
@@ -569,7 +788,11 @@
                             <h3>{{ $pendingDocuments + $revisionDocuments }}</h3>
                         </div>
                         <div class="icon-box bg-secondary">
-                            <i class="fas fa-tasks"></i>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16.9497 4.00001C17.3402 3.60948 17.3402 2.97632 16.9497 2.58579C16.5591 2.19527 15.926 2.19527 15.5355 2.58579L11.7071 6.41422L9.82843 4.53553C9.4379 4.14501 8.80474 4.14501 8.41421 4.53553C8.02369 4.92606 8.02369 5.55922 8.41421 5.94975L10.2929 7.82843C10.6834 8.21895 11.3166 8.21895 11.7071 7.82843L16.9497 2.58579C16.5591 2.19527 15.926 2.19527 15.5355 2.58579L11.7071 6.41422L9.82843 4.53553C9.4379 4.14501 8.80474 4.14501 8.41421 4.53553C8.02369 4.92606 8.02369 5.55922 8.41421 5.94975L10.2929 7.82843C10.6834 8.21895 11.3166 8.21895 11.7071 7.82843L15.5355 4.00001C15.926 3.60948 16.5591 3.60948 16.9497 4.00001Z" fill="#FF9F00"/>
+                                <path d="M16.9497 11C17.3402 10.6095 17.3402 9.97632 16.9497 9.58579C16.5591 9.19527 15.926 9.19527 15.5355 9.58579L11.7071 13.4142L9.82843 11.5355C9.4379 11.145 8.80474 11.145 8.41421 11.5355C8.02369 11.9261 8.02369 12.5592 8.41421 12.9497L10.2929 14.8284C10.6834 15.219 11.3166 15.219 11.7071 14.8284L15.5355 11C15.926 10.6095 16.5591 10.6095 16.9497 11Z" fill="#FF9F00"/>
+                                <path d="M8.41421 18.9497C8.02369 19.3403 8.02369 19.9734 8.41421 20.364C8.80474 20.7545 9.4379 20.7545 9.82843 20.364L11.7071 18.4853L15.5355 22.3137C15.926 22.7042 16.5591 22.7042 16.9497 22.3137C17.3402 21.9232 17.3402 21.29 16.9497 20.8995L13.1213 17.0711L16.9497 13.2426C17.3402 12.8521 17.3402 12.219 16.9497 11.8284C16.5591 11.4379 15.926 11.4379 15.5355 11.8284L11.7071 15.6569L9.82843 13.7782C9.4379 13.3876 8.80474 13.3876 8.41421 13.7782C8.02369 14.1687 8.02369 14.8018 8.41421 15.1924L10.2929 17.0711C10.6834 17.4616 11.3166 17.4616 11.7071 17.0711C11.3166 17.4616 10.6834 17.4616 10.2929 17.0711L8.41421 18.9497Z" fill="#FF9F00"/>
+                            </svg>
                         </div>
                     </div>
                     <div class="progress-box mt-0">
@@ -586,47 +809,13 @@
         </div>
 
         <!-- Document Status Chart -->
-        <div class="col-xl-5 mb-4">
+        <div class="col-xl-8 mb-4">
             <div class="card h-100">
                 <div class="card-header">
                     <h4 class="card-title">Status Dokumen</h4>
                 </div>
                 <div class="card-body d-flex align-items-center justify-content-center">
                     <div id="documentStatusChart" style="width: 100%; height: 300px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Todo List -->
-        <div class="col-xl-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header border-0 d-flex justify-content-between">
-                    <h4 class="card-title">Daftar Tugas</h4>
-                    <div>
-                        <a href="javascript:void(0);" class="text-primary">Lihat Semua</a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="custom-todo-list">
-                        @foreach($tasks as $index => $task)
-                        <div class="todo-item">
-                            <div class="todo-checkbox">
-                                <div class="form-check custom-checkbox">
-                                    <input type="checkbox" class="form-check-input" id="todo{{ $index }}" {{ $task['status'] == 'completed' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="todo{{ $index }}"></label>
-                                </div>
-                            </div>
-                            <div class="todo-text {{ $task['status'] == 'completed' ? 'completed' : '' }}">
-                                {{ $task['title'] }}
-                                <div class="text-muted small">{{ $task['date'] }}</div>
-                            </div>
-                            <div class="todo-actions">
-                                <button type="button"><i class="fas fa-edit"></i></button>
-                                <button type="button"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
                 </div>
             </div>
         </div>
@@ -642,61 +831,29 @@
                 </div>
                 <div class="card-body">
                     <div id="documentProgressChart" style="width: 100%; height: 350px;"></div>
-                    <div class="ttl-project">
-                        <div class="pr-data">
-                            <h5>{{ $totalDocuments }}</h5>
-                            <span>Total Dokumen</span>
-                        </div>
-                        <div class="pr-data">
-                            <h5 class="text-primary">{{ $pendingDocuments }}</h5>
-                            <span>Menunggu Validasi</span>
-                        </div>
-                        <div class="pr-data">
-                            <h5 class="text-danger">{{ $revisionDocuments }}</h5>
-                            <span>Perlu Revisi</span>
-                        </div>
-                        <div class="pr-data">
-                            <h5 class="text-success">{{ $verifiedDocuments }}</h5>
-                            <span>Terverifikasi</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Calendar -->
+        <!-- Calendar and Events -->
         <div class="col-xl-4 mb-4">
-            <div class="card calendar-card h-100">
-                <div class="card-header">
-                    <h4 class="card-title text-white mb-0">Kalender Aktivitas</h4>
+            <div class="card my-calendar h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Events</h4>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">+ Tambah Event</a>
                 </div>
-                <div class="card-body p-0">
-                    <div id="calendar" class="dashboard-calendar"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Info -->
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-header border-0 pb-0">
-                    <h4 class="card-title">Informasi Profil</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="profile-info">
-                                <p><strong>Username:</strong> {{ $user->username }}</p>
-                                <p><strong>Email:</strong> {{ $user->email ?? 'Belum diatur' }}</p>
-                                <p><strong>Peran:</strong> <span class="badge bg-primary">{{ ucfirst($user->role) }}</span></p>
+                <div class="card-body schedules-cal p-2">
+                    <input type="text" class="form-control d-none" id="datetimepicker1">
+                    <div class="events">
+                        <h6 class="mb-3">Daftar Events</h6>
+                        <div class="dz-scroll event-scroll">
+                            <div id="eventsList">
+                                <!-- Dynamic events will be added here -->
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="profile-info">
-                                <p><strong>Terakhir Login:</strong> {{ $user->last_login ?? 'Belum ada data' }}</p>
-                                <p><strong>Bergabung Sejak:</strong> {{ $user->created_at ? $user->created_at->format('d M Y') : 'Tidak ada data' }}</p>
+                            
+                            <!-- Pesan jika tidak ada tugas -->
+                            <div id="noTasksMessage" class="text-center p-3 {{ count($tasks) > 0 ? 'd-none' : '' }}">
+                                <p class="text-muted mb-0">Belum ada events. Klik tombol "Tambah Event" untuk membuat event baru.</p>
                             </div>
                         </div>
                     </div>
@@ -704,11 +861,85 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addTaskModalLabel">Tambah Event Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTaskForm">
+                        <div class="mb-3">
+                            <label for="taskTitle" class="form-label">Judul Event</label>
+                            <input type="text" class="form-control" id="taskTitle" required placeholder="Masukkan judul event">
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskDate" class="form-label">Tanggal</label>
+                            <input type="date" class="form-control" id="taskDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskTime" class="form-label">Waktu</label>
+                            <input type="time" class="form-control" id="taskTime" value="00:00">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="addToCalendar" checked>
+                            <label class="form-check-label" for="addToCalendar">Tambahkan ke Kalender</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="saveTaskBtn">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editTaskModalLabel">Edit Event</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTaskForm">
+                        <input type="hidden" id="editTaskId">
+                        <div class="mb-3">
+                            <label for="editTaskTitle" class="form-label">Judul Event</label>
+                            <input type="text" class="form-control" id="editTaskTitle" required placeholder="Masukkan judul event">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTaskDate" class="form-label">Tanggal</label>
+                            <input type="date" class="form-control" id="editTaskDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTaskTime" class="form-label">Waktu</label>
+                            <input type="time" class="form-control" id="editTaskTime" value="00:00">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="updateCalendar" checked>
+                            <label class="form-check-label" for="updateCalendar">Perbarui di Kalender</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="updateTaskBtn">Perbarui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('vendor-script')
-    <script src="{{ asset('assets/vendor/apexchart/apexchart.js') }}"></script>
-    <!-- Fallback to CDN if local ApexCharts fails to load -->
+    <!-- Tambahkan CDN ApexCharts jika file lokal tidak ditemukan -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.js"></script>
     <script>
         if (typeof ApexCharts === 'undefined') {
             console.log('Loading ApexCharts from CDN as fallback');
@@ -716,13 +947,50 @@
         }
     </script>
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/fullcalendar-5.11.0/lib/main.min.js') }}"></script>
-    <link href="{{ asset('assets/vendor/fullcalendar-5.11.0/lib/main.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('assets/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js') }}"></script>
 @endsection
 
 @section('page-script')
 <script>
     $(document).ready(function() {
+        // Initialize datetimepicker
+        if($("#datetimepicker1").length > 0) {
+            $('#datetimepicker1').datetimepicker({
+                inline: true,
+                format: 'YYYY-MM-DD',
+                defaultDate: moment(),
+                icons: {
+                    time: "fa fa-clock-o",
+                    date: "fa fa-calendar",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down",
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-screenshot',
+                    clear: 'fa fa-trash',
+                    close: 'fa fa-remove'
+                }
+            });
+        }
+
+        // Load tasks from database - use the tasks variable from PHP
+        const tasksData = {!! json_encode($tasks) !!};
+        
+        // Add tasks to UI only if they have valid IDs (from database)
+        if (tasksData && tasksData.length > 0) {
+            tasksData.forEach(task => {
+                // Only add tasks that have numeric IDs (from database)
+                if (typeof task.id === 'number' && task.id > 0) {
+                    addTaskToUI(task);
+                }
+            });
+            // Sembunyikan pesan "tidak ada tugas" jika ada tugas
+            $('#noTasksMessage').addClass('d-none');
+        } else {
+            // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas
+            $('#noTasksMessage').removeClass('d-none');
+        }
+
         // Network Animation for Welcome Container
         const canvas = document.getElementById('networkCanvas');
         if (canvas) {
@@ -853,39 +1121,6 @@
         // Variabel untuk menyimpan data tugas
         let tasks = {!! json_encode($tasks) !!};
         let calendar;
-        let nextTaskId = tasks.length;
-
-        // Coba memuat tugas dari localStorage
-        const savedTasks = loadTasksFromLocalStorage();
-        if (savedTasks && savedTasks.length > 0) {
-            // Gunakan tugas yang disimpan jika ada
-            tasks = savedTasks;
-            nextTaskId = Math.max(...savedTasks.map(task => task.id)) + 1;
-
-            // Bersihkan daftar tugas UI dan muat ulang dari localStorage
-            $('#taskList').empty();
-            savedTasks.forEach(task => {
-                addTaskToUI(task);
-
-                // Tambahkan ke kalender jika ada rawDate
-                if (task.rawDate && calendar) {
-                    const eventId = 'task-' + task.id;
-                    const eventDate = task.rawDate + 'T' + (task.rawTime || '00:00');
-
-                    calendar.addEvent({
-                        id: eventId,
-                        title: task.title,
-                        start: eventDate,
-                        allDay: !task.rawTime || task.rawTime === '00:00',
-                        className: 'deadline',
-                        extendedProps: {
-                            type: 'task',
-                            description: 'Tugas: ' + task.title
-                        }
-                    });
-                }
-            });
-        }
 
         // Function to check if charts are rendered and retry if not
         function ensureChartsRendered() {
@@ -965,19 +1200,347 @@
             console.error("ApexCharts not loaded or progress chart container not found");
         }
 
-        // Todo list functionality - Mark as completed
-        $('.task-checkbox').change(function() {
-            const taskId = $(this).data('id');
-            if($(this).is(':checked')) {
-                $(this).closest('.todo-item').find('.todo-text').addClass('completed');
-                tasks[taskId].status = 'completed';
-            } else {
-                $(this).closest('.todo-item').find('.todo-text').removeClass('completed');
-                tasks[taskId].status = 'pending';
+        // Helper function to add task to UI
+        function addTaskToUI(task) {
+            // Format tanggal untuk tampilan event
+            const date = new Date(task.rawDate);
+            const day = date.getDate().toString().padStart(2, '0');
+            const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+            const dayName = dayNames[date.getDay()];
+            const time = task.rawTime || '00:00';
+            const timeDisplay = time === '00:00' ? 'Sepanjang hari' : time;
+            
+            // Tentukan kelas warna berdasarkan status
+            let statusClass = task.status === 'completed' ? 'success' : 'warning';
+            
+            // Buat HTML untuk event
+            const eventHtml = `
+                <div class="event-media" data-id="${task.id}" data-raw-date="${task.rawDate}" data-raw-time="${task.rawTime}">
+                    <div class="d-flex align-items-center">
+                        <div class="event-box">
+                            <h5 class="mb-0">${day}</h5>
+                            <span>${dayName}</span>
+                        </div>
+                        <div class="event-data">
+                            <h5 class="mb-0">
+                                <a href="javascript:void(0);" class="${task.status === 'completed' ? 'text-decoration-line-through' : ''}">${task.title}</a>
+                            </h5>
+                            <span>${formatDate(task.rawDate)}</span>
+                        </div>
+                    </div>
+                    <div class="event-actions">
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input task-checkbox" type="checkbox" role="switch" data-id="${task.id}" ${task.status === 'completed' ? 'checked' : ''}>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item edit-task" href="javascript:void(0);" data-id="${task.id}"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item delete-task" href="javascript:void(0);" data-id="${task.id}"><i class="fas fa-trash me-2"></i>Hapus</a></li>
+                            </ul>
+                        </div>
+                        <span class="event-time text-white bg-${statusClass}">${timeDisplay}</span>
+                    </div>
+                </div>
+            `;
+            
+            $('#eventsList').append(eventHtml);
+            
+            // Sembunyikan pesan "tidak ada tugas" jika ada tugas
+            $('#noTasksMessage').addClass('d-none');
+        }
+
+        // Add new task
+        $('#saveTaskBtn').click(function() {
+            const title = $('#taskTitle').val().trim();
+            const date = $('#taskDate').val();
+            const time = $('#taskTime').val() || '00:00';
+            const addToCalendar = $('#addToCalendar').is(':checked');
+
+            if (!title || !date) {
+                alert('Judul dan tanggal harus diisi!');
+                return;
             }
 
-            // Simpan perubahan ke localStorage
-            saveTasksToLocalStorage();
+            // Kirim data ke server menggunakan AJAX
+            $.ajax({
+                url: '{{ route("tugas.store") }}',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                data: JSON.stringify({
+                    judul: title,
+                    tanggal: date,
+                    waktu: time,
+                    show_in_calendar: addToCalendar
+                }),
+                processData: false,
+                success: function(response) {
+                    console.log('Success response:', response);
+                    // Format tanggal untuk tampilan
+                    const displayDate = formatDate(date);
+                    
+                    // Tambahkan ke daftar tugas di UI
+                    const newTask = {
+                        id: response.id,
+                        title: title,
+                        date: displayDate,
+                        rawDate: date,
+                        rawTime: time,
+                        status: 'pending',
+                        show_in_calendar: addToCalendar
+                    };
+                    
+                    // Tambahkan ke daftar events
+                    addTaskToUI(newTask);
+                    
+                    // Tambahkan ke kalender jika dipilih
+                    if (addToCalendar && typeof calendar !== 'undefined') {
+                        const eventId = 'task-' + newTask.id;
+                        const eventDate = date + 'T' + time;
+                        
+                        calendar.addEvent({
+                            id: eventId,
+                            title: title,
+                            start: eventDate,
+                            allDay: time === '00:00',
+                            className: 'deadline',
+                            extendedProps: {
+                                type: 'task',
+                                description: 'Tugas: ' + title
+                            }
+                        });
+                    }
+                    
+                    // Reset form dan tutup modal
+                    $('#addTaskForm')[0].reset();
+                    $('#addTaskModal').modal('hide');
+                },
+                error: function(xhr) {
+                    console.error('Error response:', xhr);
+                    if (xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        let errorMessage = 'Terjadi kesalahan:';
+                        for (const key in errors) {
+                            errorMessage += '\n- ' + errors[key][0];
+                        }
+                        alert(errorMessage);
+                    } else {
+                        alert('Terjadi kesalahan saat menyimpan tugas.');
+                    }
+                }
+            });
+        });
+
+        // Edit task - open modal with data
+        $(document).on('click', '.edit-task', function() {
+            const taskId = $(this).data('id');
+            console.log('Editing task ID:', taskId);
+            const taskItem = $(`.event-media[data-id="${taskId}"]`);
+            const title = taskItem.find('.event-data h5 a').text().trim();
+            const date = taskItem.data('raw-date');
+            const time = taskItem.data('raw-time') || '00:00';
+            
+            $('#editTaskId').val(taskId);
+            $('#editTaskTitle').val(title);
+            $('#editTaskDate').val(date);
+            $('#editTaskTime').val(time);
+            
+            $('#editTaskModal').modal('show');
+        });
+        
+        // Update task
+        $('#updateTaskBtn').click(function() {
+            const taskId = $('#editTaskId').val();
+            const title = $('#editTaskTitle').val().trim();
+            const date = $('#editTaskDate').val();
+            const time = $('#editTaskTime').val() || '00:00';
+            const updateCalendar = $('#updateCalendar').is(':checked');
+            
+            if (!title || !date) {
+                alert('Judul dan tanggal harus diisi!');
+                return;
+            }
+            
+            console.log('Updating task ID:', taskId, 'with data:', { title, date, time, updateCalendar });
+            
+            // Kirim data ke server menggunakan AJAX
+            $.ajax({
+                url: `/tugas/${taskId}`,
+                type: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                data: JSON.stringify({
+                    judul: title,
+                    tanggal: date,
+                    waktu: time,
+                    show_in_calendar: updateCalendar
+                }),
+                processData: false,
+                success: function(response) {
+                    console.log('Update success response:', response);
+                    // Hapus task lama dari UI
+                    $(`.event-media[data-id="${taskId}"]`).remove();
+                    
+                    // Format tanggal untuk tampilan
+                    const displayDate = formatDate(date);
+                    
+                    // Tambahkan task yang diupdate ke UI
+                    const updatedTask = {
+                        id: taskId,
+                        title: title,
+                        date: displayDate,
+                        rawDate: date,
+                        rawTime: time,
+                        status: response.status,
+                        show_in_calendar: updateCalendar
+                    };
+                    
+                    addTaskToUI(updatedTask);
+                    
+                    // Update kalender jika dipilih
+                    if (typeof calendar !== 'undefined') {
+                        const eventId = 'task-' + taskId;
+                        
+                        // Hapus event lama jika ada
+                        const existingEvent = calendar.getEventById(eventId);
+                        if (existingEvent) {
+                            existingEvent.remove();
+                        }
+                        
+                        // Tambahkan event baru jika dicentang
+                        if (updateCalendar) {
+                            const eventDate = date + 'T' + time;
+                            
+                            calendar.addEvent({
+                                id: eventId,
+                                title: title,
+                                start: eventDate,
+                                allDay: time === '00:00',
+                                className: 'deadline',
+                                extendedProps: {
+                                    type: 'task',
+                                    description: 'Tugas: ' + title
+                                }
+                            });
+                        }
+                    }
+                    
+                    // Tutup modal
+                    $('#editTaskModal').modal('hide');
+                },
+                error: function(xhr) {
+                    console.error('Update error response:', xhr);
+                    if (xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        let errorMessage = 'Terjadi kesalahan:';
+                        for (const key in errors) {
+                            errorMessage += '\n- ' + errors[key][0];
+                        }
+                        alert(errorMessage);
+                    } else {
+                        alert('Terjadi kesalahan saat memperbarui tugas.');
+                    }
+                }
+            });
+        });
+        
+        // Delete task
+        $(document).on('click', '.delete-task', function() {
+            if (!confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
+                return;
+            }
+            
+            const taskId = $(this).data('id');
+            console.log('Deleting task ID:', taskId);
+            
+            // Kirim data ke server menggunakan AJAX
+            $.ajax({
+                url: `/tugas/${taskId}`,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                processData: false,
+                success: function(response) {
+                    console.log('Delete success response:', response);
+                    // Hapus dari UI
+                    $(`.event-media[data-id="${taskId}"]`).remove();
+                    
+                    // Hapus dari kalender
+                    if (typeof calendar !== 'undefined') {
+                        const eventId = 'task-' + taskId;
+                        const existingEvent = calendar.getEventById(eventId);
+                        if (existingEvent) {
+                            existingEvent.remove();
+                        }
+                    }
+                    
+                    // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas lagi
+                    if ($('#eventsList .event-media').length === 0) {
+                        $('#noTasksMessage').removeClass('d-none');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Delete error response:', xhr);
+                    alert('Terjadi kesalahan saat menghapus tugas.');
+                }
+            });
+        });
+        
+        // Toggle task completion
+        $(document).on('change', '.task-checkbox', function() {
+            const taskId = $(this).data('id');
+            const isCompleted = $(this).is(':checked');
+            const status = isCompleted ? 'completed' : 'pending';
+            
+            console.log('Toggling task ID:', taskId, 'to status:', status);
+            
+            // Kirim data ke server menggunakan AJAX
+            $.ajax({
+                url: `/tugas/${taskId}/status`,
+                type: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                data: JSON.stringify({
+                    status: status
+                }),
+                processData: false,
+                success: function(response) {
+                    console.log('Toggle status success response:', response);
+                    // Update UI
+                    const $eventMedia = $(`.event-media[data-id="${taskId}"]`);
+                    const $taskTitle = $eventMedia.find('.event-data h5 a');
+                    const $statusBadge = $eventMedia.find('.bg-warning, .bg-success');
+                    
+                    if (isCompleted) {
+                        $taskTitle.addClass('text-decoration-line-through');
+                        $statusBadge.removeClass('bg-warning').addClass('bg-success');
+                    } else {
+                        $taskTitle.removeClass('text-decoration-line-through');
+                        $statusBadge.removeClass('bg-success').addClass('bg-warning');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Toggle status error response:', xhr);
+                    // Kembalikan status checkbox jika gagal
+                    $(this).prop('checked', !isCompleted);
+                    alert('Terjadi kesalahan saat memperbarui status tugas.');
+                }
+            });
         });
 
         // Check if charts are rendered after a delay
@@ -1010,6 +1573,7 @@
                     type: 'donut',
                     height: 300,
                     fontFamily: 'inherit',
+                    parentHeightOffset: 0,
                     animations: {
                         enabled: true,
                         easing: 'easeinout',
@@ -1119,11 +1683,11 @@
 
             const documentProgressOptions = {
                 series: [{
-                    name: 'Dokumen Terverifikasi',
-                    data: {!! json_encode($ppepp_verified) !!}
-                }, {
                     name: 'Total Dokumen',
                     data: {!! json_encode($ppepp_total) !!}
+                }, {
+                    name: 'Dokumen Terverifikasi',
+                    data: {!! json_encode($ppepp_verified) !!}
                 }],
                 chart: {
                     type: 'bar',
@@ -1135,12 +1699,13 @@
                     fontFamily: 'inherit',
                     animations: {
                         enabled: true
-                    }
+                    },
+                    parentHeightOffset: 0,
                 },
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: '55%',
+                        columnWidth: '70%',
                         borderRadius: 5,
                         dataLabels: {
                             position: 'top',
@@ -1175,20 +1740,13 @@
                     max: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...{!! json_encode($ppepp_total) !!}) + 1 : 5,
                     tickAmount: Math.max(...{!! json_encode($ppepp_total) !!}) > 0 ? Math.max(...{!! json_encode($ppepp_total) !!}) + 1 : 5
                 },
+                colors: ['#6366f1', '#10b981'],
                 fill: {
-                    opacity: 1,
-                    colors: ['#10b981', '#6366f1']
-                },
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return val + " dokumen"
-                        }
-                    }
+                    opacity: 1
                 },
                 legend: {
                     position: 'top',
-                    horizontalAlign: 'right',
+                    horizontalAlign: 'center',
                     fontSize: '14px',
                     markers: {
                         width: 12,
@@ -1200,6 +1758,24 @@
                         vertical: 0
                     }
                 },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            height: 280
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }],
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val + " dokumen"
+                        }
+                    }
+                }
             };
 
             try {
@@ -1210,247 +1786,10 @@
             }
         }
 
-        // Add new task
-        $('#saveTaskBtn').click(function() {
-            const title = $('#taskTitle').val().trim();
-            const date = $('#taskDate').val();
-            const time = $('#taskTime').val() || '00:00';
-            const addToCalendar = $('#addToCalendar').is(':checked');
-
-            if (!title || !date) {
-                alert('Judul dan tanggal harus diisi!');
-                return;
-            }
-
-            // Format tanggal untuk tampilan
-            const displayDate = formatDate(date);
-
-            // Buat objek tugas baru
-            const newTask = {
-                id: nextTaskId++,
-                title: title,
-                date: displayDate,
-                rawDate: date,
-                rawTime: time,
-                status: 'pending'
-            };
-
-            // Tambahkan ke array tugas
-            tasks.push(newTask);
-
-            // Tambahkan ke daftar tugas di UI
-            addTaskToUI(newTask);
-
-            // Tambahkan ke kalender jika dipilih
-            if (addToCalendar && calendar) {
-                const eventId = 'task-' + (newTask.id);
-                const eventDate = date + 'T' + time;
-
-                calendar.addEvent({
-                    id: eventId,
-                    title: title,
-                    start: eventDate,
-                    allDay: time === '00:00',
-                    className: 'deadline',
-                    extendedProps: {
-                        type: 'task',
-                        description: 'Tugas: ' + title
-                    }
-                });
-            }
-
-            // Simpan ke localStorage
-            saveTasksToLocalStorage();
-
-            // Reset form dan tutup modal
-            $('#addTaskForm')[0].reset();
-            $('#addTaskModal').modal('hide');
-        });
-
-        // Edit task - open modal with data
-        $(document).on('click', '.edit-task', function() {
-            const taskId = $(this).data('id');
-            const task = tasks[taskId];
-
-            $('#editTaskId').val(taskId);
-            $('#editTaskTitle').val(task.title);
-            $('#editTaskDate').val(task.rawDate || formatDateForInput(task.date));
-            $('#editTaskTime').val(task.rawTime || '00:00');
-
-            $('#editTaskModal').modal('show');
-        });
-
-        // Update task
-        $('#updateTaskBtn').click(function() {
-            const taskId = $('#editTaskId').val();
-            const title = $('#editTaskTitle').val().trim();
-            const date = $('#editTaskDate').val();
-            const time = $('#editTaskTime').val() || '00:00';
-            const updateCalendar = $('#updateCalendar').is(':checked');
-
-            if (!title || !date) {
-                alert('Judul dan tanggal harus diisi!');
-                return;
-            }
-
-            // Format tanggal untuk tampilan
-            const displayDate = formatDate(date);
-
-            // Update objek tugas
-            tasks[taskId].title = title;
-            tasks[taskId].date = displayDate;
-            tasks[taskId].rawDate = date;
-            tasks[taskId].rawTime = time;
-
-            // Update tampilan UI
-            const $taskItem = $(`.todo-item[data-id="${taskId}"]`);
-            $taskItem.find('.todo-text').html(title + '<div class="text-muted small">' + displayDate + '</div>');
-
-            // Update kalender jika dipilih
-            if (updateCalendar && calendar) {
-                const eventId = 'task-' + taskId;
-                const eventDate = date + 'T' + time;
-
-                // Hapus event lama jika ada
-                const existingEvent = calendar.getEventById(eventId);
-                if (existingEvent) {
-                    existingEvent.remove();
-                }
-
-                // Tambahkan event baru
-                calendar.addEvent({
-                    id: eventId,
-                    title: title,
-                    start: eventDate,
-                    allDay: time === '00:00',
-                    className: 'deadline',
-                    extendedProps: {
-                        type: 'task',
-                        description: 'Tugas: ' + title
-                    }
-                });
-            }
-
-            // Simpan ke localStorage
-            saveTasksToLocalStorage();
-
-            // Tutup modal
-            $('#editTaskModal').modal('hide');
-        });
-
-        // Delete task
-        $(document).on('click', '.delete-task', function() {
-            if (!confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
-                return;
-            }
-
-            const taskId = $(this).data('id');
-
-            // Hapus dari UI
-            $(`.todo-item[data-id="${taskId}"]`).remove();
-
-            // Hapus dari array (set null agar tidak mengubah indeks)
-            tasks[taskId] = null;
-
-            // Hapus dari kalender
-            if (calendar) {
-                const eventId = 'task-' + taskId;
-                const existingEvent = calendar.getEventById(eventId);
-                if (existingEvent) {
-                    existingEvent.remove();
-                }
-            }
-
-            // Simpan ke localStorage
-            saveTasksToLocalStorage();
-        });
-
-        // Helper function to add task to UI
-        function addTaskToUI(task) {
-            const taskHtml = `
-                <div class="todo-item" data-id="${task.id}">
-                    <div class="todo-checkbox">
-                        <div class="form-check custom-checkbox">
-                            <input type="checkbox" class="form-check-input task-checkbox" id="todo${task.id}" ${task.status === 'completed' ? 'checked' : ''} data-id="${task.id}">
-                            <label class="form-check-label" for="todo${task.id}"></label>
-                        </div>
-                    </div>
-                    <div class="todo-text ${task.status === 'completed' ? 'completed' : ''}">
-                        ${task.title}
-                        <div class="text-muted small">${task.date}</div>
-                    </div>
-                    <div class="todo-actions">
-                        <button type="button" class="edit-task" data-id="${task.id}"><i class="fas fa-edit"></i></button>
-                        <button type="button" class="delete-task" data-id="${task.id}"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>
-            `;
-
-            $('#taskList').append(taskHtml);
-
-            // Reattach event handler for the new checkbox
-            $(`#todo${task.id}`).change(function() {
-                const taskId = $(this).data('id');
-                if($(this).is(':checked')) {
-                    $(this).closest('.todo-item').find('.todo-text').addClass('completed');
-                    tasks[taskId].status = 'completed';
-                } else {
-                    $(this).closest('.todo-item').find('.todo-text').removeClass('completed');
-                    tasks[taskId].status = 'pending';
-                }
-
-                // Simpan perubahan ke localStorage
-                saveTasksToLocalStorage();
-            });
-        }
-
         // Helper function to format date for display
         function formatDate(dateString) {
             const options = { day: 'numeric', month: 'short', year: 'numeric' };
             return new Date(dateString).toLocaleDateString('id-ID', options);
-        }
-
-        // Helper function to format date for input field
-        function formatDateForInput(dateString) {
-            try {
-                // Parse the date string (e.g., "15 Jan 2023")
-                const parts = dateString.split(' ');
-                const day = parseInt(parts[0]);
-                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                const month = monthNames.indexOf(parts[1]);
-                const year = parseInt(parts[2]);
-
-                if (isNaN(day) || month === -1 || isNaN(year)) {
-                    return '';
-                }
-
-                // Format as YYYY-MM-DD
-                return `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-            } catch (e) {
-                console.error('Error parsing date:', e);
-                return '';
-            }
-        }
-
-        // Helper function to save tasks to localStorage
-        function saveTasksToLocalStorage() {
-            // Filter out null entries (deleted tasks)
-            const filteredTasks = tasks.filter(task => task !== null);
-            localStorage.setItem('dosenTasks', JSON.stringify(filteredTasks));
-        }
-
-        // Helper function to load tasks from localStorage
-        function loadTasksFromLocalStorage() {
-            const savedTasks = localStorage.getItem('dosenTasks');
-            if (savedTasks) {
-                try {
-                    return JSON.parse(savedTasks);
-                } catch (e) {
-                    console.error('Error parsing saved tasks:', e);
-                    return [];
-                }
-            }
-            return [];
         }
     });
 </script>

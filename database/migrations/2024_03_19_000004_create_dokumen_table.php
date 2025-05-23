@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignId('kriteria_id')->constrained('kriteria')->onDelete('cascade');
             $table->string('nama_dokumen');
             $table->text('path')->nullable();
-            $table->text('keterangan_revisi')->nullable()->comment('Catatan revisi yang diberikan oleh dosen');
 
             $ppepp_values = ['penetapan', 'pelaksanaan', 'evaluasi', 'pengendalian', 'peningkatan'];
             $table->enum('jenis_ppepp', $ppepp_values)
