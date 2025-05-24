@@ -41,11 +41,8 @@ class KriteriaController extends Controller
         // Mengambil dokumen yang dikelompokkan per tahap PPEPP
         if ($user && in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator'])) {
             foreach ($ppepp_stages as $stage) {
-                // Important change: Include all documents for this user and kriteria,
-                // regardless of status, to ensure validated documents remain visible
-                // even when some need revision
+                // Get all documents for the kriteria, regardless of user
                 $query = Dokumen::where('kriteria_id', $kriteria->id)
-                    ->where('user_id', $user->id)
                     ->where('jenis_ppepp', $stage)
                     ->whereNotNull('path') // Only get actual documents, not descriptions
                     ->orderByRaw("FIELD(status, '".Dokumen::STATUS_DRAFT."', '".Dokumen::STATUS_REVISI."',
@@ -109,10 +106,6 @@ class KriteriaController extends Controller
         $statusQueryBaseFinal = Dokumen::where('kriteria_id', $kriteria->id)
                                     ->where('status', '!=', Dokumen::STATUS_DRAFT);
 
-        if ($user && in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
-            $statusQueryBaseFinal->where('user_id', $user->id);
-        }
-
         $statusCounts = [
             'menunggu'     => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_MENUNGGU)->count(),
             'revisi'       => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_REVISI)->count(),
@@ -131,7 +124,7 @@ class KriteriaController extends Controller
             $daftarDokumenFinal = $daftarDokumenFinal->concat($stageDokumen->where('status', '!=', Dokumen::STATUS_DRAFT));
         }
 
-        if ($user && !in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
+        if ($user && !in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator'])) {
             $daftarDokumenFinal = Dokumen::where('kriteria_id', $kriteria->id)
                                 ->where('status', '!=', Dokumen::STATUS_DRAFT)
                                 ->whereNotNull('path') // Only get actual documents, not descriptions
@@ -221,12 +214,7 @@ class KriteriaController extends Controller
                 ->whereNotNull('path') // Only get actual documents, not descriptions
                 ->with('user'); // Eager load the user relationship
 
-            // For dosen, only show their own documents
-            // For admin, show all documents
-            if (in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
-                $query->where('user_id', $user->id);
-            }
-
+            // Show all documents for all users
             $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
@@ -298,8 +286,7 @@ class KriteriaController extends Controller
         }
 
         // Get only draft documents to finalize
-        $dokumenDrafts = Dokumen::where('user_id', $user->id)
-                       ->where('kriteria_id', $kriteria->id)
+        $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria->id)
                        ->where('status', Dokumen::STATUS_DRAFT)
                        ->whereNotNull('path')
                        ->get();

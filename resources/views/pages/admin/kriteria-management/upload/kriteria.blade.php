@@ -121,7 +121,7 @@ $(document).ready(function() {
                             <h4 class="mb-1">{{ isset($kriteria) ? $kriteria->nama_kriteria : 'Nama Kriteria Tidak Ditemukan' }}</h4>
                             <p class="mb-0">{{ isset($kriteria) ? $kriteria->deskripsi : 'Deskripsi kriteria tidak tersedia.' }}</p>
                         </div>
-                        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
+                        @if(auth()->user() && (auth()->user()->role === 'dosen1' || auth()->user()->role === 'dosen2' || auth()->user()->role === 'dosen3' || auth()->user()->role === 'administrator'))
                         <div class="col-md-4 text-end">
                             <a href="{{ route('admin.kriteria-management.upload.form', ['id' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
                                 <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
@@ -196,12 +196,12 @@ $(document).ready(function() {
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
-        <!-- Finalization Section for Admin -->
-        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
+        <!-- Finalization Section -->
+        @if(auth()->user() && (auth()->user()->role === 'dosen1' || auth()->user()->role === 'dosen2' || auth()->user()->role === 'dosen3' || auth()->user()->role === 'administrator'))
             <div class="col-xl-12 mb-4">
                 <div class="card">
                     <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i> Finalisasi Dokumen Admin</h5>
+                        <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i> Finalisasi Dokumen</h5>
                     </div>
                     <div class="card-body">
                         @php
@@ -231,12 +231,12 @@ $(document).ready(function() {
                         
                         @if($totalDraftCount == 0)
                             <div class="alert alert-info">
-                                <h6 class="alert-heading fw-bold">Tidak Ada Draft Admin untuk Difinalisasi</h6>
+                                <h6 class="alert-heading fw-bold">Tidak Ada Dokumen Draft untuk Difinalisasi</h6>
                                 <p class="mb-0">
                                     @if($totalValidCount > 0)
-                                        Semua dokumen admin sudah dalam proses validasi atau telah divalidasi. Anda dapat menambahkan dokumen baru jika diperlukan.
+                                        Semua dokumen sudah dalam proses validasi atau telah divalidasi. Anda dapat menambahkan dokumen baru jika diperlukan.
                                     @else
-                                        Belum ada dokumen admin draft yang perlu difinalisasi. Silakan tambahkan dokumen terlebih dahulu.
+                                        Belum ada dokumen draft yang perlu difinalisasi. Silakan tambahkan dokumen terlebih dahulu.
                                     @endif
                                 </p>
                             </div>
@@ -245,24 +245,24 @@ $(document).ready(function() {
                                 <div class="d-flex">
                                     <i class="fas fa-info-circle fa-2x me-3"></i>
                                     <div>
-                                        <h5 class="alert-heading fw-bold">Informasi Finalisasi Admin</h5>
-                                        <p>Anda memiliki <strong>{{ $totalDraftCount }} dokumen draft admin</strong> yang siap difinalisasi.</p>
-                                        <p class="mb-0">Dokumen admin yang difinalisasi akan otomatis berstatus <strong>Diterima</strong> tanpa perlu validasi lebih lanjut.</p>
+                                        <h5 class="alert-heading fw-bold">Informasi Finalisasi</h5>
+                                        <p>Anda memiliki <strong>{{ $totalDraftCount }} dokumen draft</strong> yang siap difinalisasi.</p>
+                                        <p class="mb-0">Dokumen yang difinalisasi akan otomatis berstatus <strong>Diterima</strong> tanpa perlu validasi lebih lanjut.</p>
                                     </div>
                                 </div>
                             </div>
                             
-                            <form action="{{ route('admin.kriteria-management.upload.finalisasi', ['id' => $kriteria->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft admin untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi.')">
+                            <form action="{{ route('admin.kriteria-management.upload.finalisasi', ['id' => $kriteria->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi.')">
                                 @csrf
                                 <button type="submit" class="btn btn-success btn-lg w-100">
-                                    <i class="fas fa-check-circle me-1"></i> Finalisasi {{ $totalDraftCount }} Dokumen Draft Admin
+                                    <i class="fas fa-check-circle me-1"></i> Finalisasi {{ $totalDraftCount }} Dokumen Draft
                                 </button>
                             </form>
                             
                             @if($totalValidCount > 0)
                             <div class="alert alert-success mt-3 mb-0">
                                 <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Tambahan</h6>
-                                <p class="mb-0">{{ $totalValidCount }} dokumen admin lainnya sudah dalam proses validasi atau sudah divalidasi.</p>
+                                <p class="mb-0">{{ $totalValidCount }} dokumen lainnya sudah dalam proses validasi atau sudah divalidasi.</p>
                             </div>
                             @endif
                         @endif
@@ -271,7 +271,7 @@ $(document).ready(function() {
             </div>
         @endif
 
-        @if(isset($kriteria) && auth()->user() && (auth()->user()->role == 'dosen' || auth()->user()->role == 'administrator') && (!isset($showUploadButton) || !$showUploadButton))
+        @if(isset($kriteria) && auth()->user() && (auth()->user()->role == 'dosen1' || auth()->user()->role == 'dosen2' || auth()->user()->role == 'dosen3' || auth()->user()->role == 'administrator') && (!isset($showUploadButton) || !$showUploadButton))
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">

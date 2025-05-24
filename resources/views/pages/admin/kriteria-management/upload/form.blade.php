@@ -87,7 +87,7 @@
     <!-- Dokumen yang Ada -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i> Dokumen Admin {{ $stageLabel }}</h5>
+            <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i> Dokumen {{ $stageLabel }}</h5>
             <span class="badge bg-light text-primary fs-6">{{ count($existingDocsForStage) }} Dokumen</span>
         </div>
         <div class="card-body">
@@ -124,6 +124,7 @@
                         <tr>
                             <th width="50">No</th>
                             <th>Nama Dokumen</th>
+                            <th>Pemilik</th>
                             <th>Status</th>
                             <th>Tanggal Update</th>
                             <th>Aksi</th>
@@ -137,7 +138,10 @@
                                 <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank" class="text-primary">
                                     <i class="fas fa-file-alt me-1"></i> {{ $doc->nama_dokumen }}
                                 </a>
-                                <span class="badge bg-primary ms-2">Admin</span>
+                            </td>
+                            <td>
+                                {{ $doc->user->name ?? 'Unknown' }}
+                                <small class="d-block text-muted">{{ $doc->user->role ?? '' }}</small>
                             </td>
                             <td>
                                 @if($doc->status == 'draft')
@@ -162,7 +166,7 @@
                                     </a>
 
                                     @if($doc->status == 'draft')
-                                        <form action="{{ route('admin.kriteria-management.upload.destroyDraft', $doc->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus dokumen draft admin ini?')">
+                                        <form action="{{ route('admin.kriteria-management.upload.destroyDraft', $doc->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus dokumen draft ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm" title="Hapus Draft">
@@ -175,10 +179,10 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-3">
+                            <td colspan="6" class="text-center py-3">
                                 <div class="text-muted">
                                     <i class="fas fa-folder-open me-2 fa-2x"></i><br>
-                                    Belum ada dokumen admin yang diunggah untuk tahap {{ $stageLabel }}
+                                    Belum ada dokumen yang diunggah untuk tahap {{ $stageLabel }}
                                 </div>
                             </td>
                         </tr>

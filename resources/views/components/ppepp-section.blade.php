@@ -14,6 +14,7 @@
                     <thead>
                         <tr>
                             <th>Nama Dokumen</th>
+                            <th>Pemilik</th>
                             <th>Status</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -24,6 +25,10 @@
                             <td>
                                 {{ $dokumen->nama_dokumen }}
                                 <span class="small d-block text-muted">ID: {{ $dokumen->id }}</span>
+                            </td>
+                            <td>
+                                {{ $dokumen->user->name ?? 'Unknown' }}
+                                <span class="small d-block text-muted">{{ $dokumen->user->role ?? '' }}</span>
                             </td>
                             <td>
                                 <x-dokumen-status-badge :status="$dokumen->status" />
@@ -53,7 +58,7 @@
                                     @endif
 
                                     <!-- Revision button - only show in non-validation view -->
-                                    @if(!$is_validation_view && auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
+                                    @if(!$is_validation_view && $dokumen->status === 'revisi')
                                         <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
                                             <i class="fas fa-upload"></i>
                                         </button>
@@ -70,7 +75,7 @@
                                         <x-dokumen-comments-modal :dokumen="$dokumen" :dokumenComments="$dokumenComments" :commentCount="$commentCount" />
                                     @endif
                                     
-                                    @if(!$is_validation_view && auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
+                                    @if(!$is_validation_view && $dokumen->status === 'revisi')
                                         <x-dokumen-revisi-modal :dokumen="$dokumen" />
                                     @endif
                                     
@@ -82,15 +87,15 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-center">Belum ada dokumen untuk {{ $title }}</td>
+                            <td colspan="4" class="text-center">Belum ada dokumen untuk {{ $title }}</td>
                         </tr>
                         @endforelse
                     </tbody>
                     <tfoot>
                         <tr class="bg-light">
-                            <td colspan="3">
+                            <td colspan="4">
                                 <strong>Deskripsi:</strong>
-                                <p class="mb-0 mt-1">{{ isset($ppepp_descriptions[$ppepp_key]) ? $ppepp_descriptions[$ppepp_key] : '-' }}</p>
+                                <p class="mb-0 mt-1">{{ $ppepp_descriptions[$ppepp_key] ?? '-' }}</p>
                             </td>
                         </tr>
                     </tfoot>

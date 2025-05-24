@@ -66,6 +66,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'kriteria.access' => \App\Http\Middleware\KriteriaAccessMiddleware::class,
+        'role' => \App\Http\Middleware\CheckRole::class,
     ];
 
     protected $routeMiddleware = [
@@ -80,5 +81,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'kriteria.access' => \App\Http\Middleware\KriteriaAccessMiddleware::class,
+        'role' => \App\Http\Middleware\CheckRole::class,
     ];
 }
