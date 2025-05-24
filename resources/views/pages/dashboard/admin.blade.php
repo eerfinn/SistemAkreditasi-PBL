@@ -3,44 +3,17 @@
 @section('title', 'Dashboard')
 
 @section('vendor-style')
-
-    <link href="{{ asset('assets/vendor/swiper/css/swiper-bundle.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/swiper/css/swiper-bundle.min.css') }}" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.4/nouislider.min.css" rel="stylesheet">
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}"
-        rel="stylesheet">
 @endsection
 
 @section('vendor-script')
     <!-- Required vendors -->
-
-    <script src="{{ asset('assets/vendor/chart.js/Chart.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/apexchart/apexchart.js') }}"></script>
-
-    <!-- Dashboard 1 -->
-    <script src="{{ asset('assets/vendor/draggable/draggable.js') }}"></script>
-    <script src="{{ asset('assets/vendor/swiper/js/swiper-bundle.min.js') }}"></script>
-
-    <!-- tagify -->
-    <script src="{{ asset('assets/vendor/tagify/dist/tagify.js') }}"></script>
-
     <script src="{{ asset('assets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/datatables/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/datatables/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/datatables/js/jszip.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins-init/datatables.init.js') }}"></script>
-
-    <!-- Apex Chart -->
-
-    <script src="{{ asset('assets/vendor/bootstrap-datetimepicker/js/moment.js') }}"></script>
-    <script src="{{ asset('assets/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js') }}"></script>
-@endsection
-
-@section('page-script')
-    <script src="{{ asset('assets/js/dashboard/dashboard-1.js') }}"></script>
 @endsection
 
 @section('content')

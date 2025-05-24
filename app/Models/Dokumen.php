@@ -27,13 +27,16 @@ class Dokumen extends Model
     protected $table = 'dokumen';
 
     protected $fillable = [
-        'user_id',
         'kriteria_id',
+        'user_id',
+        'validator_id',
         'nama_dokumen',
-        'path',
         'jenis_ppepp',
-        'deskripsi_dokumen',
+        'path',
         'status',
+        'komentar',
+        'validated_at',
+        'is_admin_upload',
     ];
 
     public function user(): BelongsTo

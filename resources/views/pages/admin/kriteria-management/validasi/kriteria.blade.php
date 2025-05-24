@@ -59,58 +59,58 @@ $(document).ready(function() {
         @endif
 
         @php
-            $ppepp_labels = [
-                \App\Models\Dokumen::PPEPP_PENETAPAN => 'C.1. Penetapan',
-                \App\Models\Dokumen::PPEPP_PELAKSANAAN => 'C.2. Pelaksanaan',
-                \App\Models\Dokumen::PPEPP_EVALUASI => 'C.3. Evaluasi',
-                \App\Models\Dokumen::PPEPP_PENGENDALIAN => 'C.4. Pengendalian',
-                \App\Models\Dokumen::PPEPP_PENINGKATAN => 'C.5. Peningkatan'
-            ];
+        $ppepp_labels = [
+            \App\Models\Dokumen::PPEPP_PENETAPAN => 'C.1. Penetapan',
+            \App\Models\Dokumen::PPEPP_PELAKSANAAN => 'C.2. Pelaksanaan',
+            \App\Models\Dokumen::PPEPP_EVALUASI => 'C.3. Evaluasi',
+            \App\Models\Dokumen::PPEPP_PENGENDALIAN => 'C.4. Pengendalian',
+            \App\Models\Dokumen::PPEPP_PENINGKATAN => 'C.5. Peningkatan'
+        ];
 
-            // Default descriptions if none are set in the kriteria table
-            $default_descriptions = [
-                \App\Models\Dokumen::PPEPP_PENETAPAN => 'Dokumen terkait penetapan standar dan kebijakan dalam kriteria ini.',
-                \App\Models\Dokumen::PPEPP_PELAKSANAAN => 'Dokumen terkait pelaksanaan kebijakan dan standar yang telah ditetapkan.',
-                \App\Models\Dokumen::PPEPP_EVALUASI => 'Dokumen terkait evaluasi terhadap pelaksanaan kebijakan dan standar.',
-                \App\Models\Dokumen::PPEPP_PENGENDALIAN => 'Dokumen terkait tindakan pengendalian berdasarkan hasil evaluasi.',
-                \App\Models\Dokumen::PPEPP_PENINGKATAN => 'Dokumen terkait perbaikan dan peningkatan kebijakan dan standar.'
-            ];
+        // Default descriptions if none are set in the kriteria table
+        $default_descriptions = [
+            \App\Models\Dokumen::PPEPP_PENETAPAN => 'Dokumen terkait penetapan standar dan kebijakan dalam kriteria ini.',
+            \App\Models\Dokumen::PPEPP_PELAKSANAAN => 'Dokumen terkait pelaksanaan kebijakan dan standar yang telah ditetapkan.',
+            \App\Models\Dokumen::PPEPP_EVALUASI => 'Dokumen terkait evaluasi terhadap pelaksanaan kebijakan dan standar.',
+            \App\Models\Dokumen::PPEPP_PENGENDALIAN => 'Dokumen terkait tindakan pengendalian berdasarkan hasil evaluasi.',
+            \App\Models\Dokumen::PPEPP_PENINGKATAN => 'Dokumen terkait perbaikan dan peningkatan kebijakan dan standar.'
+        ];
 
-            // Use descriptions from kriteria table if available, otherwise use defaults
-            $ppepp_descriptions = $ppepp_descriptions ?? $default_descriptions;
+        // Use descriptions from kriteria table if available, otherwise use defaults
+        $ppepp_descriptions = $ppepp_descriptions ?? $default_descriptions;
 
-            // Check if there are any draft documents
-            $hasDraftDocuments = false;
-            foreach($dokumenPerPPEPP as $stageDocs) {
-                if(isset($stageDocs) && $stageDocs->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() > 0) {
-                    $hasDraftDocuments = true;
-                    break;
-                }
+        // Check if there are any draft documents
+        $hasDraftDocuments = false;
+        foreach($dokumenPerPPEPP as $stageDocs) {
+            if(isset($stageDocs) && $stageDocs->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() > 0) {
+                $hasDraftDocuments = true;
+                break;
             }
+        }
 
-            // Check if there are documents needing revision
-            $hasRevisionDocuments = isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0;
+        // Check if there are documents needing revision
+        $hasRevisionDocuments = isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0;
 
-            // Check if there are any documents at all in this kriteria
-            $hasAnyDocuments = false;
-            foreach($dokumenPerPPEPP as $stageDocs) {
-                if(isset($stageDocs) && count($stageDocs) > 0) {
-                    $hasAnyDocuments = true;
-                    break;
-                }
+        // Check if there are any documents at all in this kriteria
+        $hasAnyDocuments = false;
+        foreach($dokumenPerPPEPP as $stageDocs) {
+            if(isset($stageDocs) && count($stageDocs) > 0) {
+                $hasAnyDocuments = true;
+                break;
             }
+        }
 
-            // Check if there are any finalized documents (menunggu/diterima/diverifikasi)
-            $hasFinalizedDocuments = isset($statusCounts) &&
-                (($statusCounts['menunggu'] ?? 0) > 0 ||
-                 ($statusCounts['diterima'] ?? 0) > 0 ||
-                 ($statusCounts['diverifikasi'] ?? 0) > 0);
+        // Check if there are any finalized documents (menunggu/diterima/diverifikasi)
+        $hasFinalizedDocuments = isset($statusCounts) &&
+            (($statusCounts['menunggu'] ?? 0) > 0 ||
+             ($statusCounts['diterima'] ?? 0) > 0 ||
+             ($statusCounts['diverifikasi'] ?? 0) > 0);
 
-            // Only disable button if:
-            // 1. There are some documents already
-            // 2. None of them are drafts or need revision
-            // 3. Some are already finalized (menunggu/diterima/diverifikasi)
-            $disableKelola = $hasAnyDocuments && !$hasDraftDocuments && !$hasRevisionDocuments && $hasFinalizedDocuments;
+        // Only disable button if:
+        // 1. There are some documents already
+        // 2. None of them are drafts or need revision
+        // 3. Some are already finalized (menunggu/diterima/diverifikasi)
+        $disableKelola = $hasAnyDocuments && !$hasDraftDocuments && !$hasRevisionDocuments && $hasFinalizedDocuments;
         @endphp
 
         <div class="col-xl-12">
@@ -121,16 +121,9 @@ $(document).ready(function() {
                             <h4 class="mb-1">{{ isset($kriteria) ? $kriteria->nama_kriteria : 'Nama Kriteria Tidak Ditemukan' }}</h4>
                             <p class="mb-0">{{ isset($kriteria) ? $kriteria->deskripsi : 'Deskripsi kriteria tidak tersedia.' }}</p>
                         </div>
-                        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
                         <div class="col-md-4 text-end">
-                            <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
-                                <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
-                            </a>
-                            @if($hasFinalizedDocuments)
-                            <small class="d-block mt-1 text-muted">Beberapa dokumen sudah difinalisasi</small>
-                            @endif
+                            <span class="badge bg-primary fs-6">Halaman Validasi Dokumen</span>
                         </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -151,6 +144,19 @@ $(document).ready(function() {
         </div>
         @endif
 
+        <!-- Alert Informasi Validasi -->
+        <div class="col-xl-12 mb-4">
+            <div class="alert alert-info">
+                <div class="d-flex">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="alert-heading">Informasi Validasi Dokumen</h5>
+                        <p class="mb-0">Pada halaman ini Anda dapat melakukan validasi terhadap dokumen yang telah disubmit oleh pengguna. Klik pada dokumen untuk melihat detail dan melakukan validasi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- C1. Penetapan Section -->
         <x-ppepp-section 
             title="C1. Penetapan" 
@@ -158,6 +164,7 @@ $(document).ready(function() {
             :documents="$dokumenPerPPEPP['penetapan'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PENETAPAN"
             :ppepp_descriptions="$ppepp_descriptions"
+            :is_validation_view="true"
         />
 
         <!-- C2. Pelaksanaan Section -->
@@ -167,6 +174,7 @@ $(document).ready(function() {
             :documents="$dokumenPerPPEPP['pelaksanaan'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PELAKSANAAN"
             :ppepp_descriptions="$ppepp_descriptions"
+            :is_validation_view="true"
         />
 
         <!-- C3. Evaluasi Section -->
@@ -176,6 +184,7 @@ $(document).ready(function() {
             :documents="$dokumenPerPPEPP['evaluasi'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_EVALUASI"
             :ppepp_descriptions="$ppepp_descriptions"
+            :is_validation_view="true"
         />
 
         <!-- C4. Pengendalian Section -->
@@ -185,6 +194,7 @@ $(document).ready(function() {
             :documents="$dokumenPerPPEPP['pengendalian'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PENGENDALIAN"
             :ppepp_descriptions="$ppepp_descriptions"
+            :is_validation_view="true"
         />
 
         <!-- C5. Peningkatan Section -->
@@ -194,94 +204,8 @@ $(document).ready(function() {
             :documents="$dokumenPerPPEPP['peningkatan'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PENINGKATAN"
             :ppepp_descriptions="$ppepp_descriptions"
+            :is_validation_view="true"
         />
-
-        <!-- Finalization Section for Dosen -->
-        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
-            <div class="col-xl-12 mb-4">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Finalisasi Dokumen</h5>
-                    </div>
-                    <div class="card-body">
-                        @php
-                            // Count draft documents
-                            $totalDraftCount = 0;
-                            $totalValidCount = 0;
-                            
-                            foreach(array_keys($ppepp_labels) as $key) {
-                                // Count draft documents for this stage
-                                $draftCount = isset($dokumenPerPPEPP[$key]) 
-                                    ? $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() 
-                                    : 0;
-                                
-                                $totalDraftCount += $draftCount;
-                                
-                                // Count already validated documents
-                                $validCount = isset($dokumenPerPPEPP[$key])
-                                    ? $dokumenPerPPEPP[$key]->whereIn('status', [
-                                        \App\Models\Dokumen::STATUS_MENUNGGU,
-                                        \App\Models\Dokumen::STATUS_DIVERIFIKASI
-                                    ])->count()
-                                    : 0;
-                                
-                                $totalValidCount += $validCount;
-                            }
-                        @endphp
-                        
-                        @if($totalDraftCount == 0)
-                            <div class="alert alert-info">
-                                <h6 class="alert-heading fw-bold">Tidak Ada Draft untuk Difinalisasi</h6>
-                                <p class="mb-0">
-                                    @if($totalValidCount > 0)
-                                        Semua dokumen sudah dalam proses validasi atau telah divalidasi. Anda dapat menambahkan dokumen baru jika diperlukan.
-                                    @else
-                                        Belum ada dokumen draft yang perlu difinalisasi. Silakan tambahkan dokumen terlebih dahulu.
-                                    @endif
-                                </p>
-                            </div>
-                        @else
-                            <div class="alert alert-info mb-4">
-                                <h5 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Finalisasi</h5>
-                                <p>Anda memiliki <strong>{{ $totalDraftCount }} dokumen draft</strong> yang siap difinalisasi.</p>
-                                <p class="mb-0">Setelah difinalisasi, dokumen akan dikirim untuk validasi dan tidak dapat diedit lagi.</p>
-                            </div>
-                            
-                            <form action="{{ route('kriteria.finalisasi', $kriteria->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi oleh Anda.')">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-lg w-100">
-                                    <i class="fas fa-check-circle me-1"></i> Finalisasi {{ $totalDraftCount }} Dokumen Draft
-                                </button>
-                            </form>
-                            
-                            @if($totalValidCount > 0)
-                            <div class="alert alert-success mt-3 mb-0">
-                                <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Tambahan</h6>
-                                <p class="mb-0">{{ $totalValidCount }} dokumen lainnya sudah dalam proses validasi atau sudah divalidasi.</p>
-                            </div>
-                            @endif
-                        @endif
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        @if(isset($kriteria) && auth()->user() && (auth()->user()->role == 'dosen' || auth()->user()->role == 'administrator') && (!isset($showUploadButton) || !$showUploadButton))
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="alert alert-info text-center" role="alert">
-                        Semua dokumen untuk {{ $kriteria->nama_kriteria }} telah difinalisasi atau sedang dalam proses validasi.
-                        @if(isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0)
-                            Ada dokumen yang perlu direvisi. Silakan <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}">kelola dokumen PPEPP</a> untuk memperbaikinya.
-                        @else
-                            Anda hanya dapat melihat dokumen yang telah disubmit.
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
         
         <!-- Comments Section - Visible to all users -->
         <div class="col-xl-12 mb-4">
@@ -300,7 +224,7 @@ $(document).ready(function() {
                         <div class="comment-item">
                             <div class="d-flex align-items-center mb-2">
                                 <div class="comment-avatar">
-                                        {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
                                 </div>
                                 <h6 class="mb-0 ms-2">{{ $comment->user->name ?? 'User' }}</h6>
                                 <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>

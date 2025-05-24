@@ -434,12 +434,19 @@
 
         // Add focus effect when clicking on form inputs
         document.querySelectorAll('.form-input').forEach(input => {
+            const formGroup = input.closest('.form-group');
+            const label = formGroup.querySelector('.form-label');
+            
             input.addEventListener('focus', function() {
-                this.parentElement.querySelector('.form-label').style.color = '#055FC5';
+                if (label) {
+                    label.style.color = '#055FC5';
+                }
             });
 
             input.addEventListener('blur', function() {
-                this.parentElement.querySelector('.form-label').style.color = '';
+                if (label) {
+                    label.style.color = '';
+                }
             });
         });
 

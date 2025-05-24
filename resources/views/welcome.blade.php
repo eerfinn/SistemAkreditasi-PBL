@@ -2,17 +2,18 @@
 <html lang="en">
 
 <head>
+    <!-- Meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>SiAkred - Sistem Akreditasi D4 SIB Polinema</title>
     <meta name="description" content="Sistem Akreditasi Program Studi D4 Sistem Informasi Bisnis - Jurusan Teknologi Informasi Politeknik Negeri Malang">
     <meta name="keywords" content="akreditasi, sistem informasi, politeknik negeri malang, D4 SIB">
 
-    <!-- Favicons -->
+    <!-- Favicon and apple touch icon -->
     <link href="{{ asset('assets\images\Jti_polinema.png') }}" rel="icon">
     <link href="{{ asset('Selecao/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
-    <!-- Fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -26,7 +27,7 @@
     <!-- Main CSS File -->
     <link href="{{ asset('assets/css/welcome.css') }}" rel="stylesheet">
     
-    <!-- Particles.js -->
+    <!-- Particles.js Library -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 
@@ -34,7 +35,7 @@
     <!-- Header -->
     <header class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <img src="{{ asset('assets\images\Jti_polinema.png') }}" alt="Polinema Logo">
                 <span class="sitename">SiAkred</span>
             </a>
@@ -107,7 +108,8 @@
         </div>
     </header>
 
-<section id="home" class="hero" style="background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('{{ asset('assets/images/Gedung JTI.jpg') }}');">
+    <!-- Hero Section with Particles Background -->
+    <section id="home" class="hero" style="background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('{{ asset('assets/images/Gedung JTI.jpg') }}');">
         <div id="particles-js" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
         <div class="container">
             <div class="hero-content" data-aos="fade-up" data-aos-delay="100">
@@ -120,7 +122,7 @@
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- About Section with Program Profile -->
     <section id="about" class="section">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
@@ -167,7 +169,7 @@
         </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Statistics Section -->
     <section class="section stats">
         <div class="container">
             <div class="row gy-4">
@@ -214,7 +216,7 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Vision & Mission Section with Tabs -->
     <section id="features" class="section bg-light">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
@@ -416,7 +418,7 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- Contact Information Section -->
     <section id="contact" class="section">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
@@ -474,41 +476,40 @@
         </div>
     </section>
 
- <!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <div class="footer-logo mb-4">
-                    <a href="#" class="d-inline-flex align-items-center justify-content-center">
-                        <img src="{{ asset('assets/images/Jti_polinema.png') }}" alt="Polinema Logo" class="me-2" style="height: 40px;">
-                        <span class="sitename" style="font-size: 1.5rem; font-weight: 700;">SiAkred</span>
-                    </a>
-                </div>
-                <p class="mb-4 mx-auto" style="max-width: 600px;">
-                    Sistem Akreditasi Program Studi D4 Sistem Informasi Bisnis<br>
-                    Jurusan Teknologi Informasi Politeknik Negeri Malang
-                </p>
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="footer-logo mb-4">
+                        <a href="#" class="d-inline-flex align-items-center justify-content-center">
+                            <img src="{{ asset('assets/images/Jti_polinema.png') }}" alt="Polinema Logo" class="me-2" style="height: 40px;">
+                            <span class="sitename" style="font-size: 1.5rem; font-weight: 700;">SiAkred</span>
+                        </a>
+                    </div>
+                    <p class="mb-4 mx-auto" style="max-width: 600px;">
+                        Sistem Akreditasi Program Studi D4 Sistem Informasi Bisnis<br>
+                        Jurusan Teknologi Informasi Politeknik Negeri Malang
+                    </p>
 
+                </div>
+            </div>
+
+            <div class="footer-bottom text-center pt-4 mt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                <p class="mb-0">&copy; 2025 SiAkred - Sistem Akreditasi D4 SIB. All Rights Reserved.</p>
             </div>
         </div>
-
-        <div class="footer-bottom text-center pt-4 mt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
-            <p class="mb-0">&copy; 2025 SiAkred - Sistem Akreditasi D4 SIB. All Rights Reserved.</p>
-        </div>
-    </div>
-</footer>
+    </footer>
 
     <!-- Back to Top Button -->
     <a href="#" class="back-to-top"><i class="bi bi-arrow-up"></i></a>
 
-    <!-- Vendor JS Files -->
+    <!-- Vendor JavaScript Files -->
     <script src="{{ asset('Selecao/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('Selecao/assets/vendor/aos/aos.js') }}"></script>
     <script src="{{ asset('Selecao/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
 
-    <!-- Main JS File -->
-
+    <!-- Main JavaScript File -->
     <script src="{{ asset('assets/js/welcome.js') }}"></script>
 
 </body>
