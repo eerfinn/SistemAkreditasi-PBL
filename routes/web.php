@@ -10,6 +10,7 @@ use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\DaftarTugasController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\KriteriaManagementController;
+use App\Http\Controllers\TemplateController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -54,7 +55,7 @@ Route::middleware('auth')->group(function () {
     | Profile Routes
     |--------------------------------------------------------------------------
     */
- Route::get('/profile', [ProfileController::class, 'index']);  
+ Route::get('/profile', [ProfileController::class, 'index']);
 Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
 Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
     /*
@@ -104,6 +105,22 @@ Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('prof
 
     /*
     |--------------------------------------------------------------------------
+    | Template Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::controller(TemplateController::class)->prefix('templates')->name('templates.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{template}', 'show')->name('show');
+        Route::get('/{template}/edit', 'edit')->name('edit');
+        Route::put('/{template}', 'update')->name('update');
+        Route::delete('/{template}', 'destroy')->name('destroy');
+        Route::get('/{template}/download', 'download')->name('download');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | Kriteria Routes
     |--------------------------------------------------------------------------
     */
@@ -150,7 +167,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('upload/store', [KriteriaManagementController::class, 'storeDocument'])->name('upload.store');
         Route::post('upload/finalisasi/{id}', [KriteriaManagementController::class, 'finalisasi'])->name('upload.finalisasi');
         Route::delete('upload/draft/{dokumen}', [KriteriaManagementController::class, 'destroyDraft'])->name('upload.destroyDraft');
-            
+
         // Validasi routes
         Route::get('validasi/{id}', [KriteriaManagementController::class, 'validasi'])->name('validasi');
         Route::post('validasi/process/{dokumen}', [KriteriaManagementController::class, 'processValidasi'])->name('validasi.process');
