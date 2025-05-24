@@ -31,7 +31,7 @@
                 </a>
             </li>
             <li>
-                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                <a class="has-arrow {{ request()->routeIs('admin.kriteria-management.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -45,18 +45,41 @@
                             </g>
                         </svg>
                     </div>
-                    <span class="nav-text">Kriteria</span>
+                    <span class="nav-text">Kriteria Management</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li>
+                        <a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
+                            <span class="nav-text">Upload</span>
+                        </a>
+                        <ul aria-expanded="false" class="mm-collapse">
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 1]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 2]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 3]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 4]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 5]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 6]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 7]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 8]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.upload', ['id' => 9]) }}" class="{{ request()->routeIs('admin.kriteria-management.upload') && request()->route('id') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
+                            <span class="nav-text">Validasi</span>
+                        </a>
+                        <ul aria-expanded="false" class="mm-collapse">
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 1]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 2]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 3]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 4]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 5]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 6]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 7]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 8]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                            <li><a href="{{ route('admin.kriteria-management.validasi', ['id' => 9]) }}" class="{{ request()->routeIs('admin.kriteria-management.validasi') && request()->route('id') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
             @endif

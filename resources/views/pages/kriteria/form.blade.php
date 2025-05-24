@@ -2,6 +2,11 @@
 
 @section('title', 'Kelola Dokumen - ' . ($kriteria->nama_kriteria ?? 'Kriteria Tidak Ditemukan'))
 
+@section('vendor-style')
+    <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/kriteria.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <!-- Breadcrumb & Judul -->
@@ -32,7 +37,7 @@
     <!-- Navigasi Tahapan PPEPP -->
     <div class="row mb-4">
         <div class="col-12">
-            <ul class="nav nav-pills nav-justified" id="ppeppTab" role="tablist">
+            <ul class="nav nav-pills nav-justified nav-ppepp" id="ppeppTab" role="tablist">
                 @foreach($allPpeppStagesWithData as $stage)
                     @php
                         $colorClass = match($stage['key']) {
@@ -43,20 +48,19 @@
                             'peningkatan' => 'danger',
                             default => 'primary'
                         };
+                        $iconClass = match($stage['key']) {
+                            'penetapan' => 'file-contract',
+                            'pelaksanaan' => 'tasks',
+                            'evaluasi' => 'chart-line',
+                            'pengendalian' => 'shield-alt',
+                            'peningkatan' => 'arrow-up',
+                            default => 'file-alt'
+                        };
                     @endphp
                     <li class="nav-item" role="presentation">
                         <a class="nav-link{{ $stage['key'] === $stageKey ? ' active' : '' }} bg-{{ $stage['key'] === $stageKey ? $colorClass : 'light' }} text-{{ $stage['key'] === $stageKey ? 'white' : $colorClass }}"
                            href="{{ $stage['route_kelola_tahap_ini'] }}">
-                            <i class="fas fa-{{
-                                match($stage['key']) {
-                                    'penetapan' => 'file-contract',
-                                    'pelaksanaan' => 'tasks',
-                                    'evaluasi' => 'chart-line',
-                                    'pengendalian' => 'shield-alt',
-                                    'peningkatan' => 'arrow-up',
-                                    default => 'file-alt'
-                                }
-                            }} me-1"></i> {{ $stage['label'] }}
+                            <i class="fas fa-{{ $iconClass }} me-1"></i> {{ $stage['label'] }}
                         </a>
                     </li>
                 @endforeach
@@ -119,7 +123,7 @@
                     </thead>
                     <tbody>
                         @forelse($existingDocsForStage as $index => $doc)
-                        <tr>
+                        <tr class="document-item">
                             <td>{{ $index + 1 }}</td>
                             <td>
                                 <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank" class="text-primary">

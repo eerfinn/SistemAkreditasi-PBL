@@ -9,7 +9,7 @@ use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\DaftarTugasController;
 use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\Admin\KriteriaManagementController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -54,7 +54,7 @@ Route::middleware('auth')->group(function () {
     | Profile Routes
     |--------------------------------------------------------------------------
     */
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
 
     /*
@@ -138,5 +138,21 @@ Route::middleware('auth')->group(function () {
         Route::put('/{id}', [DaftarTugasController::class, 'update'])->name('update');
         Route::patch('/{id}/status', [DaftarTugasController::class, 'updateStatus'])->name('update.status');
         Route::delete('/{id}', [DaftarTugasController::class, 'destroy'])->name('destroy');
+    });
+});
+
+// Admin Kriteria Management Routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('kriteria-management')->name('kriteria-management.')->group(function () {
+        // Upload routes
+        Route::get('upload/{id}', [KriteriaManagementController::class, 'upload'])->name('upload');
+        Route::get('upload/{id}/form', [KriteriaManagementController::class, 'uploadForm'])->name('upload.form');
+        Route::post('upload/store', [KriteriaManagementController::class, 'storeDocument'])->name('upload.store');
+        Route::post('upload/finalisasi/{id}', [KriteriaManagementController::class, 'finalisasi'])->name('upload.finalisasi');
+        Route::delete('upload/draft/{dokumen}', [KriteriaManagementController::class, 'destroyDraft'])->name('upload.destroyDraft');
+            
+        // Validasi routes
+        Route::get('validasi/{id}', [KriteriaManagementController::class, 'validasi'])->name('validasi');
+        Route::post('validasi/process/{dokumen}', [KriteriaManagementController::class, 'processValidasi'])->name('validasi.process');
     });
 });

@@ -32,7 +32,7 @@ class DashboardController extends Controller
         $role = $user->role;
         
         if (!array_key_exists($role, $this->dashboardViews)) {
-            return redirect()->route('login')->with('error', 'Unauthorized access');
+                return redirect()->route('login')->with('error', 'Unauthorized access');
         }
 
         $method = $role . 'Data';
@@ -126,8 +126,8 @@ class DashboardController extends Controller
             'ppepp_verified' => $ppepp_verified ?: [0, 0, 0, 0, 0],
             'ppepp_total' => $ppepp_total ?: [0, 0, 0, 0, 0]
         ];
-    }
-
+        }
+        
     /**
      * Get calendar events and tasks for a user
      */
@@ -148,20 +148,20 @@ class DashboardController extends Controller
                     'show_in_calendar' => $task->show_in_calendar
                 ];
             });
-
+        
         $calendarEvents = $tasks->filter(function($task) {
             return $task['show_in_calendar'] ?? false;
         })->map(function($task) {
             return [
-                'id' => 'task-' . $task['id'],
-                'title' => $task['title'],
-                'start' => $task['rawDate'] . 'T' . $task['rawTime'],
-                'className' => 'deadline',
-                'extendedProps' => [
-                    'type' => 'task',
-                    'description' => 'Tugas: ' . $task['title']
-                ]
-            ];
+                    'id' => 'task-' . $task['id'],
+                    'title' => $task['title'],
+                    'start' => $task['rawDate'] . 'T' . $task['rawTime'],
+                    'className' => 'deadline',
+                    'extendedProps' => [
+                        'type' => 'task',
+                        'description' => 'Tugas: ' . $task['title']
+                    ]
+                ];
         })->values()->all();
 
         return [

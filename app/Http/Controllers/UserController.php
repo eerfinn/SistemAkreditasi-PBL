@@ -93,12 +93,6 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
     
-    public function profile()
-{
-    $user = Auth::user(); // Ambil data user yang sedang login
-    return view('profil.profile', compact('user'));
-}
-    
     public function showJson(User $user)
     {
         return response()->json($user);

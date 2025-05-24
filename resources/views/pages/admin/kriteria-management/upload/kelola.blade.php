@@ -4,78 +4,7 @@
 
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6366f1;
-            --secondary: #10b981;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-
-        /* Description section styling */
-        .description-section {
-            position: relative;
-            padding-right: 40px;
-        }
-
-        .edit-description-btn {
-            position: absolute;
-            right: 0;
-            top: 0;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            border-radius: 0.2rem;
-        }
-
-        body {
-            background-color: var(--dark);
-            color: var(--light);
-            font-family: 'Inter', sans-serif;
-        }
-
-        .card-header-custom {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(0,0,0,.125);
-        }
-        .card-ppepp {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: var(--glass-shadow);
-            transition: all 0.3s ease;
-        }
-        .card-ppepp:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        .card-footer-custom {
-            padding: 0;
-            background-color: rgba(0,0,0,.03);
-        }
-        .list-group-item {
-            border-left: none;
-            border-right: none;
-        }
-        .list-group-item:first-child {
-            border-top: none;
-        }
-        .list-group-item:last-child {
-            border-bottom: none;
-        }
-        .btn {
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 10px var(--primary);
-        }
-    </style>
+    <link href="{{ asset('assets/css/kriteria.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -226,7 +155,7 @@
                                             <div class="card-footer-custom bg-light">
                                                 <div class="list-group list-group-flush">
                                                     @forelse($dokumenPerPPEPP[$key] ?? [] as $dokumen)
-                                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                        <div class="list-group-item d-flex justify-content-between align-items-center document-item">
                                                             <div>
                                                                 <strong class="d-block">{{ $dokumen->nama_dokumen }}</strong>
                                                                 @if($dokumen->status == 'draft')

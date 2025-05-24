@@ -2,6 +2,11 @@
 
 @section('title', 'Kelola Dokumen - ' . ($kriteria->nama_kriteria ?? 'Kriteria Tidak Ditemukan'))
 
+@section('vendor-style')
+    <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/kriteria.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <!-- Breadcrumb & Judul -->
@@ -12,7 +17,7 @@
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('kriteria.show', $kriteria->id) }}">{{ $kriteria->nama_kriteria }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.kriteria-management.upload', ['id' => $kriteria->id]) }}">{{ $kriteria->nama_kriteria }}</a></li>
                         <li class="breadcrumb-item active">Kelola Dokumen</li>
                     </ol>
                 </div>
@@ -23,16 +28,27 @@
     <!-- Tombol Kembali -->
     <div class="row mb-3">
         <div class="col-12 text-end">
-            <a href="{{ route('kriteria.show', $kriteria->id) }}" class="btn btn-light">
+            <a href="{{ route('admin.kriteria-management.upload', ['id' => $kriteria->id]) }}" class="btn btn-light">
                 <i class="fas fa-arrow-left me-1"></i> Kembali ke Detail Kriteria
             </a>
+        </div>
+    </div>
+
+    <!-- Admin Badge -->
+    <div class="alert alert-primary mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-user-shield fa-2x me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1">Mode Admin</h5>
+                <p class="mb-0">Anda sedang mengelola dokumen sebagai Administrator. Dokumen yang diupload akan ditandai sebagai dokumen admin.</p>
+            </div>
         </div>
     </div>
 
     <!-- Navigasi Tahapan PPEPP -->
     <div class="row mb-4">
         <div class="col-12">
-            <ul class="nav nav-pills nav-justified" id="ppeppTab" role="tablist">
+            <ul class="nav nav-pills nav-justified nav-ppepp" id="ppeppTab" role="tablist">
                 @foreach($allPpeppStagesWithData as $stage)
                     @php
                         $colorClass = match($stage['key']) {
@@ -43,20 +59,19 @@
                             'peningkatan' => 'danger',
                             default => 'primary'
                         };
+                        $iconClass = match($stage['key']) {
+                            'penetapan' => 'file-contract',
+                            'pelaksanaan' => 'tasks',
+                            'evaluasi' => 'chart-line',
+                            'pengendalian' => 'shield-alt',
+                            'peningkatan' => 'arrow-up',
+                            default => 'file-alt'
+                        };
                     @endphp
                     <li class="nav-item" role="presentation">
                         <a class="nav-link{{ $stage['key'] === $stageKey ? ' active' : '' }} bg-{{ $stage['key'] === $stageKey ? $colorClass : 'light' }} text-{{ $stage['key'] === $stageKey ? 'white' : $colorClass }}"
                            href="{{ $stage['route_kelola_tahap_ini'] }}">
-                            <i class="fas fa-{{
-                                match($stage['key']) {
-                                    'penetapan' => 'file-contract',
-                                    'pelaksanaan' => 'tasks',
-                                    'evaluasi' => 'chart-line',
-                                    'pengendalian' => 'shield-alt',
-                                    'peningkatan' => 'arrow-up',
-                                    default => 'file-alt'
-                                }
-                            }} me-1"></i> {{ $stage['label'] }}
+                            <i class="fas fa-{{ $iconClass }} me-1"></i> {{ $stage['label'] }}
                         </a>
                     </li>
                 @endforeach
@@ -66,13 +81,13 @@
 
     <!-- Alert Informasi -->
     <div class="alert alert-info">
-        <i class="fas fa-info-circle me-2"></i> Semua dokumen yang diunggah akan disimpan sebagai <strong>draft</strong>. Setelah semua dokumen lengkap, Anda perlu melakukan finalisasi dari halaman detail kriteria.
+        <i class="fas fa-info-circle me-2"></i> Semua dokumen yang diunggah akan disimpan sebagai <strong>draft</strong>. Setelah semua dokumen lengkap, kembali ke <a href="{{ route('admin.kriteria-management.upload', ['id' => $kriteria->id]) }}">halaman kriteria</a> untuk melakukan finalisasi dokumen.
     </div>
 
     <!-- Dokumen yang Ada -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i> Dokumen {{ $stageLabel }}</h5>
+            <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i> Dokumen Admin {{ $stageLabel }}</h5>
             <span class="badge bg-light text-primary fs-6">{{ count($existingDocsForStage) }} Dokumen</span>
         </div>
         <div class="card-body">
@@ -109,9 +124,6 @@
                         <tr>
                             <th width="50">No</th>
                             <th>Nama Dokumen</th>
-                            @if(auth()->user()->role === 'administrator')
-                            <th>Dosen</th>
-                            @endif
                             <th>Status</th>
                             <th>Tanggal Update</th>
                             <th>Aksi</th>
@@ -119,23 +131,27 @@
                     </thead>
                     <tbody>
                         @forelse($existingDocsForStage as $index => $doc)
-                        <tr>
+                        <tr class="document-item">
                             <td>{{ $index + 1 }}</td>
                             <td>
                                 <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank" class="text-primary">
                                     <i class="fas fa-file-alt me-1"></i> {{ $doc->nama_dokumen }}
                                 </a>
+                                <span class="badge bg-primary ms-2">Admin</span>
                             </td>
-                            @if(auth()->user()->role === 'administrator')
-                            <td>{{ $doc->user->name ?? 'Unknown' }}</td>
-                            @endif
                             <td>
                                 @if($doc->status == 'draft')
                                     <span class="badge bg-secondary">Draft</span>
                                 @elseif($doc->status == 'revisi')
                                     <span class="badge bg-warning">Revisi</span>
+                                @elseif($doc->status == 'menunggu')
+                                    <span class="badge bg-info">Menunggu</span>
+                                @elseif($doc->status == 'diterima')
+                                    <span class="badge bg-success">Diterima</span>
+                                @elseif($doc->status == 'diverifikasi')
+                                    <span class="badge bg-primary">Diverifikasi</span>
                                 @else
-                                    <span class="badge bg-success">{{ ucfirst($doc->status) }}</span>
+                                    <span class="badge bg-secondary">{{ ucfirst($doc->status) }}</span>
                                 @endif
                             </td>
                             <td>{{ $doc->updated_at->format('d-m-Y H:i') }}</td>
@@ -146,31 +162,23 @@
                                     </a>
 
                                     @if($doc->status == 'draft')
-                                        <form action="{{ route('dokumen.destroy.draft', $doc->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus dokumen draft ini?')">
+                                        <form action="{{ route('admin.kriteria-management.upload.destroyDraft', $doc->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus dokumen draft admin ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm" title="Hapus Draft">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
-                                    @elseif($doc->status == 'revisi')
-                                        <button type="button" class="btn btn-warning btn-sm" title="Perbarui Revisi" onclick="scrollToForm()">
-                                            <i class="fas fa-sync-alt"></i>
-                                        </button>
                                     @endif
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->role === 'administrator' ? '6' : '5' }}" class="text-center py-3">
+                            <td colspan="5" class="text-center py-3">
                                 <div class="text-muted">
                                     <i class="fas fa-folder-open me-2 fa-2x"></i><br>
-                                    @if(auth()->user()->role === 'administrator')
-                                        Belum ada dokumen yang diunggah untuk tahap {{ $stageLabel }}
-                                    @else
-                                        Belum ada dokumen untuk tahap {{ $stageLabel }}
-                                    @endif
+                                    Belum ada dokumen admin yang diunggah untuk tahap {{ $stageLabel }}
                                 </div>
                             </td>
                         </tr>
@@ -248,7 +256,7 @@
 
     <!-- Form Upload Dokumen -->
     <div class="card" id="uploadForm">
-        <div class="card-header bg-success text-white">
+        <div class="card-header bg-primary text-white">
             <h5 class="mb-0"><i class="fas fa-upload me-2"></i> Unggah Dokumen untuk Tahap {{ $stageLabel }}</h5>
         </div>
         <div class="card-body">
@@ -266,7 +274,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('dokumen.store') }}" method="POST" enctype="multipart/form-data" id="dokumenForm">
+            <form action="{{ route('admin.kriteria-management.upload.store') }}" method="POST" enctype="multipart/form-data" id="dokumenForm">
                 @csrf
                 <input type="hidden" name="kriteria_id" value="{{ $kriteria->id }}">
                 <input type="hidden" name="jenis_ppepp" value="{{ $stageKey }}">

@@ -1,0 +1,132 @@
+/* Common styles for kriteria pages */
+.modal {
+    z-index: 1060 !important;
+}
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+/* Variables */
+:root {
+    --primary: #6366f1;
+    --secondary: #10b981;
+    --dark: #0f172a;
+    --light: #f8fafc;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Description section styling */
+.description-section {
+    position: relative;
+    padding-right: 40px;
+}
+
+.edit-description-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+
+/* Card styling */
+.card-header-custom {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.card-ppepp {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
+}
+
+.card-ppepp:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-footer-custom {
+    padding: 0;
+    background-color: rgba(0,0,0,.03);
+}
+
+/* List group styling */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+.list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* Button styling */
+.btn {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* Badge positioning for comment count */
+.badge-comment-count {
+    font-size: 8px; 
+    top: -5px; 
+    right: -5px;
+}
+
+/* PPEPP navigation styling */
+.nav-ppepp .nav-link {
+    transition: all 0.3s ease;
+}
+
+.nav-ppepp .nav-link:hover {
+    transform: translateY(-2px);
+}
+
+/* Document list styling */
+.document-item {
+    transition: all 0.2s ease;
+}
+
+.document-item:hover {
+    background-color: rgba(0,0,0,0.02);
+}
+
+/* Comment section styling */
+.comment-item {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+
+.comment-content {
+    padding-left: 1rem;
+} 
