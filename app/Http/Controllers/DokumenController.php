@@ -162,10 +162,9 @@ class DokumenController extends Controller
      */
     public function destroyDraft(Dokumen $dokumen)
     {
-        // Otorisasi: Pastikan user yang menghapus adalah pemilik dan statusnya draft
-        // Anda bisa menggunakan Gate di sini: Gate::authorize('delete-draft-dokumen', $dokumen);
-        if (Auth::id() !== $dokumen->user_id || $dokumen->status !== Dokumen::STATUS_DRAFT) {
-            return back()->with('error', 'Anda tidak memiliki izin untuk menghapus dokumen ini atau dokumen sudah difinalisasi.');
+        // Only check if the document is a draft, allow any user to delete
+        if ($dokumen->status !== Dokumen::STATUS_DRAFT) {
+            return back()->with('error', 'Hanya dokumen draft yang dapat dihapus.');
         }
 
         $kriteriaId = $dokumen->kriteria_id;
@@ -252,9 +251,9 @@ class DokumenController extends Controller
 
     public function update(Request $request, Dokumen $dokumen)
     {
-        // Validasi akses
-        if (Auth::id() !== $dokumen->user_id || !in_array($dokumen->status, [Dokumen::STATUS_DRAFT, Dokumen::STATUS_REVISI])) {
-            return back()->with('error', 'Anda tidak memiliki izin untuk mengubah dokumen ini.');
+        // Only check if document is in draft or revision status
+        if (!in_array($dokumen->status, [Dokumen::STATUS_DRAFT, Dokumen::STATUS_REVISI])) {
+            return back()->with('error', 'Hanya dokumen draft atau revisi yang dapat diubah.');
         }
 
         $request->validate([
@@ -298,9 +297,9 @@ class DokumenController extends Controller
 
     public function destroy(Dokumen $dokumen)
     {
-        // Validasi akses
-        if (Auth::id() !== $dokumen->user_id || !in_array($dokumen->status, [Dokumen::STATUS_DRAFT, Dokumen::STATUS_REVISI])) {
-            return back()->with('error', 'Anda tidak memiliki izin untuk menghapus dokumen ini.');
+        // Only check if document is in draft or revision status
+        if (!in_array($dokumen->status, [Dokumen::STATUS_DRAFT, Dokumen::STATUS_REVISI])) {
+            return back()->with('error', 'Hanya dokumen draft atau revisi yang dapat dihapus.');
         }
 
         $kriteriaId = $dokumen->kriteria_id;
@@ -322,7 +321,6 @@ class DokumenController extends Controller
         try {
             // Ambil semua dokumen draft untuk kriteria ini
             $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria_id)
-                ->where('user_id', Auth::id())
                 ->where('status', Dokumen::STATUS_DRAFT)
                 ->get();
 
@@ -378,11 +376,7 @@ class DokumenController extends Controller
     {
         $user = Auth::user();
 
-        // Validate that the user owns this document or is an admin, and document needs revision
-        if ($user->id !== $dokumen->user_id && $user->role !== 'administrator') {
-            return back()->with('error', 'Anda tidak memiliki izin untuk merevisi dokumen ini.');
-        }
-
+        // Only check if document needs revision
         if ($dokumen->status !== Dokumen::STATUS_REVISI) {
             return back()->with('error', 'Dokumen ini tidak dalam status revisi.');
         }
@@ -452,5 +446,70 @@ class DokumenController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat mengunggah revisi: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function uploadForm(Kriteria $kriteria, Request $request)
+    {
+        $user = Auth::user();
+        // Gate::authorize('upload-dokumen-kriteria', $kriteria);
+
+        $selected_ppepp = $request->query('ppepp', null); // Default to null if not specified
+
+        $ppepp_labels = [
+            'penetapan' => 'C1. Penetapan',
+            'pelaksanaan' => 'C2. Pelaksanaan',
+            'evaluasi' => 'C3. Evaluasi',
+            'pengendalian' => 'C4. Pengendalian',
+            'peningkatan' => 'C5. Peningkatan'
+        ];
+
+        // Get existing documents for all PPEPP stages
+        $dokumenPerPPEPP = [];
+        foreach (array_keys($ppepp_labels) as $stage) {
+            $query = Dokumen::where('kriteria_id', $kriteria->id)
+                ->where('jenis_ppepp', $stage)
+                ->whereNotNull('path') // Only get actual documents, not descriptions
+                ->with('user'); // Eager load the user relationship
+
+            // Show all documents for both admin and dosen users
+            $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
+        }
+
+        // Prepare data for the new view format with the needed structure for navigation
+        $allPpeppStagesWithData = [];
+        foreach ($ppepp_labels as $key => $label) {
+            $allPpeppStagesWithData[] = [
+                'key' => $key,
+                'label' => $label,
+                'route_kelola_tahap_ini' => route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => $key])
+            ];
+        }
+
+        // Get descriptions for each PPEPP stage from kriteria table
+        $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
+
+        // Common data array for both views
+        $viewData = [
+            'kriteria' => $kriteria,
+            'selected_ppepp' => $selected_ppepp,
+            'ppepp_labels' => $ppepp_labels,
+            'dokumenPerPPEPP' => $dokumenPerPPEPP,
+            'ppepp_descriptions' => $ppepp_descriptions,
+            'allPpeppStagesWithData' => $allPpeppStagesWithData,
+            'stageKey' => $selected_ppepp,
+            'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
+            'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect()
+        ];
+
+        // Check if we should use the new view or existing one
+        if (view()->exists('pages.kriteria.upload-kriteria.form')) {
+            return view('pages.kriteria.upload-kriteria.form', $viewData);
+        }
+
+        if (!view()->exists('pages.kriteria.form')) {
+            abort(404, "View untuk form upload dokumen tidak ditemukan.");
+        }
+
+        return view('pages.kriteria.form', $viewData);
     }
 }

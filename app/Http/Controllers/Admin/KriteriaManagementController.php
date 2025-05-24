@@ -48,9 +48,7 @@ class KriteriaManagementController extends Controller
                 ->whereNotNull('path') // Only get actual documents, not descriptions
                 ->with('user'); // Eager load the user relationship
 
-            // For admin upload, show all documents but with admin flag
-            $query->where('is_admin_upload', true);
-
+            // Show all documents for admin, both admin-uploaded and user-uploaded
             $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
@@ -131,9 +129,7 @@ class KriteriaManagementController extends Controller
                 ->whereNotNull('path') // Only get actual documents, not descriptions
                 ->with('user'); // Eager load the user relationship
 
-            // For admin upload, show all documents but with admin flag
-            $query->where('is_admin_upload', true);
-
+            // Show all documents for admin, both admin-uploaded and user-uploaded
             $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
@@ -247,8 +243,10 @@ class KriteriaManagementController extends Controller
             $query = Dokumen::where('kriteria_id', $kriteria->id)
                 ->where('jenis_ppepp', $stage)
                 ->whereNotNull('path')
-                ->whereIn('status', [Dokumen::STATUS_MENUNGGU, Dokumen::STATUS_REVISI])
                 ->with('user');
+                
+            // For validation, show documents that need validation (menunggu/revisi)
+            $query->whereIn('status', [Dokumen::STATUS_MENUNGGU, Dokumen::STATUS_REVISI]);
 
             $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
@@ -339,27 +337,27 @@ class KriteriaManagementController extends Controller
     }
 
     /**
-     * Finalize admin documents
+     * Finalize documents
      */
     public function finalisasi(Request $request, $id)
     {
         $user = Auth::user();
         
-        if ($user->role !== 'administrator') {
+        if (!in_array($user->role, ['administrator', 'dosen1', 'dosen2', 'dosen3'])) {
             abort(403, 'Unauthorized access');
         }
 
         $kriteria = Kriteria::findOrFail($id);
 
         // Get only draft documents to finalize
-        $dokumenDrafts = Dokumen::where('user_id', $user->id)
-                       ->where('kriteria_id', $kriteria->id)
+        $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria->id)
                        ->where('status', Dokumen::STATUS_DRAFT)
-                       ->where('is_admin_upload', true)
                        ->whereNotNull('path')
                        ->get();
 
-        Log::info('Admin found drafts to finalize', [
+        Log::info('User found drafts to finalize', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
             'draft_count' => $dokumenDrafts->count(),
             'draft_ids' => $dokumenDrafts->pluck('id')->toArray()
         ]);
@@ -372,20 +370,20 @@ class KriteriaManagementController extends Controller
 
         $berhasilFinalisasi = 0;
         foreach ($dokumenDrafts as $dokumen) {
-            $dokumen->status = Dokumen::STATUS_DITERIMA; // Admin documents are automatically accepted
+            $dokumen->status = Dokumen::STATUS_DITERIMA; // Documents are automatically accepted
             $dokumen->validator_id = $user->id;
             $dokumen->validated_at = now();
             $dokumen->save();
             $berhasilFinalisasi++;
             
-            Log::info('Admin document finalized successfully', [
+            Log::info('Document finalized successfully', [
                 'dokumen_id' => $dokumen->id,
                 'jenis_ppepp' => $dokumen->jenis_ppepp
             ]);
         }
 
         if ($berhasilFinalisasi > 0) {
-            Log::info('Admin finalization completed successfully', [
+            Log::info('Finalization completed successfully', [
                 'successful_count' => $berhasilFinalisasi
             ]);
             
@@ -393,26 +391,26 @@ class KriteriaManagementController extends Controller
                             ->with('success', "{$berhasilFinalisasi} dokumen draft berhasil difinalisasi dan langsung diterima.");
         }
 
-        Log::warning('Admin finalization failed - no documents were finalized');
+        Log::warning('Finalization failed - no documents were finalized');
         
         return redirect()->back()
                         ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file.');
     }
     
     /**
-     * Delete admin draft document
+     * Delete draft document
      */
     public function destroyDraft(Dokumen $dokumen)
     {
         $user = Auth::user();
         
-        if ($user->role !== 'administrator') {
+        if (!in_array($user->role, ['administrator', 'dosen1', 'dosen2', 'dosen3'])) {
             abort(403, 'Unauthorized access');
         }
 
-        // Verify document is a draft and belongs to the admin
-        if ($dokumen->status !== Dokumen::STATUS_DRAFT || $dokumen->user_id !== $user->id || !$dokumen->is_admin_upload) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menghapus dokumen ini atau dokumen sudah difinalisasi.');
+        // Verify document is a draft
+        if ($dokumen->status !== Dokumen::STATUS_DRAFT) {
+            return redirect()->back()->with('error', 'Hanya dokumen draft yang dapat dihapus.');
         }
 
         $kriteriaId = $dokumen->kriteria_id;
@@ -425,12 +423,14 @@ class KriteriaManagementController extends Controller
         // Delete database record
         $dokumen->delete();
         
-        Log::info('Admin deleted draft document', [
+        Log::info('User deleted draft document', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
             'dokumen_id' => $dokumen->id,
             'kriteria_id' => $kriteriaId
         ]);
 
         return redirect()->route('admin.kriteria-management.upload', ['id' => $kriteriaId])
-                         ->with('success', 'Dokumen draft admin berhasil dihapus.');
+                         ->with('success', 'Dokumen draft berhasil dihapus.');
     }
 } 
