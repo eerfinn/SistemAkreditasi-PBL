@@ -14,7 +14,9 @@ class DashboardController extends Controller
      */
     protected $dashboardViews = [
         'administrator' => 'admin',
-        'dosen' => 'dosen',
+        'dosen1' => 'dosen',
+        'dosen2' => 'dosen',
+        'dosen3' => 'dosen',
         'koordinator' => 'koordinator',
         'kjm' => 'kjm',
         'kaprodi' => 'kaprodi',
@@ -30,14 +32,21 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $role = $user->role;
-        
+
         if (!array_key_exists($role, $this->dashboardViews)) {
                 return redirect()->route('login')->with('error', 'Unauthorized access');
         }
 
-        $method = $role . 'Data';
+        // Map dosen1, dosen2, dosen3 to use dosenData method
+        $methodMap = [
+            'dosen1' => 'dosenData',
+            'dosen2' => 'dosenData',
+            'dosen3' => 'dosenData',
+        ];
+
+        $method = $methodMap[$role] ?? ($role . 'Data');
         $data = method_exists($this, $method) ? $this->{$method}() : ['user' => $user];
-        
+
         return view('pages.dashboard.' . $this->dashboardViews[$role], $data);
     }
 
@@ -58,16 +67,16 @@ class DashboardController extends Controller
     protected function dosenData()
     {
         $user = auth()->user();
-        
+
         // Get document statistics
         $documentStats = $this->getDocumentStatistics($user);
-        
+
         // Get PPEPP statistics
         $ppeppStats = $this->getPPEPPStatistics($user);
-        
+
         // Get calendar events and tasks
         $calendarData = $this->getCalendarData($user);
-        
+
         return array_merge(
             ['user' => $user],
             $documentStats,
@@ -82,7 +91,7 @@ class DashboardController extends Controller
     protected function getDocumentStatistics($user)
     {
         $baseQuery = Dokumen::where('user_id', $user->id);
-        
+
         return [
             'totalDocuments' => $baseQuery->count(),
             'verifiedDocuments' => (clone $baseQuery)->where('status', Dokumen::STATUS_DIVERIFIKASI)->count(),
@@ -104,30 +113,30 @@ class DashboardController extends Controller
             Dokumen::PPEPP_PENGENDALIAN,
             Dokumen::PPEPP_PENINGKATAN
         ];
-        
+
         $ppepp_verified = [];
         $ppepp_total = [];
-        
+
         foreach ($ppepp_stages as $stage) {
             $verified = Dokumen::where('user_id', $user->id)
                         ->where('jenis_ppepp', $stage)
                         ->where('status', Dokumen::STATUS_DIVERIFIKASI)
                         ->count();
-            
+
             $total = Dokumen::where('user_id', $user->id)
                     ->where('jenis_ppepp', $stage)
                     ->count();
-            
+
             $ppepp_verified[] = $verified;
             $ppepp_total[] = $total;
         }
-        
+
         return [
             'ppepp_verified' => $ppepp_verified ?: [0, 0, 0, 0, 0],
             'ppepp_total' => $ppepp_total ?: [0, 0, 0, 0, 0]
         ];
         }
-        
+
     /**
      * Get calendar events and tasks for a user
      */
@@ -148,7 +157,7 @@ class DashboardController extends Controller
                     'show_in_calendar' => $task->show_in_calendar
                 ];
             });
-        
+
         $calendarEvents = $tasks->filter(function($task) {
             return $task['show_in_calendar'] ?? false;
         })->map(function($task) {
@@ -192,4 +201,4 @@ class DashboardController extends Controller
     {
         return ['user' => auth()->user()];
     }
-} 
+}

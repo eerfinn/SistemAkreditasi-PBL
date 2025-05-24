@@ -121,7 +121,7 @@ $(document).ready(function() {
                             <h4 class="mb-1">{{ isset($kriteria) ? $kriteria->nama_kriteria : 'Nama Kriteria Tidak Ditemukan' }}</h4>
                             <p class="mb-0">{{ isset($kriteria) ? $kriteria->deskripsi : 'Deskripsi kriteria tidak tersedia.' }}</p>
                         </div>
-                        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
+                        @if(auth()->user() && (auth()->user()->role === 'dosen1' || auth()->user()->role === 'dosen2' || auth()->user()->role === 'dosen3' || auth()->user()->role === 'administrator'))
                         <div class="col-md-4 text-end">
                             <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
                                 <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
@@ -152,52 +152,52 @@ $(document).ready(function() {
         @endif
 
         <!-- C1. Penetapan Section -->
-        <x-ppepp-section 
-            title="C1. Penetapan" 
-            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] }}" 
+        <x-ppepp-section
+            title="C1. Penetapan"
+            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] }}"
             :documents="$dokumenPerPPEPP['penetapan'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PENETAPAN"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
         <!-- C2. Pelaksanaan Section -->
-        <x-ppepp-section 
-            title="C2. Pelaksanaan" 
-            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] }}" 
+        <x-ppepp-section
+            title="C2. Pelaksanaan"
+            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] }}"
             :documents="$dokumenPerPPEPP['pelaksanaan'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PELAKSANAAN"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
         <!-- C3. Evaluasi Section -->
-        <x-ppepp-section 
-            title="C3. Evaluasi" 
-            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] }}" 
+        <x-ppepp-section
+            title="C3. Evaluasi"
+            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] }}"
             :documents="$dokumenPerPPEPP['evaluasi'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_EVALUASI"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
         <!-- C4. Pengendalian Section -->
-        <x-ppepp-section 
-            title="C4. Pengendalian" 
-            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] }}" 
+        <x-ppepp-section
+            title="C4. Pengendalian"
+            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] }}"
             :documents="$dokumenPerPPEPP['pengendalian'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PENGENDALIAN"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
         <!-- C5. Peningkatan Section -->
-        <x-ppepp-section 
-            title="C5. Peningkatan" 
-            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] }}" 
+        <x-ppepp-section
+            title="C5. Peningkatan"
+            description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] }}"
             :documents="$dokumenPerPPEPP['peningkatan'] ?? []"
             ppepp_key="\App\Models\Dokumen::PPEPP_PENINGKATAN"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
         <!-- Finalization Section for Dosen -->
-        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
+        @if(auth()->user() && (auth()->user()->role === 'dosen1' || auth()->user()->role === 'dosen2' || auth()->user()->role === 'dosen3' || auth()->user()->role === 'administrator'))
             <div class="col-xl-12 mb-4">
                 <div class="card">
                     <div class="card-header bg-light">
@@ -208,15 +208,15 @@ $(document).ready(function() {
                             // Count draft documents
                             $totalDraftCount = 0;
                             $totalValidCount = 0;
-                            
+
                             foreach(array_keys($ppepp_labels) as $key) {
                                 // Count draft documents for this stage
-                                $draftCount = isset($dokumenPerPPEPP[$key]) 
-                                    ? $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() 
+                                $draftCount = isset($dokumenPerPPEPP[$key])
+                                    ? $dokumenPerPPEPP[$key]->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count()
                                     : 0;
-                                
+
                                 $totalDraftCount += $draftCount;
-                                
+
                                 // Count already validated documents
                                 $validCount = isset($dokumenPerPPEPP[$key])
                                     ? $dokumenPerPPEPP[$key]->whereIn('status', [
@@ -224,11 +224,11 @@ $(document).ready(function() {
                                         \App\Models\Dokumen::STATUS_DIVERIFIKASI
                                     ])->count()
                                     : 0;
-                                
+
                                 $totalValidCount += $validCount;
                             }
                         @endphp
-                        
+
                         @if($totalDraftCount == 0)
                             <div class="alert alert-info">
                                 <h6 class="alert-heading fw-bold">Tidak Ada Draft untuk Difinalisasi</h6>
@@ -246,14 +246,14 @@ $(document).ready(function() {
                                 <p>Anda memiliki <strong>{{ $totalDraftCount }} dokumen draft</strong> yang siap difinalisasi.</p>
                                 <p class="mb-0">Setelah difinalisasi, dokumen akan dikirim untuk validasi dan tidak dapat diedit lagi.</p>
                             </div>
-                            
+
                             <form action="{{ route('kriteria.finalisasi', $kriteria->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memfinalisasi semua dokumen draft untuk kriteria ini? Dokumen yang sudah difinalisasi tidak bisa diubah atau dihapus lagi oleh Anda.')">
                                 @csrf
                                 <button type="submit" class="btn btn-success btn-lg w-100">
                                     <i class="fas fa-check-circle me-1"></i> Finalisasi {{ $totalDraftCount }} Dokumen Draft
                                 </button>
                             </form>
-                            
+
                             @if($totalValidCount > 0)
                             <div class="alert alert-success mt-3 mb-0">
                                 <h6 class="alert-heading fw-bold"><i class="fas fa-info-circle me-2"></i>Informasi Tambahan</h6>
@@ -282,7 +282,7 @@ $(document).ready(function() {
             </div>
         </div>
         @endif
-        
+
         <!-- Comments Section - Visible to all users -->
         <div class="col-xl-12 mb-4">
             <div class="card">

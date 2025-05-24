@@ -572,24 +572,24 @@
             overflow-y: auto;
             padding: 0;
         }
-        
+
         .event-scroll::-webkit-scrollbar {
             width: 4px;
         }
-        
+
         .event-scroll::-webkit-scrollbar-track {
             background: transparent;
         }
-        
+
         .event-scroll::-webkit-scrollbar-thumb {
             background: #ddd;
             border-radius: 10px;
         }
-        
+
         .event-scroll::-webkit-scrollbar-thumb:hover {
             background: #ccc;
         }
-        
+
         .event-box {
             width: 45px;
             height: 45px;
@@ -603,19 +603,19 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
             margin-right: 15px;
         }
-        
+
         .event-box h5 {
             font-size: 16px;
             font-weight: 700;
             margin: 0;
             color: #333;
         }
-        
+
         .event-box span {
             font-size: 11px;
             color: #666;
         }
-        
+
         .event-media {
             display: flex;
             justify-content: space-between;
@@ -628,40 +628,40 @@
             transition: all 0.3s ease;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         .event-media:last-child {
             border-bottom: none;
         }
-        
+
         .event-media:hover {
             transform: translateY(0);
             box-shadow: none;
             background-color: rgba(0, 0, 0, 0.02);
         }
-        
+
         .event-data {
             flex-grow: 1;
             margin-right: 10px;
         }
-        
+
         .event-data h5 {
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 2px;
             color: #333;
         }
-        
+
         .event-data span {
             font-size: 12px;
             color: #666;
         }
-        
+
         .event-actions {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .event-time {
             padding: 4px 10px;
             border-radius: 20px;
@@ -670,11 +670,11 @@
             min-width: 70px;
             text-align: center;
         }
-        
+
         .card-body.schedules-cal {
             padding: 0 !important;
         }
-        
+
         .events h6 {
             padding: 15px 15px 0;
             margin-bottom: 10px;
@@ -682,7 +682,7 @@
             font-weight: 600;
             color: #555;
         }
-        
+
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             .my-calendar .card-header {
@@ -690,37 +690,37 @@
                 color: #ffffff;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
+
             .event-box {
                 background: #2a2f45;
                 border: 1px solid rgba(255, 255, 255, 0.05);
             }
-            
+
             .event-box h5 {
                 color: #e2e8f0;
             }
-            
+
             .event-box span {
                 color: #a0aec0;
             }
-            
+
             .event-media {
                 background: transparent;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             }
-            
+
             .event-media:hover {
                 background-color: rgba(255, 255, 255, 0.03);
             }
-            
+
             .event-data h5 a {
                 color: #e2e8f0;
             }
-            
+
             .event-data span {
                 color: #a0aec0;
             }
-            
+
             .events h6 {
                 color: #a0aec0;
             }
@@ -732,17 +732,17 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 15px 20px;
         }
-        
+
         .my-calendar .card-header .card-title {
             font-weight: 600;
             color: white;
         }
-        
+
         .my-calendar .card-header .btn-primary {
             background-color: rgba(255, 255, 255, 0.2);
             border-color: transparent;
         }
-        
+
         .my-calendar .card-header .btn-primary:hover {
             background-color: rgba(255, 255, 255, 0.3);
             border-color: transparent;
@@ -755,7 +755,13 @@
         <canvas id="networkCanvas"></canvas>
         <div class="welcome-card">
             <h1 class="mb-0">Selamat Datang, {{ $user->nama }}!</h1>
-            <p class="mt-3">Dashboard Dosen</p>
+            @if ($user->role === 'dosen1')
+                <p class="mt-3">Anda memiliki akses untuk Kriteria 1, kriteria 2 dan Kriteria 3</p>
+            @elseif ($user->role === 'dosen2')
+                <p class="mt-3">Anda memiliki akses untuk Kriteria 4, kriteria 5 dan Kriteria 6</p>
+            @elseif ($user->role === 'dosen3')
+                <p class="mt-3">Anda memiliki akses untuk Kriteria 7, kriteria 8 dan Kriteria 9</p>
+            @endif
         </div>
     </div>
 

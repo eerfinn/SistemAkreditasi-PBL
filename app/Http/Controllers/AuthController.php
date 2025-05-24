@@ -20,9 +20,9 @@ class AuthController extends Controller
 
             // First check: Verify if username exists
             $user = User::where('username', $credentials['username'])->first();
-            
+
             $errors = [];
-            
+
             if (!$user) {
                 $errors['username'] = 'Username tidak terdaftar.';
                 throw ValidationException::withMessages($errors);
@@ -37,6 +37,16 @@ class AuthController extends Controller
             // If both checks pass, attempt to login
             if (Auth::attempt($credentials)) {
                 $request->session()->regenerate();
+
+                // Check if user has a valid role for dashboard access
+                $validRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
+                if (!in_array($user->role, $validRoles)) {
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                    return redirect()->route('login')->with('error', 'Peran pengguna tidak valid.');
+                }
+
                 return redirect()->intended('dashboard');
             }
 
@@ -61,7 +71,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()->route('login')->with('success', 'Anda telah berhasil logout.');
     }
 }

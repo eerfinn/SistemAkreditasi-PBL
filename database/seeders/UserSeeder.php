@@ -18,10 +18,22 @@ class UserSeeder extends Seeder
                 'role' => 'administrator',
             ],
             [
-                'username' => 'dosen',
-                'nama' => 'Dosen',
-                'password' => Hash::make('dosen123'),
-                'role' => 'dosen',
+                'username' => 'dosen1',
+                'nama' => 'Dosen 1',
+                'password' => Hash::make('dosen1123'),
+                'role' => 'dosen1',
+            ],
+            [
+                'username' => 'dosen2',
+                'nama' => 'Dosen 2',
+                'password' => Hash::make('dosen2123'),
+                'role' => 'dosen2',
+            ],
+            [
+                'username' => 'dosen3',
+                'nama' => 'Dosen 3',
+                'password' => Hash::make('dosen3123'),
+                'role' => 'dosen3',
             ],
             [
                 'username' => 'kjm',

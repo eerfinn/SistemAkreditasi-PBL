@@ -84,31 +84,8 @@
             </li>
             @endif
 
-            {{-- Dosen Menu Items --}}
-            @if(auth()->user()->role === 'dosen')
-            {{-- <li>
-                <a class="has-arrow {{ request()->routeIs('dokumen.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
-                    <div class="menu-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path opacity="0.4" d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z" fill="#90959F"/>
-                            <path d="M12.5 11.5C12.5 10.672 13.172 10 14 10C14.828 10 15.5 10.672 15.5 11.5C15.5 12.328 14.828 13 14 13C13.172 13 12.5 12.328 12.5 11.5Z" fill="#90959F"/>
-                        </svg>
-                    </div>
-                    <span class="nav-text">Dokumen Kriteria</span>
-                </a>
-                <ul aria-expanded="false">
-                    <li>
-                        <a href="{{ route('kriteria.suplemen') }}" class="{{ request()->routeIs('kriteria.suplemen') ? 'active' : '' }}">
-                            Upload Dokumen
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="{{ request()->routeIs('dokumen.history') ? 'active' : '' }}">
-                            Riwayat Upload
-                        </a>
-                    </li>
-                </ul>
-            </li> --}}
+            {{-- Dosen1 Menu Items - Only Kriteria 1-3 --}}
+            @if(auth()->user()->role === 'dosen1')
             <li>
                 <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
                     <div class="menu-icon">
@@ -127,15 +104,63 @@
                     <span class="nav-text">Kriteria</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                </ul>
+            </li>
+            @endif
+
+            {{-- Dosen2 Menu Items - Only Kriteria 4-6 --}}
+            @if(auth()->user()->role === 'dosen2')
+            <li>
+                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                    <div class="menu-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g opacity="0.5">
+                                <path opacity="0.4"
+                                    d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z"
+                                    fill="white" />
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M8.08002 6.64999V6.65999C7.64902 6.65999 7.30002 7.00999 7.30002 7.43999C7.30002 7.86999 7.64902 8.21999 8.08002 8.21999H11.069C11.5 8.21999 11.85 7.86999 11.85 7.42899C11.85 6.99999 11.5 6.64999 11.069 6.64999H8.08002ZM15.92 12.74H8.08002C7.64902 12.74 7.30002 12.39 7.30002 11.96C7.30002 11.53 7.64902 11.179 8.08002 11.179H15.92C16.35 11.179 16.7 11.53 16.7 11.96C16.7 12.39 16.35 12.74 15.92 12.74ZM15.92 17.31H8.08002C7.78002 17.35 7.49002 17.2 7.33002 16.95C7.17002 16.69 7.17002 16.36 7.33002 16.11C7.49002 15.85 7.78002 15.71 8.08002 15.74H15.92C16.319 15.78 16.62 16.12 16.62 16.53C16.62 16.929 16.319 17.27 15.92 17.31Z"
+                                    fill="white" />
+                            </g>
+                        </svg>
+                    </div>
+                    <span class="nav-text">Kriteria</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                </ul>
+            </li>
+            @endif
+
+            {{-- Dosen3 Menu Items - Only Kriteria 7-9 --}}
+            @if(auth()->user()->role === 'dosen3')
+            <li>
+                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                    <div class="menu-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g opacity="0.5">
+                                <path opacity="0.4"
+                                    d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z"
+                                    fill="white" />
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M8.08002 6.64999V6.65999C7.64902 6.65999 7.30002 7.00999 7.30002 7.43999C7.30002 7.86999 7.64902 8.21999 8.08002 8.21999H11.069C11.5 8.21999 11.85 7.86999 11.85 7.42899C11.85 6.99999 11.5 6.64999 11.069 6.64999H8.08002ZM15.92 12.74H8.08002C7.64902 12.74 7.30002 12.39 7.30002 11.96C7.30002 11.53 7.64902 11.179 8.08002 11.179H15.92C16.35 11.179 16.7 11.53 16.7 11.96C16.7 12.39 16.35 12.74 15.92 12.74ZM15.92 17.31H8.08002C7.78002 17.35 7.49002 17.2 7.33002 16.95C7.17002 16.69 7.17002 16.36 7.33002 16.11C7.49002 15.85 7.78002 15.71 8.08002 15.74H15.92C16.319 15.78 16.62 16.12 16.62 16.53C16.62 16.929 16.319 17.27 15.92 17.31Z"
+                                    fill="white" />
+                            </g>
+                        </svg>
+                    </div>
+                    <span class="nav-text">Kriteria</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 9 ? 'active' : '' }}">Kriteria 9</a></li>
                 </ul>
             </li>
             @endif
@@ -183,15 +208,15 @@
                     <span class="nav-text">Kriteria</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 9 ? 'active' : '' }}">Kriteria 9</a></li>
                 </ul>
             </li>
             @endif
@@ -239,15 +264,15 @@
                     <span class="nav-text">Kriteria</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 9 ? 'active' : '' }}">Kriteria 9</a></li>
                 </ul>
             </li>
             @endif
@@ -290,20 +315,20 @@
                     <span class="nav-text">Kriteria</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('id') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') && request()->route('kriteria')->id == 9 ? 'active' : '' }}">Kriteria 9</a></li>
                 </ul>
             </li>
 
             @endif
-            
+
             <li>
                 <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">
                     <div class="menu-icon">
@@ -317,7 +342,7 @@
                     <span class="nav-text">Home</span>
                 </a>
             </li>
-            
+
         </ul>
     </div>
 </div>

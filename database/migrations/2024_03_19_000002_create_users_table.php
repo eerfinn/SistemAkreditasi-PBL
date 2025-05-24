@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('username')->unique();
             $table->string('password');
-            $table->enum('role', ['administrator', 'dosen', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
+            $table->enum('role', ['administrator', 'dosen1','dosen2', 'dosen3', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
             $table->string('path_profile')->nullable();
             $table->timestamps();
         });
@@ -23,4 +23,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('users');
     }
-}; 
+};

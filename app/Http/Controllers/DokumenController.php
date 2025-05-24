@@ -73,6 +73,10 @@ class DokumenController extends Controller
             'kriteria_id' => 'required|exists:kriteria,id',
             'jenis_ppepp' => 'required|string',
             'files.*' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
+        ], [
+            'files.*.mimes' => 'Format file tidak valid. Hanya file PDF, DOC, DOCX, XLS, XLSX, PPT, dan PPTX yang diperbolehkan.',
+            'files.*.max' => 'Ukuran file tidak boleh lebih dari 5MB.',
+            'files.*.required' => 'File dokumen wajib diunggah.',
         ]);
 
         $kriteriaId = $request->kriteria_id;
@@ -89,23 +93,23 @@ class DokumenController extends Controller
         if ($request->hasFile('files')) {
             $uploadedCount = 0;
             $folderPath = "dokumen_akreditasi/kriteria_{$kriteriaId}/{$jenisPpepp}/user_{$user->id}";
-            
+
             foreach ($request->file('files') as $file) {
                 if ($file->isValid()) {
                     $originalNameForDisplay = $file->getClientOriginalName();
-            
+
             Log::info('Processing file upload', [
                 'original_name' => $originalNameForDisplay,
                 'mime_type' => $file->getMimeType(),
                 'size' => $file->getSize()
             ]);
-            
-            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) 
+
+            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME))
                             . '.' . $file->getClientOriginalExtension();
 
             try {
                 $path = $file->storeAs($folderPath, $fileNameToStore, 'public');
-                
+
                 if (!$path) {
                     Log::error('Failed to save file', [
                                 'original_name' => $originalNameForDisplay
@@ -128,7 +132,7 @@ class DokumenController extends Controller
                         'jenis_ppepp' => $jenisPpepp,
                         'status' => Dokumen::STATUS_DRAFT,
                     ]);
-                    
+
                     Log::info('New document created', [
                         'dokumen_id' => $newDokumen->id
                     ]);
@@ -142,7 +146,7 @@ class DokumenController extends Controller
                     }
                 }
             }
-            
+
             if ($uploadedCount > 0) {
                 return redirect()->back()->with('success', "{$uploadedCount} dokumen berhasil diunggah.");
             } else {
@@ -199,9 +203,10 @@ class DokumenController extends Controller
             // Coba akses file dari storage public
             if (Storage::disk('public')->exists($dokumen->path)) {
                 $filePath = storage_path('app/public/' . $dokumen->path);
+                $fileName = basename($dokumen->path);
+                $extension = pathinfo($dokumen->path, PATHINFO_EXTENSION);
 
                 // Tentukan content type berdasarkan ekstensi file
-                $extension = pathinfo($dokumen->path, PATHINFO_EXTENSION);
                 $contentType = match(strtolower($extension)) {
                     'pdf' => 'application/pdf',
                     'doc' => 'application/msword',
@@ -213,9 +218,10 @@ class DokumenController extends Controller
                     default => 'application/octet-stream'
                 };
 
+                // Tampilkan file langsung di browser
                 return response()->file($filePath, [
                     'Content-Type' => $contentType,
-                    'Content-Disposition' => 'inline; filename="' . basename($dokumen->path) . '"'
+                    'Content-Disposition' => 'inline; filename="' . $fileName . '"'
                 ]);
             }
 
@@ -263,12 +269,12 @@ class DokumenController extends Controller
         if ($request->hasFile('dokumen') && $request->file('dokumen')->isValid()) {
             $file = $request->file('dokumen');
             $originalNameForDisplay = $file->getClientOriginalName();
-            
+
             // Buat struktur folder
             $folderPath = "dokumen_akreditasi/kriteria_{$dokumen->kriteria_id}/{$dokumen->jenis_ppepp}/user_{$dokumen->user_id}";
-            
+
             // Generate nama file yang unik
-            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) 
+            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME))
                              . '.' . $file->getClientOriginalExtension();
 
             // Hapus file lama jika ada
@@ -278,7 +284,7 @@ class DokumenController extends Controller
 
             // Simpan file baru
             $path = $file->storeAs($folderPath, $fileNameToStore, 'public');
-            
+
             if ($path) {
                 $dokumen->path = $path;
                 $dokumen->nama_dokumen = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
@@ -347,7 +353,7 @@ class DokumenController extends Controller
                 $missingStageNames = array_map(function($stage) {
                     return ucfirst($stage);
                 }, array_keys($missingStages));
-                
+
                 return redirect()->back()->with('error', 'Beberapa tahapan belum memiliki dokumen: ' . implode(', ', $missingStageNames) . '. Harap upload dokumen untuk semua tahapan sebelum finalisasi.');
             }
 
@@ -371,47 +377,47 @@ class DokumenController extends Controller
     public function submitRevision(Request $request, Dokumen $dokumen)
     {
         $user = Auth::user();
-        
+
         // Validate that the user owns this document or is an admin, and document needs revision
         if ($user->id !== $dokumen->user_id && $user->role !== 'administrator') {
             return back()->with('error', 'Anda tidak memiliki izin untuk merevisi dokumen ini.');
         }
-        
+
         if ($dokumen->status !== Dokumen::STATUS_REVISI) {
             return back()->with('error', 'Dokumen ini tidak dalam status revisi.');
         }
-        
+
         // Validate the request
         $request->validate([
             'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
             'keterangan_revisi' => 'nullable|string|max:500',
         ]);
-        
+
         try {
             // Get the uploaded file
             $file = $request->file('file');
             $originalNameForDisplay = $file->getClientOriginalName();
-            
+
             // Create the folder structure
             $folderPath = "dokumen_akreditasi/kriteria_{$dokumen->kriteria_id}/{$dokumen->jenis_ppepp}/user_{$user->id}";
-            
+
             // Generate a unique filename
-            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME)) 
+            $fileNameToStore = time() . '_' . Str::slug(pathinfo($originalNameForDisplay, PATHINFO_FILENAME))
                             . '.' . $file->getClientOriginalExtension();
-            
+
             // Delete the old file if it exists
             if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {
                 Storage::disk('public')->delete($dokumen->path);
                 Log::info('Deleted old revision file', ['path' => $dokumen->path]);
             }
-            
+
             // Store the new file
             $path = $file->storeAs($folderPath, $fileNameToStore, 'public');
-            
+
             if (!$path) {
                 throw new \Exception('Failed to save the file.');
             }
-            
+
             // Update the document
             $dokumen->nama_dokumen = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
             $dokumen->path = $path;
@@ -421,28 +427,28 @@ class DokumenController extends Controller
             }
             $dokumen->updated_at = now();
             $dokumen->save();
-            
+
             // Record the history
             $history = new History();
             $history->user_id = $user->id;
             $history->dokumen_id = $dokumen->id;
             $history->aktivitas = "Mengupload revisi dokumen {$dokumen->nama_dokumen}";
             $history->save();
-            
+
             Log::info('Document revision submitted successfully', [
                 'dokumen_id' => $dokumen->id,
                 'new_path' => $path
             ]);
-            
+
             return redirect()->route('kriteria.show', $dokumen->kriteria_id)
                 ->with('success', 'Revisi dokumen berhasil diunggah dan menunggu validasi.');
-                
+
         } catch (\Exception $e) {
             Log::error('Error submitting document revision', [
                 'dokumen_id' => $dokumen->id,
                 'error' => $e->getMessage()
             ]);
-            
+
             return back()->with('error', 'Terjadi kesalahan saat mengunggah revisi: ' . $e->getMessage())
                 ->withInput();
         }

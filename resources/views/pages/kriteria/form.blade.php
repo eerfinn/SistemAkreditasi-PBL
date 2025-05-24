@@ -158,9 +158,55 @@
                                             </button>
                                         </form>
                                     @elseif($doc->status == 'revisi')
-                                        <button type="button" class="btn btn-warning btn-sm" title="Perbarui Revisi" onclick="scrollToForm()">
+                                        <button type="button" class="btn btn-warning btn-sm" title="Perbarui Revisi"
+                                            data-bs-toggle="modal" data-bs-target="#revisiModal{{ $doc->id }}">
                                             <i class="fas fa-sync-alt"></i>
                                         </button>
+
+                                        <!-- Modal Revisi untuk dokumen ini -->
+                                        <div class="modal fade" id="revisiModal{{ $doc->id }}" tabindex="-1" aria-labelledby="revisiModalLabel{{ $doc->id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form action="{{ route('dokumen.submit.revision', $doc->id) }}" method="POST" enctype="multipart/form-data">
+                                                        @csrf
+                                                        <div class="modal-header bg-warning">
+                                                            <h5 class="modal-title" id="revisiModalLabel{{ $doc->id }}">Perbarui Revisi Dokumen</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold">Nama Dokumen</label>
+                                                                <input type="text" class="form-control" value="{{ $doc->nama_dokumen }}" readonly>
+                                                            </div>
+
+                                                            @if($doc->keterangan_revisi)
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold">Keterangan Revisi</label>
+                                                                <div class="alert alert-info">
+                                                                    {{ $doc->keterangan_revisi }}
+                                                                </div>
+                                                            </div>
+                                                            @endif
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold">Unggah File Revisi</label>
+                                                                <input type="file" class="form-control" name="file" required>
+                                                                <small class="text-muted">Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX. Maksimal 5MB.</small>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold">Keterangan Tambahan (Opsional)</label>
+                                                                <textarea class="form-control" name="keterangan_revisi" rows="3" placeholder="Tambahkan keterangan tentang revisi yang dilakukan..."></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn btn-primary">Kirim Revisi</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 </div>
                             </td>
@@ -223,7 +269,7 @@
                 <form action="{{ route('kriteria.update.description', ['kriteria' => $kriteria->id, 'ppepp' => $stageKey]) }}" method="POST">
                     @csrf
                     @method('PUT')
-                    
+
                     <div class="modal-header bg-info text-white">
                         <h5 class="modal-title" id="editDescriptionModalLabel"><i class="fas fa-edit me-2"></i>Edit Deskripsi Umum {{ $stageLabel }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

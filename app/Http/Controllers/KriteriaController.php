@@ -14,7 +14,7 @@ class KriteriaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('kriteria.access')->only(['uploadForm', 'finalisasiDokumen']);
+        $this->middleware('kriteria.access')->only(['show', 'uploadForm', 'finalisasiDokumen']);
     }
 
     public function show(Kriteria $kriteria)
@@ -39,7 +39,7 @@ class KriteriaController extends Controller
         ]);
 
         // Mengambil dokumen yang dikelompokkan per tahap PPEPP
-        if ($user && $user->role === 'dosen') {
+        if ($user && in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator'])) {
             foreach ($ppepp_stages as $stage) {
                 // Important change: Include all documents for this user and kriteria,
                 // regardless of status, to ensure validated documents remain visible
@@ -48,13 +48,13 @@ class KriteriaController extends Controller
                     ->where('user_id', $user->id)
                     ->where('jenis_ppepp', $stage)
                     ->whereNotNull('path') // Only get actual documents, not descriptions
-                    ->orderByRaw("FIELD(status, '".Dokumen::STATUS_DRAFT."', '".Dokumen::STATUS_REVISI."', 
-                               '".Dokumen::STATUS_MENUNGGU."', '".Dokumen::STATUS_DITERIMA."', 
+                    ->orderByRaw("FIELD(status, '".Dokumen::STATUS_DRAFT."', '".Dokumen::STATUS_REVISI."',
+                               '".Dokumen::STATUS_MENUNGGU."', '".Dokumen::STATUS_DITERIMA."',
                                '".Dokumen::STATUS_DIVERIFIKASI."') ASC")
                     ->orderBy('updated_at', 'desc');
-                
+
                 $dokumenCollection = $query->get();
-                
+
                 Log::info("Documents for stage {$stage}", [
                     'count' => $dokumenCollection->count(),
                     'sql' => $query->toSql(),
@@ -74,9 +74,9 @@ class KriteriaController extends Controller
                     ->whereNotIn('status', [Dokumen::STATUS_DRAFT])
                     ->whereNotNull('path') // Only get actual documents, not descriptions
                     ->orderBy('updated_at', 'desc');
-                
+
                 $dokumenCollection = $query->get();
-                
+
                 Log::info("Documents for stage {$stage} (non-dosen)", [
                     'count' => $dokumenCollection->count(),
                     'sql' => $query->toSql(),
@@ -92,7 +92,7 @@ class KriteriaController extends Controller
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->get();
-            
+
         Log::info('Loaded kriteria comments', [
             'kriteria_id' => $kriteria->id,
             'comment_count' => $kriteriaComments->count()
@@ -109,7 +109,7 @@ class KriteriaController extends Controller
         $statusQueryBaseFinal = Dokumen::where('kriteria_id', $kriteria->id)
                                     ->where('status', '!=', Dokumen::STATUS_DRAFT);
 
-        if ($user && $user->role === 'dosen') {
+        if ($user && in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
             $statusQueryBaseFinal->where('user_id', $user->id);
         }
 
@@ -131,7 +131,7 @@ class KriteriaController extends Controller
             $daftarDokumenFinal = $daftarDokumenFinal->concat($stageDokumen->where('status', '!=', Dokumen::STATUS_DRAFT));
         }
 
-        if ($user && $user->role !== 'dosen') {
+        if ($user && !in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
             $daftarDokumenFinal = Dokumen::where('kriteria_id', $kriteria->id)
                                 ->where('status', '!=', Dokumen::STATUS_DRAFT)
                                 ->whereNotNull('path') // Only get actual documents, not descriptions
@@ -191,7 +191,7 @@ class KriteriaController extends Controller
             'bisaFinalisasi'   => $bisaFinalisasi,
             'daftarDokumen'    => $daftarDokumenFinal,
             'dokumenDrafts'    => $dokumenDrafts,
-            'showUploadButton' => $user && $user->role === 'dosen',
+            'showUploadButton' => $user && in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator']),
             'ppepp_descriptions' => $ppepp_descriptions,
             'kriteriaComments' => $kriteriaComments,
             'disableKelola' => $disableKelola
@@ -223,7 +223,7 @@ class KriteriaController extends Controller
 
             // For dosen, only show their own documents
             // For admin, show all documents
-            if ($user->role === 'dosen') {
+            if (in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
                 $query->where('user_id', $user->id);
             }
 
@@ -271,7 +271,7 @@ class KriteriaController extends Controller
     public function finalisasiDokumen(Request $request, Kriteria $kriteria)
     {
         $user = Auth::user();
-        
+
         // Log initial information
         Log::info('Starting finalization process', [
             'user_id' => $user->id,
@@ -279,7 +279,8 @@ class KriteriaController extends Controller
             'kriteria_id' => $kriteria->id
         ]);
 
-        if ($user->role !== 'dosen') {
+        // Check if user role is one of the dosen roles
+        if (!in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator'])) {
             Log::warning('Unauthorized finalization attempt - not a dosen', [
                 'user_id' => $user->id,
                 'role' => $user->role
@@ -319,7 +320,7 @@ class KriteriaController extends Controller
             $dokumen->status = Dokumen::STATUS_MENUNGGU;
             $dokumen->save();
             $berhasilFinalisasi++;
-            
+
             Log::info('Document finalized successfully', [
                 'dokumen_id' => $dokumen->id,
                 'jenis_ppepp' => $dokumen->jenis_ppepp
@@ -330,13 +331,13 @@ class KriteriaController extends Controller
             Log::info('Finalization completed successfully', [
                 'successful_count' => $berhasilFinalisasi
             ]);
-            
+
             return redirect()->route('kriteria.show', $kriteria->id)
                             ->with('success', "{$berhasilFinalisasi} dokumen draft berhasil difinalisasi dan dikirim untuk validasi.");
         }
 
         Log::warning('Finalization failed - no documents were finalized');
-        
+
         return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan'])
                         ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file atau deskripsi.');
     }
@@ -361,15 +362,15 @@ class KriteriaController extends Controller
     public function deleteDescription(Kriteria $kriteria, $ppepp)
     {
         $descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true);
-        
+
         if (isset($descriptions[$ppepp])) {
             unset($descriptions[$ppepp]);
             $kriteria->ppepp_descriptions = json_encode($descriptions);
             $kriteria->save();
-            
+
             return redirect()->back()->with('success', 'Deskripsi PPEPP berhasil dihapus.');
         }
-        
+
         return redirect()->back()->with('error', 'Deskripsi PPEPP tidak ditemukan.');
     }
 }
