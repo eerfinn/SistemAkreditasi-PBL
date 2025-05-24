@@ -7,6 +7,7 @@ use App\Models\Kriteria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class TemplateController extends Controller
 {
@@ -196,30 +197,43 @@ class TemplateController extends Controller
      */
     public function download(Template $template)
     {
-        $user = Auth::user();
-
-        // Cek apakah user memiliki akses ke template ini
-        if ($user->role !== 'administrator') {
+        // Pastikan pengguna memiliki akses ke template ini
+        if (auth()->user()->role !== 'administrator') {
+            // Jika bukan admin, cek apakah user memiliki akses ke kriteria ini
             $allowedKriteriaIds = [];
 
-            if ($user->role === 'dosen1') {
+            if (auth()->user()->role === 'dosen1') {
                 $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
+            } elseif (auth()->user()->role === 'dosen2') {
                 $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
+            } elseif (auth()->user()->role === 'dosen3') {
                 $allowedKriteriaIds = [7, 8, 9];
             }
 
             if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
                 return redirect()->route('templates.index')
-                    ->with('error', 'Anda tidak memiliki akses ke template ini.');
+                    ->with('error', 'Anda tidak memiliki akses untuk mengunduh template ini.');
             }
         }
 
-        $filename = str_replace(' ', '_', $template->name) . '.html';
+        // Buat nama file yang aman
+        $filename = Str::slug($template->name) . '-' . date('YmdHis') . '.docx';
 
-        return response($template->content)
-            ->header('Content-Type', 'text/html')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        // Header untuk download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Konversi HTML ke Word menggunakan PhpWord
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $section = $phpWord->addSection();
+
+        // Import HTML
+        \PhpOffice\PhpWord\Shared\Html::addHtml($section, $template->content);
+
+        // Simpan ke output
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save('php://output');
+        exit;
     }
 }

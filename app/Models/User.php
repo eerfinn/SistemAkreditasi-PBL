@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Kriteria;
 
 class User extends Authenticatable
 {
@@ -58,5 +59,18 @@ class User extends Authenticatable
         return $this->role === 'dosen';
     }
 
-    
+    public function kriteria()
+    {
+        if ($this->role === 'dosen1') {
+            return Kriteria::whereIn('id', [1, 2, 3])->get();
+        } elseif ($this->role === 'dosen2') {
+            return Kriteria::whereIn('id', [4, 5, 6])->get();
+        } elseif ($this->role === 'dosen3') {
+            return Kriteria::whereIn('id', [7, 8, 9])->get();
+        } elseif ($this->role === 'administrator') {
+            return Kriteria::all();
+        } else {
+            return collect();
+        }
+    }
 }

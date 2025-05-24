@@ -3,8 +3,7 @@
 @section('title', 'Buat Template Baru')
 
 @section('vendor-style')
-    <!-- TinyMCE CSS -->
-    <link href="{{ asset('assets/vendor/tinymce/skins/ui/oxide/skin.min.css') }}" rel="stylesheet">
+    <!-- TinyMCE CSS tidak diperlukan lagi karena menggunakan CDN -->
 @endsection
 
 @section('content')
@@ -100,34 +99,5 @@
 
 @section('vendor-script')
     <!-- TinyMCE -->
-    <script src="{{ asset('assets/vendor/tinymce/tinymce.min.js') }}"></script>
+    <x-head.tinymce-config selector="#content" height="500" />
 @endsection
-
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        // Initialize TinyMCE
-        tinymce.init({
-            selector: '#content',
-            height: 500,
-            plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'save'
-            ],
-            toolbar: 'undo redo | formatselect | ' +
-                'bold italic backcolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | table | help',
-            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-            branding: false,
-            promotion: false,
-            setup: function (editor) {
-                editor.on('change', function () {
-                    editor.save();
-                });
-            }
-        });
-    });
-</script>
-@endpush

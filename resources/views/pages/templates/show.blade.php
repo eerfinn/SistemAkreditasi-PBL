@@ -2,6 +2,20 @@
 
 @section('title', 'Detail Template')
 
+@section('vendor-style')
+    <!-- TinyMCE CSS tidak diperlukan lagi karena menggunakan CDN -->
+@endsection
+
+@php
+$ppepp_types = [
+    'penetapan' => 'Penetapan',
+    'pelaksanaan' => 'Pelaksanaan',
+    'evaluasi' => 'Evaluasi',
+    'pengendalian' => 'Pengendalian',
+    'peningkatan' => 'Peningkatan'
+];
+@endphp
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -25,75 +39,55 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">{{ $template->name }}</h4>
                     <div>
-                        <a href="{{ route('templates.download', $template->id) }}" class="btn btn-primary">
-                            <i class="fas fa-download me-1"></i> Download Template
-                        </a>
                         @if(auth()->user()->role === 'administrator')
-                        <a href="{{ route('templates.edit', $template->id) }}" class="btn btn-warning ms-2">
-                            <i class="fas fa-edit me-1"></i> Edit Template
+                        <a href="{{ route('templates.edit', $template->id) }}" class="btn btn-primary btn-sm me-2">
+                            <i class="ti ti-edit me-1"></i> Edit
                         </a>
                         @endif
+                        <a href="{{ route('templates.download', $template->id) }}" class="btn btn-success btn-sm">
+                            <i class="ti ti-download me-1"></i> Download
+                        </a>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-4">
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <h5>Informasi Template</h5>
-                            <table class="table table-bordered">
+                            <table class="table table-sm table-borderless">
                                 <tr>
-                                    <th style="width: 150px;">Kriteria</th>
-                                    <td>{{ $template->kriteria->nama_kriteria ?? 'Tidak ada' }}</td>
+                                    <th width="150">Kriteria</th>
+                                    <td>{{ $template->kriteria->nama_kriteria }}</td>
                                 </tr>
                                 <tr>
                                     <th>Tahap PPEPP</th>
-                                    <td>
-                                        @php
-                                            $ppepp_labels = [
-                                                'penetapan' => 'Penetapan',
-                                                'pelaksanaan' => 'Pelaksanaan',
-                                                'evaluasi' => 'Evaluasi',
-                                                'pengendalian' => 'Pengendalian',
-                                                'peningkatan' => 'Peningkatan'
-                                            ];
-                                        @endphp
-                                        {{ $ppepp_labels[$template->ppepp_type] ?? $template->ppepp_type }}
-                                    </td>
+                                    <td>{{ $ppepp_types[$template->ppepp_type] }}</td>
                                 </tr>
                                 <tr>
                                     <th>Deskripsi</th>
-                                    <td>{{ $template->description ?? 'Tidak ada deskripsi' }}</td>
+                                    <td>{{ $template->description ?: 'Tidak ada deskripsi' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Dibuat Oleh</th>
-                                    <td>{{ $template->creator->name ?? 'Unknown' }}</td>
+                                    <th>Dibuat oleh</th>
+                                    <td>{{ $template->creator->nama }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Tanggal Dibuat</th>
-                                    <td>{{ $template->created_at->format('d-m-Y H:i') }}</td>
+                                    <th>Dibuat pada</th>
+                                    <td>{{ $template->created_at->format('d M Y H:i') }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Terakhir Diperbarui</th>
-                                    <td>{{ $template->updated_at->format('d-m-Y H:i') }}</td>
+                                    <th>Diperbarui pada</th>
+                                    <td>{{ $template->updated_at->format('d M Y H:i') }}</td>
                                 </tr>
                             </table>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <h5>Preview Template</h5>
-                            <div class="border p-3 rounded">
-                                <div class="template-preview">
-                                    {!! $template->content !!}
-                                </div>
-                            </div>
+                    <hr>
+                    <div class="row mt-4">
+                        <div class="col-12 d-flex justify-content-between">
+                            <p class="text-muted">Template ini hanya dapat dilihat setelah diunduh sebagai dokumen Word.</p>
+                            <a href="{{ route('templates.index') }}" class="btn btn-secondary">Kembali</a>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer">
-                    <a href="{{ route('templates.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Kembali
-                    </a>
                 </div>
             </div>
         </div>
