@@ -27,31 +27,39 @@
 
 <nav class="nav flex-column sidebar-nav">
     <a class="nav-link" href="{{ route('dashboard') }}">
-<i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-</a>
+        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+    </a>
 </nav>
+
 <div class="container-fluid px-4 py-4">
     <div class="row">
         <!-- Sidebar -->
         <div class="col-lg-3">
             <div class="card shadow-sm rounded-lg border-0">
-                <div class="card-body p-0">
+                <div class="card-body p-0" style="background-color: transparent">
                     <div class="profile-sidebar text-center py-4">
-                        <div class="avatar-wrapper mx-auto mb-3">
-                            <img src="{{ asset('assets/images/profile/profile.png') }}" 
-                            class="rounded-circle shadow" 
-                            width="200" 
-                            height="200"
-                            alt="Admin Avatar">
+                        <div class="avatar-wrapper mx-auto mb-3 position-relative">
+                            <form action="{{ route('profile.upload') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <label for="profile_photo" class="d-block mb-0" style="position: relative; display: inline-block;">
+                                    <img src="{{ $user->photo ? asset('storage/profile/' . $user->photo) : asset('assets/images/profile/profile.png') }}"
+                                         class="rounded-circle shadow mb-2"
+                                         width="250"
+                                         height="250"
+                                         alt="Profile Photo"
+                                         style="cursor: pointer; object-fit: cover;">
+                                    <!-- Camera Icon Overlay -->
+                                    <div class="camera-icon position-absolute" title="Ganti Foto">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                </label>
+                                <input type="file" id="profile_photo" name="profile_photo" class="d-none" onchange="this.form.submit()">
+                            </form>
                             <div class="status-indicator bg-success"></div>
                         </div>
-                        {{-- <h5 class="mb-1">Administrator</h5>
-                        <p class="text-muted small mb-3">Super Admin</p> --}}
                         <h5 class="mb-1">{{ $user->nama }}</h5>
                         <p class="text-muted small mb-3">{{ ucfirst($user->role) }}</p>
-
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -80,7 +88,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="info-card mb-4 p-4 rounded-lg border">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="icon-circle bg-primary-light text-primary me-3">
@@ -106,7 +113,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="info-card mb-4 p-4 rounded-lg border">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="icon-circle bg-primary-light text-primary me-3">
@@ -116,9 +122,6 @@
                                         <h6 class="mb-0 text-muted small">Password</h6>
                                         <div class="d-flex align-items-center">
                                             <h5 class="mb-0 me-3">{{ str_repeat('•', 10) }}</h5>
-                                            {{-- <button class="btn btn-sm btn-outline-primary rounded-pill">
-                                                Change
-                                            </button> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -144,18 +147,18 @@
     .card:hover {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
     }
-    
+
     /* Sidebar styling */
     .profile-sidebar {
         background-color: #fff;
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-    
+
     .avatar-wrapper {
         position: relative;
         width: fit-content;
     }
-    
+
     .status-indicator {
         position: absolute;
         bottom: 10px;
@@ -165,46 +168,67 @@
         border-radius: 50%;
         border: 2px solid #fff;
     }
-    
+
+    .camera-icon {
+        bottom: 15px;
+        right: 15px;
+        background-color: #ffffff;
+        border-radius: 50%;
+        padding: 6px;
+        font-size: 14px;
+        color: #333;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        cursor: pointer;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-wrapper:hover .camera-icon {
+        background-color: #f0f0f0;
+    }
+
     .sidebar-nav {
         padding: 1rem 0;
     }
-    
+
     .sidebar-nav .nav-link {
         padding: 0.75rem 1.5rem;
         color: #495057;
         border-left: 3px solid transparent;
         transition: all 0.3s ease;
     }
-    
+
     .sidebar-nav .nav-link:hover {
         background-color: rgba(0, 123, 255, 0.05);
         color: #0d6efd;
     }
-    
+
     .sidebar-nav .nav-link.active {
         background-color: rgba(0, 123, 255, 0.1);
         color: #0d6efd;
         border-left: 3px solid #0d6efd;
         font-weight: 500;
     }
-    
+
     .sidebar-nav .nav-link i {
         width: 20px;
         text-align: center;
     }
-    
+
     /* Content styling */
     .info-card {
         transition: all 0.3s ease;
         background-color: #fff;
     }
-    
+
     .info-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
-    
+
     .icon-circle {
         width: 40px;
         height: 40px;
@@ -213,11 +237,11 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .bg-primary-light {
         background-color: rgba(13, 110, 253, 0.1);
     }
-    
+
     /* Responsive adjustments */
     @media (max-width: 991.98px) {
         .sidebar-nav .nav-link {

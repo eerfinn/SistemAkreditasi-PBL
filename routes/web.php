@@ -54,9 +54,9 @@ Route::middleware('auth')->group(function () {
     | Profile Routes
     |--------------------------------------------------------------------------
     */
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
-
+ Route::get('/profile', [ProfileController::class, 'index']);  
+Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
+Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
     /*
     |--------------------------------------------------------------------------
     | Administrator Routes
