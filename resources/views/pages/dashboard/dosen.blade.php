@@ -823,70 +823,74 @@
 
     <!-- Main Content Row 1 -->
     <div class="row">
-        <!-- Tasks Not Finished -->
-        <div class="col-xl-4 col-lg-6 col-sm-6 mb-4">
-            <div class="card h-100">
-                <div class="card-body depostit-card">
-                    <div class="depostit-card-media d-flex justify-content-between style-1">
-                        <div>
-                            <h6>Tugas Belum Selesai</h6>
-                            <h3>{{ $pendingDocuments + $revisionDocuments }}</h3>
+        <!-- Left Column -->
+        <div class="col-xl-8">
+            <!-- Row for Tugas & Status -->
+            <div class="row">
+                <!-- Tasks Not Finished -->
+                <div class="col-xl-6 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body depostit-card">
+                            <div class="depostit-card-media d-flex justify-content-between style-1">
+                                <div>
+                                    <h6>Tugas Belum Selesai</h6>
+                                    <h3>{{ $pendingDocuments + $revisionDocuments }}</h3>
+                                </div>
+                                <div class="icon-box bg-secondary">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"
+                                            fill="#FF9F00" />
+                                        <path d="M10 8h4v2h-4zm0 4h4v2h-4z" fill="#FF9F00" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="progress-box mt-0">
+                                <div class="d-flex justify-content-between">
+                                    <p class="mb-0">Dokumen Terselesaikan</p>
+                                    <p class="mb-0">{{ $verifiedDocuments }}/{{ $totalDocuments }}</p>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-secondary"
+                                        style="width:{{ $totalDocuments > 0 ? ($verifiedDocuments / $totalDocuments) * 100 : 0 }}%; height:5px; border-radius:4px;"
+                                        role="progressbar"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="icon-box bg-secondary">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"
-                                    fill="#FF9F00" />
-                                <path d="M10 8h4v2h-4zm0 4h4v2h-4z" fill="#FF9F00" />
-                            </svg>
-                        </div>
-
                     </div>
-                    <div class="progress-box mt-0">
-                        <div class="d-flex justify-content-between">
-                            <p class="mb-0">Dokumen Terselesaikan</p>
-                            <p class="mb-0">{{ $verifiedDocuments }}/{{ $totalDocuments }}</p>
+                </div>
+
+                <!-- Document Status Chart -->
+                <div class="col-xl-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h4 class="card-title">Status Dokumen</h4>
                         </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-secondary"
-                                style="width:{{ $totalDocuments > 0 ? ($verifiedDocuments / $totalDocuments) * 100 : 0 }}%; height:5px; border-radius:4px;"
-                                role="progressbar"></div>
+                        <div class="card-body d-flex align-items-center justify-content-center">
+                            <div id="documentStatusChart" style="width: 100%; height: 200px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Progress Chart -->
+            <div class="row">
+                <div class="col-xl-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h4 class="card-title">Progress Dokumen PPEPP</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="documentProgressChart" style="width: 100%; height: 300px;"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Document Status Chart -->
-        <div class="col-xl-8 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h4 class="card-title">Status Dokumen</h4>
-                </div>
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <div id="documentStatusChart" style="width: 100%; height: 300px;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content Row 2 -->
-    <div class="row">
-        <!-- Document Progress Chart -->
-        <div class="col-xl-8 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h4 class="card-title">Progress Dokumen PPEPP</h4>
-                </div>
-                <div class="card-body">
-                    <div id="documentProgressChart" style="width: 100%; height: 350px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Calendar and Events -->
-        <div class="col-xl-4 mb-4">
+        <!-- Right Column - Calendar and Events -->
+        <div class="col-xl-4 col-lg-6 mb-4">
             <div class="card my-calendar h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Events</h4>
@@ -1623,7 +1627,7 @@
                 if (totalDocs === 0) {
                     $('#documentStatusChart').html(
                         '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>'
-                        );
+                    );
                     return;
                 }
 
@@ -1745,7 +1749,7 @@
                 if (!hasData) {
                     $('#documentProgressChart').html(
                         '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>'
-                        );
+                    );
                     return;
                 }
 

@@ -297,7 +297,7 @@
         </div>
         <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
             <div class="card stat-card">
-                <div class="card-body">
+            <div class="card-body">
                     <div class="stat-icon warning">
                         <i class="fas fa-clock"></i>
                     </div>
@@ -340,14 +340,14 @@
                                     d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"
                                     fill="#FF9F00" />
                                 <path d="M10 8h4v2h-4zm0 4h4v2h-4z" fill="#FF9F00" />
-                            </svg>
-                        </div>
-                    </div>
+                                    </svg>
+                                </div>
+                                </div>
                     <div class="progress-box mt-0">
                         <div class="d-flex justify-content-between">
                             <p class="mb-0">Dokumen Terselesaikan</p>
                             <p class="mb-0">{{ $verifiedDocuments }}/{{ $totalDocuments }}</p>
-                        </div>
+                            </div>
                         <div class="progress">
                             <div class="progress-bar bg-secondary"
                                 style="width:{{ $totalDocuments > 0 ? ($verifiedDocuments / $totalDocuments) * 100 : 0 }}%; height:5px; border-radius:4px;"
@@ -387,12 +387,12 @@
                                             <div class="event-actions">
                                                 <span class="event-time bg-light">{{ $task['rawTime'] }}</span>
                                             </div>
-                                        </div>
+                                </div>
                                     @endforeach
                                 @else
                                     <div class="text-center p-3">
                                         <p class="text-muted mb-0">Belum ada events yang dibuat.</p>
-                                    </div>
+                                </div>
                                 @endif
                             </div>
                         </div>
