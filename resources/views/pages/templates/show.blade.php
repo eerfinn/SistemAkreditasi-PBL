@@ -72,11 +72,11 @@ $ppepp_types = [
                                 </tr>
                                 <tr>
                                     <th>Dibuat pada</th>
-                                    <td>{{ $template->created_at->format('d M Y H:i') }}</td>
+                                    <td>{{ $template->created_at->setTimezone('Asia/Jakarta')->format('d M Y H:i') }} WIB</td>
                                 </tr>
                                 <tr>
                                     <th>Diperbarui pada</th>
-                                    <td>{{ $template->updated_at->format('d M Y H:i') }}</td>
+                                    <td>{{ $template->updated_at->setTimezone('Asia/Jakarta')->format('d M Y H:i') }} WIB</td>
                                 </tr>
                             </table>
                         </div>

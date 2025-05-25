@@ -81,8 +81,8 @@
                                         @endphp
                                         {{ $ppepp_labels[$template->ppepp_type] ?? $template->ppepp_type }}
                                     </td>
-                                    <td>{{ $template->creator->name ?? 'Unknown' }}</td>
-                                    <td>{{ $template->created_at->format('d-m-Y H:i') }}</td>
+                                    <td>{{ $template->creator->nama ?? 'Unknown' }}</td>
+                                    <td>{{ $template->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB</td>
                                     <td>
                                         <div class="d-flex">
                                             <a href="{{ route('templates.show', $template->id) }}" class="btn btn-info btn-sm me-1" title="Lihat">
@@ -136,9 +136,16 @@
                 paginate: {
                     first: "Pertama",
                     last: "Terakhir",
-                    next: "Selanjutnya",
-                    previous: "Sebelumnya"
+                    next: "<i class='fas fa-chevron-right'></i>",
+                    previous: "<i class='fas fa-chevron-left'></i>"
                 }
+            },
+            drawCallback: function() {
+                $('.paginate_button.page-item').addClass('m-1');
+                $('.paginate_button.page-item.previous').removeClass('disabled').addClass('btn btn-sm btn-primary');
+                $('.paginate_button.page-item.next').removeClass('disabled').addClass('btn btn-sm btn-primary');
+                $('.paginate_button.page-item:not(.previous):not(.next)').addClass('btn btn-sm btn-outline-primary');
+                $('.paginate_button.page-item.active').removeClass('btn-outline-primary').addClass('btn-primary');
             }
         });
     });
