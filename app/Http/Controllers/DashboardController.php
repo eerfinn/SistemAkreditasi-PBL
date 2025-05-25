@@ -55,9 +55,84 @@ class DashboardController extends Controller
      */
     protected function administratorData()
     {
+        $user = auth()->user();
+
+        // Hitung total dokumen dan dokumen berdasarkan status
+        $totalDocuments = Dokumen::count();
+        $verifiedDocuments = Dokumen::where('status', Dokumen::STATUS_DIVERIFIKASI)->count();
+        $pendingDocuments = Dokumen::where('status', Dokumen::STATUS_MENUNGGU)->count();
+        $revisionDocuments = Dokumen::where('status', Dokumen::STATUS_REVISI)->count();
+        $draftDocuments = Dokumen::where('status', Dokumen::STATUS_DRAFT)->count();
+
+        // Hitung statistik PPEPP untuk semua dokumen
+        $ppepp_stages = [
+            Dokumen::PPEPP_PENETAPAN,
+            Dokumen::PPEPP_PELAKSANAAN,
+            Dokumen::PPEPP_EVALUASI,
+            Dokumen::PPEPP_PENGENDALIAN,
+            Dokumen::PPEPP_PENINGKATAN
+        ];
+
+        $ppepp_verified = [];
+        $ppepp_total = [];
+
+        foreach ($ppepp_stages as $stage) {
+            $verified = Dokumen::where('jenis_ppepp', $stage)
+                        ->where('status', Dokumen::STATUS_DIVERIFIKASI)
+                        ->count();
+
+            $total = Dokumen::where('jenis_ppepp', $stage)->count();
+
+            $ppepp_verified[] = $verified;
+            $ppepp_total[] = $total;
+        }
+
+        // Hitung jumlah pengguna per role
+        $admin_count = User::where('role', 'administrator')->count();
+        $dosen1_count = User::where('role', 'dosen1')->count();
+        $dosen2_count = User::where('role', 'dosen2')->count();
+        $dosen3_count = User::where('role', 'dosen3')->count();
+        $koordinator_count = User::where('role', 'koordinator')->count();
+        $kjm_count = User::where('role', 'kjm')->count();
+        $kaprodi_count = User::where('role', 'kaprodi')->count();
+        $kajur_count = User::where('role', 'kajur')->count();
+
+        // Ambil tugas-tugas terbaru (maksimal 5)
+        $latestTasks = \App\Models\DaftarTugas::orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function($task) {
+                $tanggal = Carbon::parse($task->tanggal);
+                return [
+                    'id' => $task->id,
+                    'title' => $task->judul,
+                    'status' => $task->status,
+                    'date' => $tanggal->format('d M Y'),
+                    'rawDate' => $tanggal->format('Y-m-d'),
+                    'rawTime' => substr($task->waktu, 0, 5),
+                    'user' => User::find($task->user_id)->nama ?? 'Unknown'
+                ];
+            });
+
         return [
+            'user' => $user,
             'total_users' => User::count(),
-            'user' => auth()->user()
+            'totalDocuments' => $totalDocuments,
+            'verifiedDocuments' => $verifiedDocuments,
+            'pendingDocuments' => $pendingDocuments,
+            'revisionDocuments' => $revisionDocuments,
+            'draftDocuments' => $draftDocuments,
+            'ppepp_verified' => $ppepp_verified ?: [0, 0, 0, 0, 0],
+            'ppepp_total' => $ppepp_total ?: [0, 0, 0, 0, 0],
+            'admin_count' => $admin_count,
+            'dosen1_count' => $dosen1_count,
+            'dosen2_count' => $dosen2_count,
+            'dosen3_count' => $dosen3_count,
+            'koordinator_count' => $koordinator_count,
+            'kjm_count' => $kjm_count,
+            'kaprodi_count' => $kaprodi_count,
+            'kajur_count' => $kajur_count,
+            'latestTasks' => $latestTasks
         ];
     }
 
