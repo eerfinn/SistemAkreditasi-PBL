@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('type')->nullable(); // dokumen, komen, validasi, etc
             $table->unsignedBigInteger('dokumen_id')->nullable();
             $table->foreign('dokumen_id')->references('id')->on('dokumen')->onDelete('cascade');
-            $table->foreignId('kriteria_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('kriteria_id')->nullable()->references('id')->on('kriteria')->onDelete('cascade');
             $table->string('icon')->default('fa-bell');
             $table->string('color')->default('primary'); // primary, success, warning, danger
             $table->boolean('is_read')->default(false);
