@@ -54,13 +54,31 @@ class TemplateController extends Controller
      */
     public function create()
     {
-        // Hanya admin yang bisa membuat template
-        if (Auth::user()->role !== 'administrator') {
+        $user = Auth::user();
+        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+
+        // Cek apakah user memiliki izin untuk membuat template
+        if (!in_array($user->role, $allowedRoles)) {
             return redirect()->route('templates.index')
                 ->with('error', 'Anda tidak memiliki izin untuk membuat template.');
         }
 
-        $kriteria = Kriteria::all();
+        // Tentukan kriteria yang bisa diakses oleh user
+        if ($user->role === 'administrator') {
+            $kriteria = Kriteria::all();
+        } else {
+            $allowedKriteriaIds = [];
+            if ($user->role === 'dosen1') {
+                $allowedKriteriaIds = [1, 2, 3];
+            } elseif ($user->role === 'dosen2') {
+                $allowedKriteriaIds = [4, 5, 6];
+            } elseif ($user->role === 'dosen3') {
+                $allowedKriteriaIds = [7, 8, 9];
+            }
+
+            $kriteria = Kriteria::whereIn('id', $allowedKriteriaIds)->get();
+        }
+
         $ppepp_types = [
             'penetapan' => 'Penetapan',
             'pelaksanaan' => 'Pelaksanaan',
@@ -77,8 +95,11 @@ class TemplateController extends Controller
      */
     public function store(Request $request)
     {
-        // Hanya admin yang bisa membuat template
-        if (Auth::user()->role !== 'administrator') {
+        $user = Auth::user();
+        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+
+        // Cek apakah user memiliki izin untuk membuat template
+        if (!in_array($user->role, $allowedRoles)) {
             return redirect()->route('templates.index')
                 ->with('error', 'Anda tidak memiliki izin untuk membuat template.');
         }
@@ -90,6 +111,24 @@ class TemplateController extends Controller
             'kriteria_id' => 'required|exists:kriteria,id',
             'ppepp_type' => 'required|in:penetapan,pelaksanaan,evaluasi,pengendalian,peningkatan',
         ]);
+
+        // Validasi tambahan untuk memastikan dosen hanya membuat template untuk kriteria yang mereka akses
+        if ($user->role !== 'administrator') {
+            $allowedKriteriaIds = [];
+            if ($user->role === 'dosen1') {
+                $allowedKriteriaIds = [1, 2, 3];
+            } elseif ($user->role === 'dosen2') {
+                $allowedKriteriaIds = [4, 5, 6];
+            } elseif ($user->role === 'dosen3') {
+                $allowedKriteriaIds = [7, 8, 9];
+            }
+
+            if (!in_array($validated['kriteria_id'], $allowedKriteriaIds)) {
+                return redirect()->route('templates.create')
+                    ->with('error', 'Anda hanya dapat membuat template untuk kriteria yang ditugaskan kepada Anda.')
+                    ->withInput();
+            }
+        }
 
         $template = new Template($validated);
         $template->created_by = Auth::id();
@@ -132,13 +171,48 @@ class TemplateController extends Controller
      */
     public function edit(Template $template)
     {
-        // Hanya admin yang bisa mengedit template
-        if (Auth::user()->role !== 'administrator') {
+        $user = Auth::user();
+        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+
+        // Cek apakah user memiliki izin untuk mengedit template
+        if (!in_array($user->role, $allowedRoles)) {
             return redirect()->route('templates.index')
                 ->with('error', 'Anda tidak memiliki izin untuk mengedit template.');
         }
 
-        $kriteria = Kriteria::all();
+        // Jika bukan admin, cek apakah template ini berada dalam kriteria yang bisa diakses
+        if ($user->role !== 'administrator') {
+            $allowedKriteriaIds = [];
+            if ($user->role === 'dosen1') {
+                $allowedKriteriaIds = [1, 2, 3];
+            } elseif ($user->role === 'dosen2') {
+                $allowedKriteriaIds = [4, 5, 6];
+            } elseif ($user->role === 'dosen3') {
+                $allowedKriteriaIds = [7, 8, 9];
+            }
+
+            if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
+                return redirect()->route('templates.index')
+                    ->with('error', 'Anda hanya dapat mengedit template untuk kriteria yang ditugaskan kepada Anda.');
+            }
+        }
+
+        // Tentukan kriteria yang bisa diakses oleh user
+        if ($user->role === 'administrator') {
+            $kriteria = Kriteria::all();
+        } else {
+            $allowedKriteriaIds = [];
+            if ($user->role === 'dosen1') {
+                $allowedKriteriaIds = [1, 2, 3];
+            } elseif ($user->role === 'dosen2') {
+                $allowedKriteriaIds = [4, 5, 6];
+            } elseif ($user->role === 'dosen3') {
+                $allowedKriteriaIds = [7, 8, 9];
+            }
+
+            $kriteria = Kriteria::whereIn('id', $allowedKriteriaIds)->get();
+        }
+
         $ppepp_types = [
             'penetapan' => 'Penetapan',
             'pelaksanaan' => 'Pelaksanaan',
@@ -155,10 +229,30 @@ class TemplateController extends Controller
      */
     public function update(Request $request, Template $template)
     {
-        // Hanya admin yang bisa memperbarui template
-        if (Auth::user()->role !== 'administrator') {
+        $user = Auth::user();
+        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+
+        // Cek apakah user memiliki izin untuk memperbarui template
+        if (!in_array($user->role, $allowedRoles)) {
             return redirect()->route('templates.index')
                 ->with('error', 'Anda tidak memiliki izin untuk memperbarui template.');
+        }
+
+        // Jika bukan admin, cek apakah template ini berada dalam kriteria yang bisa diakses
+        if ($user->role !== 'administrator') {
+            $allowedKriteriaIds = [];
+            if ($user->role === 'dosen1') {
+                $allowedKriteriaIds = [1, 2, 3];
+            } elseif ($user->role === 'dosen2') {
+                $allowedKriteriaIds = [4, 5, 6];
+            } elseif ($user->role === 'dosen3') {
+                $allowedKriteriaIds = [7, 8, 9];
+            }
+
+            if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
+                return redirect()->route('templates.index')
+                    ->with('error', 'Anda hanya dapat memperbarui template untuk kriteria yang ditugaskan kepada Anda.');
+            }
         }
 
         $validated = $request->validate([
@@ -168,6 +262,24 @@ class TemplateController extends Controller
             'kriteria_id' => 'required|exists:kriteria,id',
             'ppepp_type' => 'required|in:penetapan,pelaksanaan,evaluasi,pengendalian,peningkatan',
         ]);
+
+        // Validasi tambahan untuk memastikan dosen hanya memperbarui template ke kriteria yang mereka akses
+        if ($user->role !== 'administrator') {
+            $allowedKriteriaIds = [];
+            if ($user->role === 'dosen1') {
+                $allowedKriteriaIds = [1, 2, 3];
+            } elseif ($user->role === 'dosen2') {
+                $allowedKriteriaIds = [4, 5, 6];
+            } elseif ($user->role === 'dosen3') {
+                $allowedKriteriaIds = [7, 8, 9];
+            }
+
+            if (!in_array($validated['kriteria_id'], $allowedKriteriaIds)) {
+                return redirect()->route('templates.edit', $template)
+                    ->with('error', 'Anda hanya dapat memperbarui template untuk kriteria yang ditugaskan kepada Anda.')
+                    ->withInput();
+            }
+        }
 
         $template->update($validated);
 
@@ -180,10 +292,37 @@ class TemplateController extends Controller
      */
     public function destroy(Template $template)
     {
-        // Hanya admin yang bisa menghapus template
-        if (Auth::user()->role !== 'administrator') {
+        $user = Auth::user();
+        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+
+        // Cek apakah user memiliki izin untuk menghapus template
+        if (!in_array($user->role, $allowedRoles)) {
             return redirect()->route('templates.index')
                 ->with('error', 'Anda tidak memiliki izin untuk menghapus template.');
+        }
+
+        // Jika bukan admin, cek apakah template ini berada dalam kriteria yang bisa diakses
+        // dan apakah template ini dibuat oleh user tersebut
+        if ($user->role !== 'administrator') {
+            $allowedKriteriaIds = [];
+            if ($user->role === 'dosen1') {
+                $allowedKriteriaIds = [1, 2, 3];
+            } elseif ($user->role === 'dosen2') {
+                $allowedKriteriaIds = [4, 5, 6];
+            } elseif ($user->role === 'dosen3') {
+                $allowedKriteriaIds = [7, 8, 9];
+            }
+
+            if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
+                return redirect()->route('templates.index')
+                    ->with('error', 'Anda hanya dapat menghapus template untuk kriteria yang ditugaskan kepada Anda.');
+            }
+
+            // Tambahan: Dosen hanya bisa menghapus template yang mereka buat
+            if ($template->created_by !== $user->id) {
+                return redirect()->route('templates.index')
+                    ->with('error', 'Anda hanya dapat menghapus template yang Anda buat.');
+            }
         }
 
         $template->delete();

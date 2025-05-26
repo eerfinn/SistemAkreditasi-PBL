@@ -39,7 +39,30 @@ $ppepp_types = [
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">{{ $template->name }}</h4>
                     <div>
-                        @if(auth()->user()->role === 'administrator')
+                        @php
+                            $user = auth()->user();
+                            $canEdit = false;
+
+                            if ($user->role === 'administrator') {
+                                $canEdit = true;
+                            } else if (in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
+                                // Cek apakah template ini berada dalam kriteria yang bisa diakses oleh user
+                                $allowedKriteriaIds = [];
+                                if ($user->role === 'dosen1') {
+                                    $allowedKriteriaIds = [1, 2, 3];
+                                } elseif ($user->role === 'dosen2') {
+                                    $allowedKriteriaIds = [4, 5, 6];
+                                } elseif ($user->role === 'dosen3') {
+                                    $allowedKriteriaIds = [7, 8, 9];
+                                }
+
+                                if (in_array($template->kriteria_id, $allowedKriteriaIds)) {
+                                    $canEdit = true;
+                                }
+                            }
+                        @endphp
+
+                        @if($canEdit)
                         <a href="{{ route('templates.edit', $template->id) }}" class="btn btn-primary btn-sm me-2">
                             <i class="ti ti-edit me-1"></i> Edit
                         </a>
