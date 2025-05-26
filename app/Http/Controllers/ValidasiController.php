@@ -100,7 +100,7 @@ class ValidasiController extends Controller
 
         $statusMessages = [
             Dokumen::STATUS_REVISI => 'Dokumen dikembalikan untuk revisi.',
-            Dokumen::STATUS_DIVERIFIKASI => 'Dokumen telah diverifikasi final.'
+            Dokumen::STATUS_DIVERIFIKASI => 'Dokumen telah diverifikasi.'
         ];
 
         return redirect()->back()->with('success', $statusMessages[$request->status]);

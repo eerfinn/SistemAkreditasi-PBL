@@ -9,7 +9,6 @@ use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\DaftarTugasController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\KriteriaManagementController;
 use App\Http\Controllers\TemplateController;
 /*
 |--------------------------------------------------------------------------
@@ -127,11 +126,19 @@ Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('prof
     Route::controller(KriteriaController::class)->prefix('kriteria')->name('kriteria.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{kriteria}', 'show')->name('show');
-        Route::get('/{kriteria}/upload', 'uploadForm')->name('upload.form')->middleware('kriteria.access');
+        Route::get('/{kriteria}/upload/{ppepp}', 'uploadForm')->name('upload.form')->middleware('kriteria.access');
         Route::get('/{kriteria}/kelola', 'kelola')->name('kelola')->middleware('kriteria.access');
-        Route::post('/{kriteria}/finalisasi', 'finalisasiDokumen')->name('finalisasi')->middleware('kriteria.access');
+        Route::post('/{kriteria}/finalisasi', 'finalisasi')->name('finalisasi')->middleware('kriteria.access');
         Route::put('/{kriteria}/description/{ppepp}', 'updateDescription')->name('update.description');
         Route::delete('/{kriteria}/description/{ppepp}', 'deleteDescription')->name('delete.description');
+        Route::post('/upload/store', 'storeDocument')->name('upload.store');
+        Route::delete('/upload/draft/{dokumen}', 'destroyDraft')->name('upload.destroyDraft');
+        
+        // Validation routes - admin only
+        Route::middleware('role:administrator')->group(function() {
+            Route::get('/validasi/{id}', 'validasi')->name('validasi');
+            Route::post('/validasi/process/{dokumen}', 'processValidasi')->name('validasi.process');
+        });
     });
 
     /*
@@ -155,21 +162,5 @@ Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('prof
         Route::put('/{id}', [DaftarTugasController::class, 'update'])->name('update');
         Route::patch('/{id}/status', [DaftarTugasController::class, 'updateStatus'])->name('update.status');
         Route::delete('/{id}', [DaftarTugasController::class, 'destroy'])->name('destroy');
-    });
-});
-
-// Admin Kriteria Management Routes
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::prefix('kriteria-management')->name('kriteria-management.')->group(function () {
-        // Upload routes
-        Route::get('upload/{id}', [KriteriaManagementController::class, 'upload'])->name('upload');
-        Route::get('upload/{id}/form', [KriteriaManagementController::class, 'uploadForm'])->name('upload.form');
-        Route::post('upload/store', [KriteriaManagementController::class, 'storeDocument'])->name('upload.store');
-        Route::post('upload/finalisasi/{id}', [KriteriaManagementController::class, 'finalisasi'])->name('upload.finalisasi');
-        Route::delete('upload/draft/{dokumen}', [KriteriaManagementController::class, 'destroyDraft'])->name('upload.destroyDraft');
-
-        // Validasi routes
-        Route::get('validasi/{id}', [KriteriaManagementController::class, 'validasi'])->name('validasi');
-        Route::post('validasi/process/{dokumen}', [KriteriaManagementController::class, 'processValidasi'])->name('validasi.process');
     });
 });

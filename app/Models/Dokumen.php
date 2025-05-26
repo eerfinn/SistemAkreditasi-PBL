@@ -15,7 +15,6 @@ class Dokumen extends Model
     public const STATUS_DRAFT = 'draft';
     public const STATUS_MENUNGGU = 'menunggu';
     public const STATUS_REVISI = 'revisi';
-    public const STATUS_DITERIMA = 'diterima';
     public const STATUS_DIVERIFIKASI = 'diverifikasi';
 
     public const PPEPP_PENETAPAN = 'penetapan';

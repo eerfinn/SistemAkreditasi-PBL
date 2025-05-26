@@ -24,7 +24,7 @@ return new class extends Migration
                   ->nullable()
                   ->comment('Tahapan PPEPP: ' . implode(', ', $ppepp_values));
 
-            $status_values = ['draft', 'menunggu', 'revisi', 'diterima', 'diverifikasi'];
+            $status_values = ['draft', 'menunggu', 'revisi', 'diverifikasi'];
             $table->enum('status', $status_values)
                   ->default('draft')
                   ->comment('Status alur kerja dokumen: ' . implode(', ', $status_values));

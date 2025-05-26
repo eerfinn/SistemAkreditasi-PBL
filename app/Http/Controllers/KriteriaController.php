@@ -6,8 +6,8 @@ use App\Models\Kriteria;
 use App\Models\Dokumen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class KriteriaController extends Controller
 {
@@ -17,186 +17,137 @@ class KriteriaController extends Controller
         $this->middleware('kriteria.access')->only(['show', 'uploadForm', 'finalisasiDokumen']);
     }
 
-    public function show(Kriteria $kriteria)
+    /**
+     * Display a listing of all kriteria.
+     */
+    public function index()
+    {
+        $kriteria = Kriteria::all();
+        return view('pages.kriteria.index', compact('kriteria'));
+    }
+
+    /**
+     * Show the detail of a specific kriteria
+     */
+    public function show($id, Request $request)
     {
         $user = Auth::user();
+        $kriteria = Kriteria::findOrFail($id);
+        $selected_ppepp = $request->query('ppepp', 'penetapan'); // Default to penetapan if not specified
+
+        $ppepp_labels = [
+            'penetapan' => 'C1. Penetapan',
+            'pelaksanaan' => 'C2. Pelaksanaan',
+            'evaluasi' => 'C3. Evaluasi',
+            'pengendalian' => 'C4. Pengendalian',
+            'peningkatan' => 'C5. Peningkatan'
+        ];
+
+        // Get existing documents for all PPEPP stages
         $dokumenPerPPEPP = [];
-        $totalDrafts = 0;
-
-        $ppepp_stages = [
-            Dokumen::PPEPP_PENETAPAN,
-            Dokumen::PPEPP_PELAKSANAAN,
-            Dokumen::PPEPP_EVALUASI,
-            Dokumen::PPEPP_PENGENDALIAN,
-            Dokumen::PPEPP_PENINGKATAN
-        ];
-
-        // Debugging data retrieval
-        Log::info('Retrieving documents for kriteria', [
-            'kriteria_id' => $kriteria->id,
-            'user_id' => $user ? $user->id : 'guest',
-            'user_role' => $user ? $user->role : 'guest'
-        ]);
-
-        // Mengambil dokumen yang dikelompokkan per tahap PPEPP
-        if ($user && in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator'])) {
-            foreach ($ppepp_stages as $stage) {
-                // Get all documents for the kriteria, regardless of user
+        foreach (array_keys($ppepp_labels) as $stage) {
                 $query = Dokumen::where('kriteria_id', $kriteria->id)
                     ->where('jenis_ppepp', $stage)
                     ->whereNotNull('path') // Only get actual documents, not descriptions
-                    ->orderByRaw("FIELD(status, '".Dokumen::STATUS_DRAFT."', '".Dokumen::STATUS_REVISI."',
-                               '".Dokumen::STATUS_MENUNGGU."', '".Dokumen::STATUS_DITERIMA."',
-                               '".Dokumen::STATUS_DIVERIFIKASI."') ASC")
-                    ->orderBy('updated_at', 'desc');
+                ->with('user'); // Eager load the user relationship
 
-                $dokumenCollection = $query->get();
-
-                Log::info("Documents for stage {$stage}", [
-                    'count' => $dokumenCollection->count(),
-                    'sql' => $query->toSql(),
-                    'bindings' => $query->getBindings()
-                ]);
-
-                $dokumenPerPPEPP[$stage] = $dokumenCollection;
-                $draftCount = $dokumenCollection->where('status', Dokumen::STATUS_DRAFT)->count();
-                if ($draftCount > 0) {
-                    $totalDrafts++;
-                }
-            }
-        } else {
-            foreach ($ppepp_stages as $stage) {
-                $query = Dokumen::where('kriteria_id', $kriteria->id)
-                    ->where('jenis_ppepp', $stage)
-                    ->whereNotIn('status', [Dokumen::STATUS_DRAFT])
-                    ->whereNotNull('path') // Only get actual documents, not descriptions
-                    ->orderBy('updated_at', 'desc');
-
-                $dokumenCollection = $query->get();
-
-                Log::info("Documents for stage {$stage} (non-dosen)", [
-                    'count' => $dokumenCollection->count(),
-                    'sql' => $query->toSql(),
-                    'bindings' => $query->getBindings()
-                ]);
-
-                $dokumenPerPPEPP[$stage] = $dokumenCollection;
-            }
+            // Show all documents for admin, both admin-uploaded and user-uploaded
+            $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
-        // Load kriteria comments
-        $kriteriaComments = \App\Models\Komen::where('kriteria_id', $kriteria->id)
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        Log::info('Loaded kriteria comments', [
-            'kriteria_id' => $kriteria->id,
-            'comment_count' => $kriteriaComments->count()
-        ]);
-
-        // Log dokumen yang ditemukan untuk setiap tahap
-        foreach ($ppepp_stages as $stage) {
-            Log::info("Dokumen for {$stage}", [
-                'count' => isset($dokumenPerPPEPP[$stage]) ? $dokumenPerPPEPP[$stage]->count() : 0,
-                'dokumen_ids' => isset($dokumenPerPPEPP[$stage]) ? $dokumenPerPPEPP[$stage]->pluck('id')->toArray() : []
-            ]);
+        // Prepare data for the new view format with the needed structure for navigation
+        $allPpeppStagesWithData = [];
+        foreach ($ppepp_labels as $key => $label) {
+            $allPpeppStagesWithData[] = [
+                'key' => $key,
+                'label' => $label,
+                'route_kelola_tahap_ini' => route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => $key])
+            ];
         }
 
-        $statusQueryBaseFinal = Dokumen::where('kriteria_id', $kriteria->id)
-                                    ->where('status', '!=', Dokumen::STATUS_DRAFT);
-
-        $statusCounts = [
-            'menunggu'     => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_MENUNGGU)->count(),
-            'revisi'       => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_REVISI)->count(),
-            'diverifikasi' => (clone $statusQueryBaseFinal)->where('status', Dokumen::STATUS_DIVERIFIKASI)->count(),
-        ];
-
-        // Hitung semua dokumen draft
-        $dokumenDrafts = new \Illuminate\Database\Eloquent\Collection();
-        foreach ($dokumenPerPPEPP as $stageDokumen) {
-            $dokumenDrafts = $dokumenDrafts->concat($stageDokumen->where('status', Dokumen::STATUS_DRAFT));
-        }
-
-        // Daftar dokumen final (non-draft) untuk semua tahap
-        $daftarDokumenFinal = new \Illuminate\Database\Eloquent\Collection();
-        foreach ($dokumenPerPPEPP as $stageDokumen) {
-            $daftarDokumenFinal = $daftarDokumenFinal->concat($stageDokumen->where('status', '!=', Dokumen::STATUS_DRAFT));
-        }
-
-        if ($user && !in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator'])) {
-            $daftarDokumenFinal = Dokumen::where('kriteria_id', $kriteria->id)
-                                ->where('status', '!=', Dokumen::STATUS_DRAFT)
-                                ->whereNotNull('path') // Only get actual documents, not descriptions
-                                ->with('user')
-                                ->orderBy('jenis_ppepp')->orderBy('updated_at', 'desc')->get();
-        }
-
-        // Periksa apakah semua tahap PPEPP memiliki setidaknya satu dokumen draft
-        $bisaFinalisasi = true;
-        foreach ($ppepp_stages as $stage) {
-            $hasStageDocuments = $dokumenPerPPEPP[$stage]->where('status', Dokumen::STATUS_DRAFT)->count() > 0;
-            if (!$hasStageDocuments) {
-                $bisaFinalisasi = false;
-                break;
-            }
-        }
-
-        // Get descriptions from kriteria table
+        // Get descriptions for each PPEPP stage from kriteria table
         $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
 
-        // Check if there are any draft documents
-        $hasDraftDocuments = false;
-        foreach($dokumenPerPPEPP as $stageDocs) {
-            if(isset($stageDocs) && $stageDocs->where('status', \App\Models\Dokumen::STATUS_DRAFT)->count() > 0) {
-                $hasDraftDocuments = true;
-                break;
+        // Count documents by status
+        $statusCounts = [
+            'draft' => 0,
+            'menunggu' => 0,
+            'revisi' => 0,
+            'diterima' => 0,
+            'diverifikasi' => 0
+        ];
+
+        foreach ($dokumenPerPPEPP as $docs) {
+            foreach ($docs as $doc) {
+                if (isset($statusCounts[$doc->status])) {
+                    $statusCounts[$doc->status]++;
+                }
             }
         }
 
-        // Check if there are documents needing revision
-        $hasRevisionDocuments = isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0;
-
-        // Check if there are any documents at all in this kriteria
-        $hasAnyDocuments = false;
-        foreach($dokumenPerPPEPP as $stageDocs) {
-            if(isset($stageDocs) && count($stageDocs) > 0) {
-                $hasAnyDocuments = true;
-                break;
-            }
-        }
-
-        // Check if there are any finalized documents (menunggu/diverifikasi)
-        $hasFinalizedDocuments = isset($statusCounts) &&
-            (($statusCounts['menunggu'] ?? 0) > 0 ||
-             ($statusCounts['diverifikasi'] ?? 0) > 0);
-
-        // For dosen, we'll always allow them to manage documents
-        // The old logic that disabled the button is removed
-        $disableKelola = false;
-
-        return view('pages.kriteria.kriteria', [
-            'kriteria'         => $kriteria,
-            'dokumenPerPPEPP'  => $dokumenPerPPEPP,
-            'ppepp_stages'     => $ppepp_stages,
-            'statusCounts'     => $statusCounts,
-            'user'             => $user,
-            'bisaFinalisasi'   => $bisaFinalisasi,
-            'daftarDokumen'    => $daftarDokumenFinal,
-            'dokumenDrafts'    => $dokumenDrafts,
-            'showUploadButton' => $user && in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator']),
+        $viewData = [
+            'kriteria' => $kriteria,
+            'selected_ppepp' => $selected_ppepp,
+            'ppepp_labels' => $ppepp_labels,
+            'dokumenPerPPEPP' => $dokumenPerPPEPP,
             'ppepp_descriptions' => $ppepp_descriptions,
-            'kriteriaComments' => $kriteriaComments,
-            'disableKelola' => $disableKelola
+            'allPpeppStagesWithData' => $allPpeppStagesWithData,
+            'stageKey' => $selected_ppepp,
+            'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
+            'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect(),
+            'statusCounts' => $statusCounts,
+            'is_admin' => $user->role === 'administrator'
+        ];
+
+        return view('pages.kriteria.kriteria', $viewData);
+    }
+
+    /**
+     * Show the kelola (management) view for a kriteria
+     */
+    public function kelola($kriteria, Request $request)
+    {
+        $user = Auth::user();
+        $kriteria = Kriteria::findOrFail($kriteria);
+
+        $ppepp_labels = [
+            'penetapan' => 'C1. Penetapan',
+            'pelaksanaan' => 'C2. Pelaksanaan',
+            'evaluasi' => 'C3. Evaluasi',
+            'pengendalian' => 'C4. Pengendalian',
+            'peningkatan' => 'C5. Peningkatan'
+        ];
+
+        // Get documents for each PPEPP stage
+        $dokumenPerPPEPP = [];
+        foreach (array_keys($ppepp_labels) as $stage) {
+            $query = Dokumen::where('kriteria_id', $kriteria->id)
+                ->where('jenis_ppepp', $stage)
+                ->whereNotNull('path')
+                ->with('user');
+
+            $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
+        }
+
+        // Get descriptions for each PPEPP stage from kriteria table
+        $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
+
+        return view('pages.kriteria.kelola', [
+            'kriteria' => $kriteria,
+            'ppepp_labels' => $ppepp_labels,
+            'dokumenPerPPEPP' => $dokumenPerPPEPP,
+            'ppepp_descriptions' => $ppepp_descriptions,
         ]);
     }
 
-    public function uploadForm(Kriteria $kriteria, Request $request)
+    /**
+     * Show the form for uploading documents
+     */
+    public function uploadForm($kriteria, $ppepp, Request $request)
     {
         $user = Auth::user();
-        // Gate::authorize('upload-dokumen-kriteria', $kriteria);
-
-        $selected_ppepp = $request->query('ppepp', null); // Default to null if not specified
+        $kriteria = Kriteria::findOrFail($kriteria);
+        $selected_ppepp = $ppepp; // Use the provided PPEPP value
 
         $ppepp_labels = [
             'penetapan' => 'C1. Penetapan',
@@ -214,7 +165,7 @@ class KriteriaController extends Controller
                 ->whereNotNull('path') // Only get actual documents, not descriptions
                 ->with('user'); // Eager load the user relationship
 
-            // Show all documents for all users
+            // Show all documents
             $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
@@ -231,7 +182,6 @@ class KriteriaController extends Controller
         // Get descriptions for each PPEPP stage from kriteria table
         $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
 
-        // Common data array for both views
         $viewData = [
             'kriteria' => $kriteria,
             'selected_ppepp' => $selected_ppepp,
@@ -241,49 +191,193 @@ class KriteriaController extends Controller
             'allPpeppStagesWithData' => $allPpeppStagesWithData,
             'stageKey' => $selected_ppepp,
             'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
-            'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect()
+            'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect(),
+            'is_admin' => $user->role === 'administrator'
         ];
-
-        // Check if we should use the new view or existing one
-        if (view()->exists('pages.kriteria.upload-kriteria.form')) {
-            return view('pages.kriteria.upload-kriteria.form', $viewData);
-        }
-
-        if (!view()->exists('pages.kriteria.form')) {
-            abort(404, "View untuk form upload dokumen tidak ditemukan.");
-        }
 
         return view('pages.kriteria.form', $viewData);
     }
 
-    public function finalisasiDokumen(Request $request, Kriteria $kriteria)
+    /**
+     * Store a new document
+     */
+    public function storeDocument(Request $request)
     {
         $user = Auth::user();
 
-        // Log initial information
-        Log::info('Starting finalization process', [
-            'user_id' => $user->id,
-            'user_role' => $user->role,
-            'kriteria_id' => $kriteria->id
+        $request->validate([
+            'files.*' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
+            'kriteria_id' => 'required|exists:kriteria,id',
+            'jenis_ppepp' => 'required|string'
         ]);
 
-        // Check if user role is one of the dosen roles
-        if (!in_array($user->role, ['dosen1', 'dosen2', 'dosen3', 'administrator'])) {
-            Log::warning('Unauthorized finalization attempt - not a dosen', [
+        $kriteria = Kriteria::findOrFail($request->kriteria_id);
+        $uploadedCount = 0;
+
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('public/dokumen_akreditasi/kriteria_' . $kriteria->id, $fileName);
+                
+                $dokumen = new Dokumen();
+                $dokumen->kriteria_id = $kriteria->id;
+                $dokumen->user_id = $user->id;
+                $dokumen->nama_dokumen = $file->getClientOriginalName();
+                $dokumen->jenis_ppepp = $request->jenis_ppepp;
+                $dokumen->path = $path;
+                $dokumen->status = Dokumen::STATUS_DRAFT;
+                $dokumen->is_admin_upload = $user->role === 'administrator';
+                $dokumen->save();
+                
+                $uploadedCount++;
+                
+                Log::info('User uploaded document', [
+                    'dokumen_id' => $dokumen->id,
+                    'kriteria_id' => $kriteria->id,
                 'user_id' => $user->id,
-                'role' => $user->role
-            ]);
-            abort(403, 'Hanya dosen yang dapat memfinalisasi dokumen.');
+                    'file_name' => $fileName
+                ]);
+            }
         }
 
-        // Check if the kriteria belongs to this user (if applicable)
-        if (isset($kriteria->dosen_id) && $kriteria->dosen_id !== $user->id) {
-            Log::warning('Unauthorized finalization attempt - not assigned to kriteria', [
-                'user_id' => $user->id,
-                'kriteria_dosen_id' => $kriteria->dosen_id
-            ]);
-            abort(403, 'Anda tidak berwenang memfinalisasi dokumen untuk kriteria ini.');
+        if ($uploadedCount > 0) {
+            return redirect()->back()->with('success', "{$uploadedCount} dokumen berhasil diunggah dan disimpan sebagai draft.");
         }
+
+        return redirect()->back()->with('error', 'Tidak ada dokumen yang diunggah.');
+    }
+
+    /**
+     * Show the validation page for a specific kriteria
+     */
+    public function validasi($id, Request $request)
+    {
+        $user = Auth::user();
+        
+        if ($user->role !== 'administrator') {
+            abort(403, 'Unauthorized access');
+        }
+
+        $kriteria = Kriteria::findOrFail($id);
+        $selected_ppepp = $request->query('ppepp', 'penetapan'); // Default to penetapan if not specified
+
+        $ppepp_labels = [
+            'penetapan' => 'C1. Penetapan',
+            'pelaksanaan' => 'C2. Pelaksanaan',
+            'evaluasi' => 'C3. Evaluasi',
+            'pengendalian' => 'C4. Pengendalian',
+            'peningkatan' => 'C5. Peningkatan'
+        ];
+
+        // Get documents that need validation
+        $dokumenPerPPEPP = [];
+        foreach (array_keys($ppepp_labels) as $stage) {
+            $query = Dokumen::where('kriteria_id', $kriteria->id)
+                ->where('jenis_ppepp', $stage)
+                ->whereNotNull('path')
+                ->with('user');
+                
+            // For validation, show documents that need validation (menunggu/revisi)
+            $query->whereIn('status', [Dokumen::STATUS_MENUNGGU, Dokumen::STATUS_REVISI]);
+
+            $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
+        }
+
+        // Prepare data for the navigation
+        $allPpeppStagesWithData = [];
+        foreach ($ppepp_labels as $key => $label) {
+            $allPpeppStagesWithData[] = [
+                'key' => $key,
+                'label' => $label,
+                'route_kelola_tahap_ini' => route('kriteria.validasi', ['id' => $kriteria->id, 'ppepp' => $key])
+            ];
+        }
+
+        // Get descriptions for each PPEPP stage from kriteria table
+        $ppepp_descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true) ?: [];
+
+        // Count documents by status
+        $statusCounts = [
+            'draft' => 0,
+            'menunggu' => 0,
+            'revisi' => 0,
+            'diterima' => 0,
+            'diverifikasi' => 0
+        ];
+
+        foreach ($dokumenPerPPEPP as $docs) {
+            foreach ($docs as $doc) {
+                if (isset($statusCounts[$doc->status])) {
+                    $statusCounts[$doc->status]++;
+                }
+            }
+        }
+
+        $viewData = [
+            'kriteria' => $kriteria,
+            'selected_ppepp' => $selected_ppepp,
+            'ppepp_labels' => $ppepp_labels,
+            'dokumenPerPPEPP' => $dokumenPerPPEPP,
+            'ppepp_descriptions' => $ppepp_descriptions,
+            'allPpeppStagesWithData' => $allPpeppStagesWithData,
+            'stageKey' => $selected_ppepp,
+            'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
+            'documents' => $dokumenPerPPEPP[$selected_ppepp] ?? collect(),
+            'statusCounts' => $statusCounts,
+            'is_admin' => true
+        ];
+
+        return view('pages.kriteria.validasi', $viewData);
+    }
+
+    /**
+     * Process document validation
+     */
+    public function processValidasi(Request $request, Dokumen $dokumen)
+    {
+        $user = Auth::user();
+        
+        if ($user->role !== 'administrator') {
+            abort(403, 'Unauthorized access');
+        }
+
+        $request->validate([
+            'status' => 'required|in:' . Dokumen::STATUS_DIVERIFIKASI . ',' . Dokumen::STATUS_REVISI,
+            'komentar' => 'nullable|string|max:1000',
+        ]);
+
+        $dokumen->status = $request->status;
+        
+        if ($request->filled('komentar')) {
+            $dokumen->komentar = $request->komentar;
+        }
+        
+        $dokumen->save();
+
+        Log::info('Admin validated document', [
+            'dokumen_id' => $dokumen->id,
+            'kriteria_id' => $dokumen->kriteria_id,
+            'admin_id' => $user->id,
+            'status' => $request->status
+        ]);
+
+        $statusText = ($request->status === Dokumen::STATUS_DIVERIFIKASI) ? 'diverifikasi' : 'perlu direvisi';
+        
+        return redirect()->back()->with('success', "Dokumen berhasil divalidasi dengan status: {$statusText}");
+    }
+
+    /**
+     * Finalize documents
+     */
+    public function finalisasi(Request $request, $id)
+    {
+        $user = Auth::user();
+        
+        if (!in_array($user->role, ['administrator', 'dosen1', 'dosen2', 'dosen3'])) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $kriteria = Kriteria::findOrFail($id);
 
         // Get only draft documents to finalize
         $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria->id)
@@ -291,20 +385,22 @@ class KriteriaController extends Controller
                        ->whereNotNull('path')
                        ->get();
 
-        Log::info('Found drafts to finalize', [
+        Log::info('User found drafts to finalize', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
             'draft_count' => $dokumenDrafts->count(),
             'draft_ids' => $dokumenDrafts->pluck('id')->toArray()
         ]);
 
         // If no draft documents found, inform the user
         if ($dokumenDrafts->count() === 0) {
-            return redirect()->route('kriteria.show', $kriteria->id)
+            return redirect()->back()
                             ->with('info', 'Tidak ada dokumen draft yang perlu difinalisasi.');
         }
 
         $berhasilFinalisasi = 0;
         foreach ($dokumenDrafts as $dokumen) {
-            $dokumen->status = Dokumen::STATUS_MENUNGGU;
+            $dokumen->status = Dokumen::STATUS_MENUNGGU; // Change status to menunggu (waiting for validation)
             $dokumen->save();
             $berhasilFinalisasi++;
 
@@ -319,45 +415,76 @@ class KriteriaController extends Controller
                 'successful_count' => $berhasilFinalisasi
             ]);
 
-            return redirect()->route('kriteria.show', $kriteria->id)
-                            ->with('success', "{$berhasilFinalisasi} dokumen draft berhasil difinalisasi dan dikirim untuk validasi.");
+            return redirect()->back()
+                            ->with('success', "{$berhasilFinalisasi} dokumen draft berhasil difinalisasi dan menunggu validasi.");
         }
 
         Log::warning('Finalization failed - no documents were finalized');
 
-        return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan'])
-                        ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file atau deskripsi.');
+        return redirect()->back()
+                        ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file.');
     }
-
-    public function kelola(Kriteria $kriteria)
+    
+    /**
+     * Delete draft document
+     */
+    public function destroyDraft(Dokumen $dokumen)
     {
-        return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']);
+        $user = Auth::user();
+        
+        if (!in_array($user->role, ['administrator', 'dosen1', 'dosen2', 'dosen3'])) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Verify document is a draft
+        if ($dokumen->status !== Dokumen::STATUS_DRAFT) {
+            return redirect()->back()->with('error', 'Hanya dokumen draft yang dapat dihapus.');
+        }
+
+        $kriteriaId = $dokumen->kriteria_id;
+
+        // Delete physical file if exists
+        if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {
+            Storage::disk('public')->delete($dokumen->path);
+        }
+
+        // Delete database record
+        $dokumen->delete();
+        
+        Log::info('User deleted draft document', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
+            'dokumen_id' => $dokumen->id,
+            'kriteria_id' => $kriteriaId
+        ]);
+
+        return redirect()->route('kriteria.show', ['kriteria' => $kriteriaId])
+                         ->with('success', 'Dokumen draft berhasil dihapus.');
     }
 
-    public function updateDescription(Request $request, Kriteria $kriteria, $ppepp)
+    /**
+     * Update PPEPP description for a kriteria
+     */
+    public function updateDescription(Request $request, $kriteria, $ppepp)
     {
         $request->validate([
             'description' => 'required|string|max:1000',
         ]);
 
-        // Update the description in the database
+        $kriteria = Kriteria::findOrFail($kriteria);
         $kriteria->updatePPEPPDescription($ppepp, $request->description);
 
         return redirect()->back()->with('success', 'Deskripsi PPEPP berhasil diperbarui.');
     }
 
-    public function deleteDescription(Kriteria $kriteria, $ppepp)
+    /**
+     * Delete PPEPP description for a kriteria
+     */
+    public function deleteDescription(Request $request, $kriteria, $ppepp)
     {
-        $descriptions = json_decode($kriteria->ppepp_descriptions ?? '{}', true);
-
-        if (isset($descriptions[$ppepp])) {
-            unset($descriptions[$ppepp]);
-            $kriteria->ppepp_descriptions = json_encode($descriptions);
-            $kriteria->save();
+        $kriteria = Kriteria::findOrFail($kriteria);
+        $kriteria->updatePPEPPDescription($ppepp, null);
 
             return redirect()->back()->with('success', 'Deskripsi PPEPP berhasil dihapus.');
-        }
-
-        return redirect()->back()->with('error', 'Deskripsi PPEPP tidak ditemukan.');
     }
 }
