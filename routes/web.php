@@ -10,6 +10,7 @@ use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\DaftarTugasController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -57,6 +58,21 @@ Route::middleware('auth')->group(function () {
  Route::get('/profile', [ProfileController::class, 'index']);
 Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
 Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('notifications')->name('notifications.')->controller(NotificationController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/get-navbar', 'getNavbarNotifications')->name('getNavbar');
+        Route::get('/read/{id}', 'read')->name('read');
+        Route::post('/mark-all-read', 'markAllAsRead')->name('markAllRead');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::post('/clear-all', 'clearAll')->name('clearAll');
+    });
+
     /*
     |--------------------------------------------------------------------------
     | Administrator Routes
@@ -133,7 +149,7 @@ Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('prof
         Route::delete('/{kriteria}/description/{ppepp}', 'deleteDescription')->name('delete.description');
         Route::post('/upload/store', 'storeDocument')->name('upload.store');
         Route::delete('/upload/draft/{dokumen}', 'destroyDraft')->name('upload.destroyDraft');
-        
+
         // Validation routes - admin only
         Route::middleware('role:administrator')->group(function() {
             Route::get('/validasi/{id}', 'validasi')->name('validasi');

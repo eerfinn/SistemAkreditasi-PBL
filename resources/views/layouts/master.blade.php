@@ -47,7 +47,7 @@
         .modal-backdrop {
             display: none !important;
         }
-        
+
         /* Ensure modals are always on top */
         .modal {
             padding-top: 220px;
@@ -55,7 +55,7 @@
             z-index: 9999 !important;
             margin-top: 0px;
         }
-        
+
         /* Ensure modal content is clickable */
         .modal-dialog {
             z-index: 10000 !important;
@@ -87,7 +87,7 @@
             @csrf
         </form>
 
-        
+
 
         @include('layouts/footer')
     </div>
@@ -122,6 +122,10 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        // Notification URLs
+        var notificationGetUrl = "{{ route('notifications.getNavbar') }}";
+        var notificationReadUrl = "{{ url('notifications/read/__id__') }}";
     </script>
 
     @stack('scripts')

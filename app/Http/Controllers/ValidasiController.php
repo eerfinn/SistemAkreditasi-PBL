@@ -10,12 +10,16 @@ use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Services\NotificationService;
 
 class ValidasiController extends Controller
 {
-    public function __construct()
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
     {
         $this->middleware('auth');
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -24,7 +28,7 @@ class ValidasiController extends Controller
     public function updateStatus(Request $request, Dokumen $dokumen)
     {
         $user = Auth::user();
-        
+
         // Validasi bahwa user adalah admin atau peran yang berwenang
         if (!in_array($user->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi'])) {
             return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk melakukan validasi dokumen.');
@@ -61,11 +65,22 @@ class ValidasiController extends Controller
             $dokumenKomen->user_id = $user->id;
             $dokumenKomen->komentar = $request->komentar;
             $dokumenKomen->save();
-            
+
             Log::info('Document comment saved', [
                 'dokumen_id' => $dokumen->id,
                 'user_id' => $user->id,
                 'comment' => $request->komentar
+            ]);
+
+            // Buat notifikasi untuk pemilik dokumen tentang komentar baru
+            $this->notificationService->create($dokumen->user_id, 'Komentar Baru pada Dokumen',
+                "Admin telah menambahkan komentar pada dokumen '{$dokumen->nama_dokumen}'", [
+                'type' => 'komentar',
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $dokumen->kriteria_id,
+                'icon' => 'fa-comment',
+                'color' => 'info',
+                'link' => "/dokumen/{$dokumen->id}"
             ]);
         }
 
@@ -77,12 +92,25 @@ class ValidasiController extends Controller
                 $kriteriaKomen->user_id = $user->id;
                 $kriteriaKomen->komentar = $request->kriteria_comment;
                 $kriteriaKomen->save();
-                
+
                 Log::info('Kriteria comment saved', [
                     'kriteria_id' => $dokumen->kriteria_id,
                     'user_id' => $user->id,
                     'comment' => $request->kriteria_comment
                 ]);
+
+                // Notifikasi untuk dosen yang bertanggung jawab atas kriteria ini
+                $kriteria = Kriteria::find($dokumen->kriteria_id);
+                if ($kriteria) {
+                    $this->notificationService->notifyKriteriaUsers($kriteria, 'Komentar Baru pada Kriteria',
+                        "Admin telah menambahkan komentar pada kriteria {$kriteria->nama_kriteria}", [
+                        'type' => 'kriteria',
+                        'kriteria_id' => $dokumen->kriteria_id,
+                        'icon' => 'fa-comment',
+                        'color' => 'info',
+                        'link' => "/kriteria/{$dokumen->kriteria_id}"
+                    ]);
+                }
             } catch (\Exception $e) {
                 Log::error('Failed to save kriteria comment', [
                     'error' => $e->getMessage(),
@@ -98,6 +126,29 @@ class ValidasiController extends Controller
         $history->aktivitas = "Mengubah status dokumen dari {$oldStatus} menjadi {$dokumen->status}";
         $history->save();
 
+        // Buat notifikasi untuk pemilik dokumen tentang perubahan status
+        if ($dokumen->status === Dokumen::STATUS_REVISI) {
+            $this->notificationService->create($dokumen->user_id, 'Dokumen Perlu Direvisi',
+                "Dokumen '{$dokumen->nama_dokumen}' perlu direvisi", [
+                'type' => 'dokumen',
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $dokumen->kriteria_id,
+                'icon' => 'fa-exclamation-circle',
+                'color' => 'warning',
+                'link' => "/dokumen/{$dokumen->id}"
+            ]);
+        } else if ($dokumen->status === Dokumen::STATUS_DIVERIFIKASI) {
+            $this->notificationService->create($dokumen->user_id, 'Dokumen Diverifikasi',
+                "Dokumen '{$dokumen->nama_dokumen}' telah diverifikasi", [
+                'type' => 'dokumen',
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $dokumen->kriteria_id,
+                'icon' => 'fa-check-circle',
+                'color' => 'success',
+                'link' => "/dokumen/{$dokumen->id}"
+            ]);
+        }
+
         $statusMessages = [
             Dokumen::STATUS_REVISI => 'Dokumen dikembalikan untuk revisi.',
             Dokumen::STATUS_DIVERIFIKASI => 'Dokumen telah diverifikasi.'
@@ -105,14 +156,14 @@ class ValidasiController extends Controller
 
         return redirect()->back()->with('success', $statusMessages[$request->status]);
     }
-    
+
     /**
      * Menambahkan komentar untuk kriteria (oleh admin/koordinator/direktur)
      */
     public function addKriteriaComment(Request $request, Kriteria $kriteria)
     {
         $user = Auth::user();
-        
+
         // Validasi bahwa user adalah admin atau peran yang berwenang
         if (!in_array($user->role, ['administrator', 'koordinator', 'direktur', 'kps', 'kajur', 'kjm', 'kaprodi'])) {
             return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menambahkan komentar.');
@@ -130,14 +181,24 @@ class ValidasiController extends Controller
             $komen->user_id = $user->id;
             $komen->komentar = $request->komentar;
             $komen->save();
-            
+
+            // Buat notifikasi untuk dosen yang bertanggung jawab atas kriteria ini
+            $this->notificationService->notifyKriteriaUsers($kriteria, 'Komentar Baru pada Kriteria',
+                "Admin telah menambahkan komentar pada kriteria {$kriteria->nama_kriteria}", [
+                'type' => 'kriteria',
+                'kriteria_id' => $kriteria->id,
+                'icon' => 'fa-comment',
+                'color' => 'info',
+                'link' => "/kriteria/{$kriteria->id}"
+            ]);
+
             return redirect()->back()->with('success', 'Komentar berhasil ditambahkan.');
         } catch (\Exception $e) {
             Log::error('Failed to add kriteria comment', [
                 'error' => $e->getMessage(),
                 'kriteria_id' => $kriteria->id
             ]);
-            
+
             return redirect()->back()->with('error', 'Gagal menambahkan komentar: ' . $e->getMessage());
         }
     }

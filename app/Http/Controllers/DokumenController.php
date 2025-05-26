@@ -10,16 +10,21 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\History;
+use App\Services\NotificationService;
 
 class DokumenController extends Controller
 {
-    public function __construct()
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
     {
         // Menerapkan middleware auth ke semua method kecuali yang mungkin publik
         // Sesuaikan 'except' jika ada method yang tidak memerlukan autentikasi
         $this->middleware('auth');
         // Anda bisa menambahkan middleware role di sini atau di route
         // $this->middleware('role:dosen')->only(['create', 'store', 'destroyDraft']);
+
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -137,6 +142,17 @@ class DokumenController extends Controller
                         'dokumen_id' => $newDokumen->id
                     ]);
 
+                    // Buat notifikasi untuk admin
+                    $this->notificationService->notifyRole('administrator', 'Dokumen Baru Diunggah',
+                        "Dokumen baru '{$namaDokumenDiDB}' telah diunggah untuk kriteria {$kriteria->nama_kriteria}", [
+                        'type' => 'dokumen',
+                        'dokumen_id' => $newDokumen->id,
+                        'kriteria_id' => $kriteriaId,
+                        'icon' => 'fa-file-alt',
+                        'color' => 'success',
+                        'link' => "/dokumen/{$newDokumen->id}"
+                    ]);
+
                         $uploadedCount++;
             } catch (\Exception $e) {
                 Log::error('Exception during file upload', [
@@ -168,10 +184,23 @@ class DokumenController extends Controller
         }
 
         $kriteriaId = $dokumen->kriteria_id;
+        $dokumenName = $dokumen->nama_dokumen;
+        $userId = $dokumen->user_id;
+        $kriteria = Kriteria::find($kriteriaId);
 
         // File fisik akan otomatis terhapus oleh event 'deleting' di model Dokumen
         $dokumen->delete();
         Log::info('Dokumen draft dihapus', ['dokumen_id' => $dokumen->id]);
+
+        // Buat notifikasi untuk user yang mengunggah dokumen
+        $this->notificationService->create($userId, 'Dokumen Dihapus',
+            "Dokumen draft '{$dokumenName}' untuk kriteria {$kriteria->nama_kriteria} telah dihapus", [
+            'type' => 'dokumen',
+            'kriteria_id' => $kriteriaId,
+            'icon' => 'fa-trash',
+            'color' => 'danger',
+            'link' => "/kriteria/{$kriteriaId}"
+        ]);
 
         return redirect()->route('kriteria.show', $kriteriaId)
                          ->with('success', 'Dokumen draft berhasil dihapus.');
@@ -292,6 +321,43 @@ class DokumenController extends Controller
 
         $dokumen->save();
 
+        // Buat notifikasi untuk user yang mengunggah dokumen
+        $this->notificationService->create($dokumen->user_id, 'Dokumen Diperbarui',
+            "Dokumen '{$dokumen->nama_dokumen}' telah diperbarui", [
+            'type' => 'dokumen',
+            'dokumen_id' => $dokumen->id,
+            'kriteria_id' => $dokumen->kriteria_id,
+            'icon' => 'fa-edit',
+            'color' => 'info',
+            'link' => "/dokumen/{$dokumen->id}"
+        ]);
+
+        // Jika dokumen divalidasi oleh admin, buat notifikasi untuk admin
+        if ($dokumen->status === Dokumen::STATUS_DIVERIFIKASI) {
+            $this->notificationService->notifyRole('administrator', 'Dokumen Divalidasi',
+                "Dokumen '{$dokumen->nama_dokumen}' telah divalidasi", [
+                'type' => 'dokumen',
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $dokumen->kriteria_id,
+                'icon' => 'fa-check-circle',
+                'color' => 'success',
+                'link' => "/dokumen/{$dokumen->id}"
+            ]);
+        }
+
+        // Jika dokumen perlu direvisi, buat notifikasi untuk user yang mengunggah dokumen
+        if ($dokumen->status === Dokumen::STATUS_REVISI) {
+            $this->notificationService->create($dokumen->user_id, 'Dokumen Perlu Direvisi',
+                "Dokumen '{$dokumen->nama_dokumen}' perlu direvisi", [
+                'type' => 'dokumen',
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $dokumen->kriteria_id,
+                'icon' => 'fa-exclamation-circle',
+                'color' => 'warning',
+                'link' => "/dokumen/{$dokumen->id}"
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Dokumen berhasil diperbarui.');
     }
 
@@ -359,6 +425,19 @@ class DokumenController extends Controller
             foreach ($dokumenDrafts as $dokumen) {
                 $dokumen->update([
                     'status' => Dokumen::STATUS_MENUNGGU
+                ]);
+            }
+
+            $kriteria = Kriteria::find($kriteria_id);
+            if ($kriteria) {
+                // Buat notifikasi untuk admin bahwa semua dokumen telah difinalisasi
+                $this->notificationService->notifyRole('administrator', 'Dokumen Difinalisasi',
+                    "Semua dokumen untuk kriteria {$kriteria->nama_kriteria} telah difinalisasi dan menunggu verifikasi", [
+                    'type' => 'kriteria',
+                    'kriteria_id' => $kriteria_id,
+                    'icon' => 'fa-check-double',
+                    'color' => 'success',
+                    'link' => "/kriteria/{$kriteria_id}"
                 ]);
             }
 
@@ -432,6 +511,17 @@ class DokumenController extends Controller
             Log::info('Document revision submitted successfully', [
                 'dokumen_id' => $dokumen->id,
                 'new_path' => $path
+            ]);
+
+            // Buat notifikasi untuk admin bahwa revisi telah disubmit
+            $this->notificationService->notifyRole('administrator', 'Revisi Dokumen Disubmit',
+                "Revisi untuk dokumen '{$dokumen->nama_dokumen}' telah disubmit dan menunggu verifikasi", [
+                'type' => 'dokumen',
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $dokumen->kriteria_id,
+                'icon' => 'fa-file-alt',
+                'color' => 'info',
+                'link' => "/dokumen/{$dokumen->id}"
             ]);
 
             return redirect()->route('kriteria.show', $dokumen->kriteria_id)

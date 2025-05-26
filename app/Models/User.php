@@ -81,4 +81,20 @@ class User extends Authenticatable
             return collect();
         }
     }
+
+    /**
+     * Get the notifications for the user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Get the unread notifications for the user.
+     */
+    public function unreadNotifications()
+    {
+        return $this->notifications()->where('is_read', false);
+    }
 }
