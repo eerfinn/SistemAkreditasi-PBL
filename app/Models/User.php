@@ -44,6 +44,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * Get the user's photo.
+     */
+    public function getPhotoAttribute($value)
+    {
+        return $value;
+    }
+
     public function isAdmin()
     {
         return $this->role === 'administrator';

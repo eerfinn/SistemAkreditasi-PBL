@@ -29,7 +29,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         // Hapus foto lama jika ada
-        if ($user->foto && Storage::exists('public/profile/' . $user->photo)) {
+        if ($user->photo && Storage::exists('public/profile/' . $user->photo)) {
             Storage::delete('public/profile/' . $user->photo);
         }
 
@@ -38,8 +38,33 @@ class ProfileController extends Controller
         $request->file('profile_photo')->storeAs('public/profile', $filename);
 
         // Update nama file ke kolom foto
-        $user->photo = $filename;
-        $user->save();
+        User::where('id', $user->id)->update(['photo' => $filename]);
+
+        return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
+    }
+    
+    /**
+     * Alternative method to update profile photo.
+     */
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $user = Auth::user();
+
+        // Hapus foto lama jika ada
+        if ($user->photo && Storage::exists('public/profile/' . $user->photo)) {
+            Storage::delete('public/profile/' . $user->photo);
+        }
+
+        // Simpan foto baru
+        $filename = time() . '.' . $request->file('photo')->getClientOriginalExtension();
+        $request->file('photo')->storeAs('public/profile', $filename);
+
+        // Update nama file ke kolom foto
+        User::where('id', $user->id)->update(['photo' => $filename]);
 
         return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
     }
