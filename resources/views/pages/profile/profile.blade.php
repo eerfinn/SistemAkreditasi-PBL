@@ -9,18 +9,60 @@
 
 @section('vendor-script')
     <script src="{{ asset('assets/vendor/chart.js/Chart.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection
 
 @section('page-script')
-    <script>
-        $(document).ready(function() {
-            // Add active class to nav items
-            $('.nav-link').on('click', function() {
-                $('.nav-link').removeClass('active');
-                $(this).addClass('active');
+<script>
+    $(document).ready(function () {
+        // Active state nav link
+        $('.nav-link').on('click', function () {
+            $('.nav-link').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Enhanced SweetAlert for profile photo change
+        $('#profile_photo').on('change', function (e) {
+            const fileInput = this;
+            if (fileInput.files.length === 0) return;
+
+            Swal.fire({
+                title: 'Konfirmasi Penggantian Foto',
+                html: `<p style="margin:0; font-size:15px;">Kamu yakin ingin mengganti <strong>foto profil</strong> ini?</p>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-check-circle me-1"></i> Ya, ganti',
+                cancelButtonText: '<i class="fas fa-times-circle me-1"></i> Batal',
+                customClass: {
+                    popup: 'rounded-lg shadow-sm',
+                    title: 'fw-bold text-dark',
+                    htmlContainer: 'text-muted',
+                    confirmButton: 'btn btn-primary px-4 py-2',
+                    cancelButton: 'btn btn-outline-secondary px-4 py-2',
+                },
+                buttonsStyling: false,
+                background: '#ffffff',
+                backdrop: `
+                    rgba(0,0,0,0.3)
+                    left top
+                    no-repeat
+                `,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#profileForm').submit();
+                } else {
+                    fileInput.value = '';
+                }
             });
         });
-    </script>
+    });
+</script>
 @endsection
 
 @section('content')
@@ -39,7 +81,7 @@
                 <div class="card-body p-0" style="background-color: transparent">
                     <div class="profile-sidebar text-center py-4">
                         <div class="avatar-wrapper mx-auto mb-3 position-relative">
-                            <form action="{{ route('profile.upload') }}" method="POST" enctype="multipart/form-data">
+                            <form id="profileForm" action="{{ route('profile.upload') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <label for="profile_photo" class="d-block mb-0" style="position: relative; display: inline-block;">
                                     <img src="{{ $user->photo ? asset('storage/profile/' . $user->photo) : asset('assets/images/profile/profile.png') }}"
@@ -48,17 +90,16 @@
                                          height="250"
                                          alt="Profile Photo"
                                          style="cursor: pointer; object-fit: cover;">
-                                    <!-- Camera Icon Overlay -->
                                     <div class="camera-icon position-absolute" title="Ganti Foto">
                                         <i class="fas fa-camera"></i>
                                     </div>
                                 </label>
-                                <input type="file" id="profile_photo" name="profile_photo" class="d-none" onchange="this.form.submit()">
+                                <input type="file" id="profile_photo" name="profile_photo" class="d-none">
                             </form>
                             <div class="status-indicator bg-success"></div>
                         </div>
-                        <h5 class="mb-1">{{ $user->nama }}</h5>
-                        <p class="text-muted small mb-3">{{ ucfirst($user->role) }}</p>
+                        {{-- <h5 class="mb-1">{{ $user->nama }}</h5> --}}
+                        {{-- <p class="text-muted small mb-3">{{ ucfirst($user->role) }}</p> --}}
                     </div>
                 </div>
             </div>
@@ -113,19 +154,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="info-card mb-4 p-4 rounded-lg border">
-                                <div class="d-flex align-items-center mb-3">
-                                    <div class="icon-circle bg-primary-light text-primary me-3">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-0 text-muted small">Password</h6>
-                                        <div class="d-flex align-items-center">
-                                            <h5 class="mb-0 me-3">{{ str_repeat('•', 10) }}</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {{-- Password section removed --}}
                         </div>
                     </div>
                 </div>
@@ -135,20 +164,18 @@
 </div>
 
 <style>
-    /* Main styling */
     body {
         background-color: #f8f9fa;
     }
-    
+
     .card {
         transition: all 0.3s ease;
     }
-    
+
     .card:hover {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
     }
 
-    /* Sidebar styling */
     .profile-sidebar {
         background-color: #fff;
         border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -218,7 +245,6 @@
         text-align: center;
     }
 
-    /* Content styling */
     .info-card {
         transition: all 0.3s ease;
         background-color: #fff;
@@ -242,7 +268,6 @@
         background-color: rgba(13, 110, 253, 0.1);
     }
 
-    /* Responsive adjustments */
     @media (max-width: 991.98px) {
         .sidebar-nav .nav-link {
             padding: 0.5rem 1rem;

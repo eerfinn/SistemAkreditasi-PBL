@@ -66,6 +66,13 @@ class ProfileController extends Controller
         // Update nama file ke kolom foto
         User::where('id', $user->id)->update(['photo' => $filename]);
 
+        if ($request->ajax()) {
+        return response()->json([
+            'message' => 'Foto profil berhasil diperbarui.',
+            'photo_url' => asset('storage/profile/' . $filename)
+        ]);
+    }
+
         return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
     }
-}
+}  
