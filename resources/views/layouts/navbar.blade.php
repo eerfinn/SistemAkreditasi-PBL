@@ -674,8 +674,9 @@
                                     <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <div class="header-info2 d-flex align-items-center">
                                             <div class="header-media">
-                                            <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="" class= "avatar avatar-md" >
-                                            </div>
+                                            {{-- <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="" class= "avatar avatar-md" > --}}
+                                            <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="Profile" class="navbar-profile-img">
+                                        </div>
                                         </div>
                                     </a>
                                 <div class="dropdown-menu dropdown-menu-end">
@@ -725,8 +726,8 @@
 ***********************************-->
 <style>
 .navbar-profile-img {
-    width: 36px;
-    height: 36px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #fff;
