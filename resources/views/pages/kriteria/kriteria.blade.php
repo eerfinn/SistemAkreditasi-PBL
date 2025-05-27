@@ -156,7 +156,7 @@ $(document).ready(function() {
             title="C1. Penetapan"
             description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENETAPAN] }}"
             :documents="$dokumenPerPPEPP['penetapan'] ?? []"
-            ppepp_key="\App\Models\Dokumen::PPEPP_PENETAPAN"
+            ppepp_key="penetapan"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
@@ -165,7 +165,7 @@ $(document).ready(function() {
             title="C2. Pelaksanaan"
             description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PELAKSANAAN] }}"
             :documents="$dokumenPerPPEPP['pelaksanaan'] ?? []"
-            ppepp_key="\App\Models\Dokumen::PPEPP_PELAKSANAAN"
+            ppepp_key="pelaksanaan"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
@@ -174,7 +174,7 @@ $(document).ready(function() {
             title="C3. Evaluasi"
             description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_EVALUASI] }}"
             :documents="$dokumenPerPPEPP['evaluasi'] ?? []"
-            ppepp_key="\App\Models\Dokumen::PPEPP_EVALUASI"
+            ppepp_key="evaluasi"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
@@ -183,7 +183,7 @@ $(document).ready(function() {
             title="C4. Pengendalian"
             description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENGENDALIAN] }}"
             :documents="$dokumenPerPPEPP['pengendalian'] ?? []"
-            ppepp_key="\App\Models\Dokumen::PPEPP_PENGENDALIAN"
+            ppepp_key="pengendalian"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
@@ -192,7 +192,7 @@ $(document).ready(function() {
             title="C5. Peningkatan"
             description="{{ $default_descriptions[\App\Models\Dokumen::PPEPP_PENINGKATAN] }}"
             :documents="$dokumenPerPPEPP['peningkatan'] ?? []"
-            ppepp_key="\App\Models\Dokumen::PPEPP_PENINGKATAN"
+            ppepp_key="peningkatan"
             :ppepp_descriptions="$ppepp_descriptions"
         />
 
@@ -266,22 +266,7 @@ $(document).ready(function() {
             </div>
         @endif
 
-        @if(isset($kriteria) && auth()->user() && (auth()->user()->role == 'dosen' || auth()->user()->role == 'administrator') && (!isset($showUploadButton) || !$showUploadButton))
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="alert alert-info text-center" role="alert">
-                        Semua dokumen untuk {{ $kriteria->nama_kriteria }} telah difinalisasi atau sedang dalam proses validasi.
-                        @if(isset($statusCounts) && ($statusCounts['revisi'] ?? 0) > 0)
-                            Ada dokumen yang perlu direvisi. Silakan <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}">kelola dokumen PPEPP</a> untuk memperbaikinya.
-                        @else
-                            Anda hanya dapat melihat dokumen yang telah disubmit.
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
+
 
         <!-- Comments Section - Visible to all users -->
         <div class="col-xl-12 mb-4">
@@ -300,7 +285,11 @@ $(document).ready(function() {
                         <div class="comment-item">
                             <div class="d-flex align-items-center mb-2">
                                 <div class="comment-avatar">
+                                    @if($comment->user && $comment->user->photo)
+                                        <img src="{{ asset('storage/profile/' . $comment->user->photo) }}" alt="{{ $comment->user->nama }}" class="rounded-circle" width="40" height="40">
+                                    @else
                                         {{ substr($comment->user->nama ?? 'U', 0, 1) }}
+                                    @endif
                                 </div>
                                 <h6 class="mb-0 ms-2">{{ $comment->user->nama ?? 'User' }}</h6>
                                 <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>

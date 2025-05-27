@@ -1,6 +1,6 @@
 @extends('layouts/master-error')
 
-@section('title', 'Error 400')
+@section('title', 'Error 403 - Forbidden')
     
 @section('content')
 <div class="container h-100">

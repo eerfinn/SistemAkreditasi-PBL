@@ -27,7 +27,7 @@
                                 <span class="small d-block text-muted">ID: {{ $dokumen->id }}</span>
                             </td>
                             <td>
-                                {{ $dokumen->user->name ?? 'Unknown' }}
+                                {{ $dokumen->user->nama ?? 'Unknown' }}
                                 <span class="small d-block text-muted">{{ $dokumen->user->role ?? '' }}</span>
                             </td>
                             <td>

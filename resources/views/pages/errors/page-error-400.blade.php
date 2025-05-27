@@ -1,6 +1,6 @@
 @extends('layouts/master-error')
 
-@section('title', 'Error 400')
+@section('title', 'Error 400 - Bad Request')
     
 @section('content')
 <div class="container">

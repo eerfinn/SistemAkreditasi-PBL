@@ -1,4 +1,4 @@
-    <?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -11,6 +11,11 @@ use App\Http\Controllers\DaftarTugasController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\NotificationController;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -19,10 +24,6 @@ use App\Http\Controllers\NotificationController;
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
-
-Route::get('/loginn', function () {
-    return response()->view('pages.errors.page-error-404', [], 404);
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +52,6 @@ Route::middleware('auth')->group(function () {
     | Dashboard Routes
     |--------------------------------------------------------------------------
     */
-    // Main dashboard - will automatically redirect to role-specific dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     /*
@@ -59,9 +59,9 @@ Route::middleware('auth')->group(function () {
     | Profile Routes
     |--------------------------------------------------------------------------
     */
- Route::get('/profile', [ProfileController::class, 'index']);
-Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
-Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
+    Route::get('/profile', [ProfileController::class, 'index']);
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
+    Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
 
     /*
     |--------------------------------------------------------------------------
@@ -79,48 +79,20 @@ Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('prof
 
     /*
     |--------------------------------------------------------------------------
-    | Administrator Routes
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
-        // User management routes
-        Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::post('/', 'store')->name('store');
-            Route::get('/{user}', 'show')->name('show');
-            Route::get('/{user}/edit', 'edit')->name('edit');
-            Route::put('/{user}', 'update')->name('update');
-            Route::delete('/{user}', 'destroy')->name('destroy');
-            Route::get('/{user}/json', 'showJson')->name('showJson');
-        });
-    });
-
-    /*
-    |--------------------------------------------------------------------------
     | Dokumen Routes
     |--------------------------------------------------------------------------
     */
-    // PPEPP document management
-    Route::prefix('dokumen')->name('dokumen.')->group(function () {
-        Route::post('/store-ppepp', [DokumenController::class, 'store'])->name('store.ppepp');
-        Route::delete('/draft/{dokumen}', [DokumenController::class, 'destroyDraft'])->name('destroy.draft');
-    });
-
-    // General document management
     Route::controller(DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/store', 'store')->name('store');
-        Route::delete('/{dokumen}/draft', 'destroyDraft')->name('destroy.draft');
+        Route::post('/store-ppepp', 'store')->name('store.ppepp');
         Route::get('/{dokumen}', 'show')->name('show');
         Route::put('/{dokumen}', 'update')->name('update');
         Route::delete('/{dokumen}', 'destroy')->name('destroy');
+        Route::delete('/{dokumen}/draft', 'destroyDraft')->name('destroy.draft');
         Route::post('/{dokumen}/submit-revision', 'submitRevision')->name('submit.revision');
+        Route::post('/finalisasi-all/{kriteria_id}', 'finalisasiAll')->name('finalisasi.all');
     });
-
-    // Document finalization
-    Route::post('/dokumen/finalisasi-all/{kriteria_id}', [DokumenController::class, 'finalisasiAll'])
-        ->name('dokumen.finalisasi.all');
 
     /*
     |--------------------------------------------------------------------------
@@ -182,5 +154,47 @@ Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('prof
         Route::put('/{id}', [DaftarTugasController::class, 'update'])->name('update');
         Route::patch('/{id}/status', [DaftarTugasController::class, 'updateStatus'])->name('update.status');
         Route::delete('/{id}', [DaftarTugasController::class, 'destroy'])->name('destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Administrator Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
+        // User management routes
+        Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{user}', 'show')->name('show');
+            Route::get('/{user}/edit', 'edit')->name('edit');
+            Route::put('/{user}', 'update')->name('update');
+            Route::delete('/{user}', 'destroy')->name('destroy');
+            Route::get('/{user}/json', 'showJson')->name('showJson');
+        });
+        
+        // Error testing routes (admin only)
+        Route::prefix('error-test')->name('error-test.')->group(function () {
+            Route::get('/400', function () {
+                throw new BadRequestHttpException('Bad Request Test');
+            })->name('bad-request');
+            
+            Route::get('/403', function () {
+                throw new HttpException(403, 'Forbidden Test');
+            })->name('forbidden');
+            
+            Route::get('/404', function () {
+                throw new NotFoundHttpException('Not Found Test');
+            })->name('not-found');
+            
+            Route::get('/500', function () {
+                abort(500, 'Internal Server Error Test');
+            })->name('server-error');
+            
+            Route::get('/503', function () {
+                throw new ServiceUnavailableHttpException(null, 'Service Unavailable Test');
+            })->name('service-unavailable');
+        });
     });
 });

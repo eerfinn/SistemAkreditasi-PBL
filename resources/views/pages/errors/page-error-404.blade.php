@@ -1,6 +1,6 @@
 @extends('layouts/master-error')
 
-@section('title', 'Error 400')
+@section('title', 'Error 404 - Not Found')
     
 @section('content')
 <div class="container h-100">

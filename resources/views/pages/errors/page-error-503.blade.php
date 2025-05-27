@@ -1,6 +1,6 @@
 @extends('layouts/master-error')
 
-@section('title', 'Error 400')
+@section('title', 'Error 503 - Service Unavailable')
     
 @section('content')
 <div class="container h-100">
