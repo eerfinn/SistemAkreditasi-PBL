@@ -68,7 +68,8 @@
                             <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="profile-info d-flex align-items-center">
                                     <div class="profile-image">
-                                        <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                        {{-- <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"> --}}
+                                       <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="" class= "profile-image img">
                                     </div>
                                 </div>
                             </a>

@@ -114,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
     object-fit: cover;
     border: 2px solid transparent;
     background: var(--gradient-1) border-box;
-    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    /* -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); */
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);

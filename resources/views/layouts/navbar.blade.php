@@ -674,7 +674,7 @@
                                     <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <div class="header-info2 d-flex align-items-center">
                                             <div class="header-media">
-                                            <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="" class="profile-img">
+                                            <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="" class= "avatar avatar-md" >
                                             </div>
                                         </div>
                                     </a>
@@ -683,6 +683,9 @@
                                         <div class="card-header py-2">
                                             <div class="products d-flex align-items-center gap-2">
                                             <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" class="avatar avatar-md" alt="">
+                                            {{-- <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="Profile" class="rounded-circle border border-light shadow-sm" style="width: 36px; height: 36px; object-fit: cover;"> --}}
+                                            {{-- <img src="{{ asset('storage/profile/' . $user->photo) }}" alt="User" class="avatar avatar-md"> --}}
+
                                         <div>
                                             <h6>{{ Auth::user()->name }}</h6>
                                             <span>{{ Auth::user()->role ?? 'User' }}</span> <!-- Sesuaikan jika role tersedia -->
@@ -720,3 +723,14 @@
 <!--**********************************
     Header end
 ***********************************-->
+<style>
+.navbar-profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+</style>
