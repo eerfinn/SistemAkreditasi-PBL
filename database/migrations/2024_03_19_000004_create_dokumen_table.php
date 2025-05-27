@@ -28,7 +28,8 @@ return new class extends Migration
             $table->enum('status', $status_values)
                   ->default('draft')
                   ->comment('Status alur kerja dokumen: ' . implode(', ', $status_values));
-
+            
+            $table->boolean('is_admin_upload')->default(false);
             $table->timestamps();
         });
     }

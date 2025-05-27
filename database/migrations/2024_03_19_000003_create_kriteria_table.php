@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_kriteria');
             $table->text('deskripsi')->nullable();
+            $table->json('ppepp_descriptions')->nullable();
             $table->timestamps();
         });
     }

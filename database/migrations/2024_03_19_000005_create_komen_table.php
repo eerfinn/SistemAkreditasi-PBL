@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('komen', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dokumen_id')->constrained('dokumen')->onDelete('cascade');
+            $table->foreignId('dokumen_id')->nullable()->constrained('dokumen')->onDelete('cascade');
+            $table->foreignId('kriteria_id')->nullable()->constrained('kriteria')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('komentar');
             $table->timestamps();

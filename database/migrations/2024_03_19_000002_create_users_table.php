@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->enum('role', ['administrator', 'dosen1','dosen2', 'dosen3', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
+            $table->string('photo')->nullable();
             $table->string('path_profile')->nullable();
             $table->timestamps();
         });
