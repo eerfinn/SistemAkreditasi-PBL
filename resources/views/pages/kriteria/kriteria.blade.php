@@ -300,9 +300,9 @@ $(document).ready(function() {
                         <div class="comment-item">
                             <div class="d-flex align-items-center mb-2">
                                 <div class="comment-avatar">
-                                        {{ substr($comment->user->name ?? 'U', 0, 1) }}
+                                        {{ substr($comment->user->nama ?? 'U', 0, 1) }}
                                 </div>
-                                <h6 class="mb-0 ms-2">{{ $comment->user->name ?? 'User' }}</h6>
+                                <h6 class="mb-0 ms-2">{{ $comment->user->nama ?? 'User' }}</h6>
                                 <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
                                 <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
                             </div>

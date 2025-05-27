@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kriteria extends Model
 {
@@ -25,5 +26,13 @@ class Kriteria extends Model
         $descriptions[$ppepp] = $description;
         $this->ppepp_descriptions = json_encode($descriptions);
         $this->save();
+    }
+    
+    /**
+     * Get the comments for the kriteria
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Komen::class, 'kriteria_id');
     }
 }

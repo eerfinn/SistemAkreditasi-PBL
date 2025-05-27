@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kriteria;
 use App\Models\Dokumen;
+use App\Models\Komen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -34,6 +35,13 @@ class KriteriaController extends Controller
         $user = Auth::user();
         $kriteria = Kriteria::findOrFail($id);
         $selected_ppepp = $request->query('ppepp', 'penetapan'); // Default to penetapan if not specified
+
+        // Load comments for this kriteria
+        $kriteriaComments = Komen::where('kriteria_id', $id)
+            ->whereNull('dokumen_id')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $ppepp_labels = [
             'penetapan' => 'C1. Penetapan',
@@ -96,7 +104,8 @@ class KriteriaController extends Controller
             'stageLabel' => $ppepp_labels[$selected_ppepp] ?? 'Tahap Tidak Diketahui',
             'existingDocsForStage' => $dokumenPerPPEPP[$selected_ppepp] ?? collect(),
             'statusCounts' => $statusCounts,
-            'is_admin' => $user->role === 'administrator'
+            'is_admin' => $user->role === 'administrator',
+            'kriteriaComments' => $kriteriaComments
         ];
 
         return view('pages.kriteria.kriteria', $viewData);
