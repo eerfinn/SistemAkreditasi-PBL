@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -19,6 +19,10 @@ use App\Http\Controllers\NotificationController;
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
+
+Route::get('/loginn', function () {
+    return response()->view('pages.errors.page-error-404', [], 404);
+});
 
 /*
 |--------------------------------------------------------------------------
