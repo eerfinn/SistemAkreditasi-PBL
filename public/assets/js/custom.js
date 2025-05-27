@@ -776,6 +776,9 @@ function loadNavbarNotifications() {
             // Hapus loading indicator
             $('#notification-loading').hide();
 
+            // Bersihkan notifikasi yang ada sebelum menambahkan yang baru
+            $('#notification-list li:not(#notification-loading, #notification-empty)').remove();
+
             // Tampilkan badge jika ada notifikasi yang belum dibaca
             if (response.unreadCount > 0) {
                 $('#notification-badge').text(response.unreadCount).show();
@@ -789,26 +792,38 @@ function loadNavbarNotifications() {
 
                 $.each(response.notifications, function(index, notification) {
                     var isUnread = !notification.is_read;
-                    var mediaClass = 'media-' + notification.color;
+                    var bgClass = isUnread ? ' bg-light-hover' : '';
 
-                    notificationHtml += '<li>';
-                    notificationHtml += '<div class="timeline-panel' + (isUnread ? ' bg-light' : '') + '">';
-                    notificationHtml += '<div class="media me-2 ' + mediaClass + '">';
-                    notificationHtml += '<i class="fas ' + notification.icon + '"></i>';
+                    notificationHtml += '<li class="notification-item' + bgClass + '">';
+                    notificationHtml += '<div class="timeline-panel p-3 mb-2 rounded border-0' + (isUnread ? ' bg-light' : '') + '">';
+
+                    // Ikon notifikasi dengan warna yang sesuai
+                    notificationHtml += '<div class="d-flex">';
+                    notificationHtml += '<div class="me-3">';
+                    notificationHtml += '<span class="rounded-circle d-flex align-items-center justify-content-center bg-' + notification.color + '" style="width: 40px; height: 40px;">';
+                    notificationHtml += '<i class="fas ' + notification.icon + ' text-white"></i>';
+                    notificationHtml += '</span>';
                     notificationHtml += '</div>';
+
+                    // Konten notifikasi
                     notificationHtml += '<div class="media-body">';
                     notificationHtml += '<h6 class="mb-1' + (isUnread ? ' fw-bold' : '') + '">' + notification.title + '</h6>';
-                    notificationHtml += '<p class="mb-1">' + notification.message + '</p>';
-                    notificationHtml += '<small class="d-block">' + formatTimeAgo(notification.created_at) + '</small>';
+                    notificationHtml += '<p class="mb-1 fs-13">' + notification.message + '</p>';
+                    notificationHtml += '<div class="d-flex justify-content-between align-items-center">';
+                    notificationHtml += '<small class="text-muted">' + formatTimeAgo(notification.created_at) + '</small>';
+                    notificationHtml += '<a href="' + notificationReadUrl.replace('__id__', notification.id) + '" class="btn btn-sm btn-link p-0 ms-2">Lihat</a>';
                     notificationHtml += '</div>';
                     notificationHtml += '</div>';
-                    notificationHtml += '<div class="d-flex justify-content-end px-3 pb-1">';
-                    notificationHtml += '<a href="' + notificationReadUrl.replace('__id__', notification.id) + '" class="btn btn-sm btn-link">Lihat</a>';
+                    notificationHtml += '</div>';
+
                     notificationHtml += '</div>';
                     notificationHtml += '</li>';
                 });
 
                 $('#notification-list').prepend(notificationHtml);
+
+                // Tambahkan CSS untuk hover effect
+                $('<style>.bg-light-hover:hover{background-color:rgba(0,0,0,0.03);} .fs-13{font-size:13px;}</style>').appendTo('head');
             } else {
                 $('#notification-empty').show();
             }

@@ -60,6 +60,51 @@
         .modal-dialog {
             z-index: 10000 !important;
         }
+
+        /* Notification styles */
+        .notification_dropdown .dropdown-menu {
+            min-width: 320px;
+            max-width: 400px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: none;
+        }
+
+        .notification_dropdown .timeline-panel {
+            transition: all 0.2s ease;
+        }
+
+        .notification_dropdown .all-notification {
+            display: block;
+            padding: 10px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--primary);
+            border-top: 1px solid #eee;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .notification_dropdown .all-notification:hover {
+            background: var(--rgba-primary-1);
+        }
+
+        #notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 600;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
     </style>
 
 </head>
