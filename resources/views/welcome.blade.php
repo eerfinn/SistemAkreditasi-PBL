@@ -69,7 +69,7 @@
                                 <div class="profile-info d-flex align-items-center">
                                     <div class="profile-image">
                                         {{-- <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"> --}}
-                                       <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/user.jpg') }}" alt="" class= "profile-image img">
+                                       <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/avatar/1.png') }}" alt="" class= "profile-image img">
                                     </div>
                                 </div>
                             </a>
