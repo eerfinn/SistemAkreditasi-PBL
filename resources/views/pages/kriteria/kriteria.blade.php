@@ -285,11 +285,8 @@ $(document).ready(function() {
                         <div class="comment-item">
                             <div class="d-flex align-items-center mb-2">
                                 <div class="comment-avatar">
-                                    @if($comment->user && $comment->user->photo)
-                                        <img src="{{ asset('storage/profile/' . $comment->user->photo) }}" alt="{{ $comment->user->nama }}" class="rounded-circle" width="40" height="40">
-                                    @else
-                                        {{ substr($comment->user->nama ?? 'U', 0, 1) }}
-                                    @endif
+                                    {{-- Display comment author's photo if available, otherwise display default avatar --}}
+                                    <img src="{{ ($comment->user && $comment->user->photo) ? asset('storage/profile/' . $comment->user->photo) : asset('assets/images/avatar/1.png') }}" alt="{{ optional($comment->user)->nama ?? 'User' }}" class="rounded-circle" width="40" height="40">
                                 </div>
                                 <h6 class="mb-0 ms-2">{{ $comment->user->nama ?? 'User' }}</h6>
                                 <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>

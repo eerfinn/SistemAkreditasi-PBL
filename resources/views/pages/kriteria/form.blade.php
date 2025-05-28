@@ -179,24 +179,10 @@
                                                                 <input type="text" class="form-control" value="{{ $doc->nama_dokumen }}" readonly>
                                                             </div>
 
-                                                            @if($doc->keterangan_revisi)
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold">Keterangan Revisi</label>
-                                                                <div class="alert alert-info">
-                                                                    {{ $doc->keterangan_revisi }}
-                                                                </div>
-                                                            </div>
-                                                            @endif
-
                                                             <div class="mb-3">
                                                                 <label class="form-label fw-bold">Unggah File Revisi</label>
                                                                 <input type="file" class="form-control" name="file" required>
                                                                 <small class="text-muted">Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX. Maksimal 5MB.</small>
-                                                            </div>
-
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold">Keterangan Tambahan (Opsional)</label>
-                                                                <textarea class="form-control" name="keterangan_revisi" rows="3" placeholder="Tambahkan keterangan tentang revisi yang dilakukan..."></textarea>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
