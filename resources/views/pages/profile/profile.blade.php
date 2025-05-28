@@ -154,6 +154,18 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="info-card mb-4 p-4 rounded-lg border">
+    <div class="d-flex align-items-center mb-3">
+        <div class="icon-circle bg-primary-light text-primary me-3">
+            <i class="fas fa-envelope"></i>
+        </div>
+        <div>
+            <h6 class="mb-0 text-muted small">Email</h6>
+            <h5 class="mb-0">{{ $user->email }}</h5>
+        </div>
+    </div>
+</div>
+
                             {{-- Password section removed --}}
                         </div>
                     </div>
