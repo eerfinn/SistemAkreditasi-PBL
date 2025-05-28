@@ -21,6 +21,9 @@ class MailConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Set app name
+        Config::set('app.name', 'SistemAkreditasi');
+        
         // Uncomment this section for development with log driver
         // Config::set('mail.default', 'log');
         
