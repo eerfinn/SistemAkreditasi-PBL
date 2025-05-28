@@ -894,8 +894,7 @@
             <div class="card my-calendar h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Events</h4>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#addTaskModal">+ Tambah Event</a>
+                    <span class="text-muted small">Kelola di <i class="fas fa-sticky-note"></i> Notes</span>
                 </div>
                 <div class="card-body schedules-cal">
                     <input type="text" class="form-control d-none" id="datetimepicker1">
@@ -908,8 +907,7 @@
 
                             <!-- Pesan jika tidak ada tugas -->
                             <div id="noTasksMessage" class="text-center p-3 {{ count($tasks) > 0 ? 'd-none' : '' }}">
-                                <p class="text-muted mb-0">Belum ada events. Klik tombol "Tambah Event" untuk membuat event
-                                    baru.</p>
+                                <p class="text-muted mb-0">Belum ada events. Klik ikon <i class="fas fa-comment-alt"></i> di navbar dan pilih tab Notes untuk menambahkan event baru.</p>
                             </div>
                         </div>
                     </div>
@@ -1050,6 +1048,35 @@
                 // Tampilkan pesan "tidak ada tugas" jika tidak ada tugas
                 $('#noTasksMessage').removeClass('d-none');
             }
+
+            // Listen for events updated from navbar
+            $(document).on('eventsUpdated', function(e, updatedEvents) {
+                console.log('Events updated, refreshing dashboard events');
+                // Clear existing events
+                $('#eventsList').empty();
+
+                // Add updated events to UI
+                if (updatedEvents && updatedEvents.length > 0) {
+                    updatedEvents.forEach(event => {
+                        if (typeof event.id === 'number' && event.id > 0) {
+                            // Format for addTaskToUI function
+                            const formattedTask = {
+                                id: event.id,
+                                title: event.judul,
+                                rawDate: event.tanggal,
+                                rawTime: event.waktu || '00:00',
+                                status: event.status || 'pending'
+                            };
+                            addTaskToUI(formattedTask);
+                        }
+                    });
+                    // Sembunyikan pesan "tidak ada tugas"
+                    $('#noTasksMessage').addClass('d-none');
+                } else {
+                    // Tampilkan pesan "tidak ada tugas"
+                    $('#noTasksMessage').removeClass('d-none');
+                }
+            });
 
             // Network Animation for Welcome Container
             const canvas = document.getElementById('networkCanvas');
@@ -1293,15 +1320,6 @@
                     <div class="event-actions">
                         <div class="form-check form-switch mb-0">
                             <input class="form-check-input task-checkbox" type="checkbox" role="switch" data-id="${task.id}" ${task.status === 'completed' ? 'checked' : ''}>
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item edit-task" href="javascript:void(0);" data-id="${task.id}"><i class="fas fa-edit me-2"></i>Edit</a></li>
-                                <li><a class="dropdown-item delete-task" href="javascript:void(0);" data-id="${task.id}"><i class="fas fa-trash me-2"></i>Hapus</a></li>
-                            </ul>
                         </div>
                         <span class="event-time text-white bg-${statusClass}">${timeDisplay}</span>
                     </div>
