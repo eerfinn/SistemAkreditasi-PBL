@@ -21,11 +21,6 @@
                         <input type="file" class="form-control" id="file{{ $dokumen->id }}" name="file" required>
                         <small class="text-muted">Format: PDF, Word, Excel, PowerPoint. Maks: 5MB</small>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="keterangan_revisi{{ $dokumen->id }}" class="form-label">Keterangan Revisi (opsional):</label>
-                        <textarea class="form-control" id="keterangan_revisi{{ $dokumen->id }}" name="keterangan_revisi" rows="3" placeholder="Tuliskan perubahan apa yang Anda buat pada revisi ini..."></textarea>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

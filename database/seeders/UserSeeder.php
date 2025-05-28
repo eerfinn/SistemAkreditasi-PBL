@@ -14,12 +14,14 @@ class UserSeeder extends Seeder
             [
                 'username' => 'admin',
                 'nama' => 'Administrator',
+                'email' => 'admin@gmail.com',
                 'password' => Hash::make('admin123'),
                 'role' => 'administrator',
             ],
             [
                 'username' => 'dosen1',
                 'nama' => 'Dosen 1',
+                'email' => 'erfinbrian@gmail.com',
                 'password' => Hash::make('dosen1123'),
                 'role' => 'dosen1',
             ],

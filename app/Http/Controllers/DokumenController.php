@@ -463,7 +463,6 @@ class DokumenController extends Controller
         // Validate the request
         $request->validate([
             'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
-            'keterangan_revisi' => 'nullable|string|max:500',
         ]);
 
         try {
@@ -495,9 +494,6 @@ class DokumenController extends Controller
             $dokumen->nama_dokumen = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
             $dokumen->path = $path;
             $dokumen->status = Dokumen::STATUS_MENUNGGU;
-            if ($request->filled('keterangan_revisi')) {
-                $dokumen->keterangan_revisi = $request->keterangan_revisi;
-            }
             $dokumen->updated_at = now();
             $dokumen->save();
 

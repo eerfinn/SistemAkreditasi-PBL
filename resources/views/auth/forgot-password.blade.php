@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SIAkred</title>
+    <title>Forgot Password - SIAkred</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,6 +13,7 @@
             --text-color: #2d3748;
             --text-secondary: #718096;
             --error-color: #e53e3e;
+            --success-color: #48bb78;
             --input-border: #e2e8f0;
             --input-focus: rgba(5, 95, 197, 0.1);
             --background: #f8fafc;
@@ -33,7 +34,7 @@
             background-color: rgb(255, 255, 255);
         }
 
-        .login-form-section {
+        .forgot-password-section {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -44,7 +45,7 @@
             animation: fadeIn 0.5s ease-in-out;
         }
 
-        .login-image-section {
+        .image-section {
             flex: 1.5;
             background: url('{{ asset('assets/images/LoginImage.jpg') }}') center/cover no-repeat;
             position: relative;
@@ -56,7 +57,7 @@
             padding-left: 4rem;
         }
 
-        .login-image-section::before {
+        .image-section::before {
             content: '';
             position: absolute;
             top: 0;
@@ -143,8 +144,7 @@
 
         .form-input {
             width: 100%;
-            padding: 1rem 3rem 1rem 1.25rem;
-            /* Added right padding for eye icon */
+            padding: 1rem 1.25rem;
             border: 1px solid var(--input-border);
             border-radius: 10px;
             font-size: 0.95rem;
@@ -163,29 +163,17 @@
             opacity: 1;
         }
 
-        .input-wrapper {
-            position: relative;
-            display: flex;
+        .back-home-button {
+            display: inline-flex;
             align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
         }
 
-        .password-toggle {
-            position: absolute;
-            right: 1rem;
-            cursor: pointer;
-            width: 22px;
-            height: 22px;
-            opacity: 0.7;
-            transition: opacity 0.2s ease;
-        }
-
-
-
-        .password-toggle:hover {
-            opacity: 1;
-        }
-
-        .login-button {
+        .submit-button {
             width: 100%;
             padding: 1rem;
             background: var(--primary-color);
@@ -200,31 +188,31 @@
             box-shadow: 0 4px 6px rgba(5, 95, 197, 0.1);
         }
 
-        .login-button:hover {
+        .submit-button:hover {
             background: var(--primary-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(5, 95, 197, 0.15);
         }
 
-        .login-button:active {
+        .submit-button:active {
             transform: translateY(0);
         }
 
-        .forgot-password {
+        .login-link {
             text-align: center;
             margin-top: 2rem;
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
 
-        .forgot-password a {
+        .login-link a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
             transition: all 0.2s ease;
         }
 
-        .forgot-password a:hover {
+        .login-link a:hover {
             text-decoration: underline;
             color: var(--primary-hover);
         }
@@ -235,6 +223,22 @@
             margin-top: 0.5rem;
             display: block;
             animation: shake 0.3s ease-in-out;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            padding: 0.75rem 1rem;
+            background-color: rgba(72, 187, 120, 0.1);
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .success-message svg {
+            margin-right: 0.5rem;
+            flex-shrink: 0;
         }
 
         @keyframes fadeIn {
@@ -268,11 +272,11 @@
         }
 
         @media (max-width: 1024px) {
-            .login-form-section {
+            .forgot-password-section {
                 padding: 3rem;
             }
 
-            .login-image-section {
+            .image-section {
                 padding-left: 3rem;
             }
         }
@@ -282,7 +286,7 @@
                 flex-direction: column;
             }
 
-            .login-image-section {
+            .image-section {
                 min-height: 300px;
                 order: -1;
                 padding: 2rem;
@@ -308,7 +312,7 @@
                 font-size: 1.3rem;
             }
 
-            .login-form-section {
+            .forgot-password-section {
                 padding: 2.5rem 2rem;
                 max-width: 100%;
             }
@@ -332,7 +336,7 @@
         }
 
         @media (max-width: 480px) {
-            .login-form-section {
+            .forgot-password-section {
                 padding: 2rem 1.5rem;
             }
 
@@ -349,21 +353,20 @@
             }
 
             .form-input {
-                padding: 0.9rem 2.5rem 0.9rem 1.1rem;
+                padding: 0.9rem 1.1rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="login-form-section">
-
-        <a href="{{ url('/') }}" class="back-home-button" style="display:inline-flex; align-items: center; gap: 0.3rem; margin-bottom: 1rem; color: var(--primary-color); font-weight: 600; text-decoration: none;">
+    <div class="forgot-password-section">
+        <a href="{{ url('/login') }}" class="back-home-button">
             <svg width="24" height="24" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="1.2">
                 <rect width="24" height="24" fill="white"></rect>
                 <path d="M14.5 17L9.5 12L14.5 7" stroke="#055fc5" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
-            Kembali ke Home
+            Back to Login
         </a>
 
         <div class="logo-header">
@@ -372,46 +375,42 @@
         </div>
 
         <div class="form-header">
-            <h2>Member Sign In</h2>
-            <p>Enter your username and password to sign in.</p>
+            <h2>Forgot Password</h2>
+            <p>Enter your email address and we'll send you a link to reset your password.</p>
         </div>
 
-        <form method="POST" action="{{ route('login') }}">
+        @if (session('success'))
+        <div class="success-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#48bb78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            {{ session('success') }}
+        </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.email') }}">
             @csrf
 
             <div class="form-group">
-                <label for="username" class="form-label">Username or Email</label>
-                <input type="text" id="username" name="login" class="form-input"
-                    placeholder="Enter your username or email" value="{{ old('login') }}" required autocomplete="username"
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" name="email" class="form-input"
+                    placeholder="Enter your email address" value="{{ old('email') }}" required autocomplete="email"
                     autocapitalize="off">
-                @error('login')
+                @error('email')
                     <span class="error-message">{{ $message }}</span>
                 @enderror
             </div>
 
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="password" name="password" class="form-input"
-                        placeholder="Enter your password" required autocomplete="current-password">
-                    <img id="togglePassword" class="password-toggle" src="{{ asset('assets/images/EyeHidee.png') }}"
-                        alt="Toggle Password">
-                </div>
-                @error('password')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
+            <button type="submit" class="submit-button">Send Password Reset Link</button>
 
-            <button type="submit" class="login-button">Log In</button>
-
-            <div class="forgot-password">
-                {{-- Forgot your password? Please contact <a href="mailto:admin@polinema.ac.id">admin</a> --}}
-                <p>Forgot your password? <a href="{{ route('password.request') }}">Reset password</a></p>
+            <div class="login-link">
+                <p>Remember your password? <a href="{{ route('login') }}">Login here</a></p>
             </div>
         </form>
     </div>
 
-    <div class="login-image-section">
+    <div class="image-section">
         <div class="polinema-brand">
             <img class="polinema-logo" src="{{ asset('assets/images/LogoPolinema.png') }}" alt="Polinema Logo">
             <h2 class="polinema-title">POLITEKNIK</h2>
@@ -420,18 +419,6 @@
     </div>
 
     <script>
-        // Toggle password visibility
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
-
-        togglePassword.addEventListener('click', function() {
-            const isPassword = password.type === 'password';
-            password.type = isPassword ? 'text' : 'password';
-            this.src = isPassword ?
-                "{{ asset('assets/images/EyeUnhide.png') }}" :
-                "{{ asset('assets/images/EyeHidee.png') }}";
-        });
-
         // Add focus effect when clicking on form inputs
         document.querySelectorAll('.form-input').forEach(input => {
             const formGroup = input.closest('.form-group');
@@ -454,9 +441,9 @@
         document.querySelector('form').addEventListener('submit', function(e) {
             const button = this.querySelector('button[type="submit"]');
             button.disabled = true;
-            button.innerHTML = 'Logging in...';
+            button.innerHTML = 'Sending...';
         });
     </script>
 </body>
 
-</html>
+</html> 
