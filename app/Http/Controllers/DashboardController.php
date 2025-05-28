@@ -264,7 +264,7 @@ class DashboardController extends Controller
 
     protected function kjmData()
     {
-        return ['user' => auth()->user()];
+        return $this->administratorData();
     }
 
     protected function kaprodiData()
