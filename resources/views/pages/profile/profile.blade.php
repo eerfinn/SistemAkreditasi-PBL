@@ -84,7 +84,7 @@
                             <form id="profileForm" action="{{ route('profile.upload') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <label for="profile_photo" class="d-block mb-0" style="position: relative; display: inline-block;">
-                                    <img src="{{ $user->photo ? asset('storage/profile/' . $user->photo) : asset('assets/images/profile/profile.png') }}"
+                                    <img src="{{ $user->photo ? asset('storage/profile/' . $user->photo) : asset('assets/images/avatar/1.png') }}"
                                          class="rounded-circle shadow mb-2"
                                          width="250"
                                          height="250"
