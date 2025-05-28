@@ -24,11 +24,11 @@
                         <tr>
                             <td>
                                 {{ $dokumen->nama_dokumen }}
-                                <span class="small d-block text-muted">ID: {{ $dokumen->id }}</span>
+                                {{-- <span class="small d-block text-muted">ID: {{ $dokumen->id }}</span> --}}
                             </td>
                             <td>
                                 {{ $dokumen->user->nama ?? 'Unknown' }}
-                                <span class="small d-block text-muted">{{ $dokumen->user->role ?? '' }}</span>
+                                {{-- <span class="small d-block text-muted">{{ $dokumen->user->role ?? '' }}</span> --}}
                             </td>
                             <td>
                                 <x-dokumen-status-badge :status="$dokumen->status" />
@@ -43,7 +43,7 @@
                                             ->get();
                                         $commentCount = $dokumenComments->count();
                                     @endphp
-                                    
+
                                     <!-- View button -->
                                     <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                         <i class="fas fa-eye"></i>
@@ -70,15 +70,15 @@
                                             <i class="fas fa-check-double"></i>
                                         </button>
                                     @endif
-                                    
+
                                     @if($commentCount > 0)
                                         <x-dokumen-comments-modal :dokumen="$dokumen" :dokumenComments="$dokumenComments" :commentCount="$commentCount" />
                                     @endif
-                                    
+
                                     @if(!$is_validation_view && $dokumen->status === 'revisi')
                                         <x-dokumen-revisi-modal :dokumen="$dokumen" />
                                     @endif
-                                    
+
                                     @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
                                         <x-dokumen-validasi-modal :dokumen="$dokumen" />
                                     @endif
@@ -103,4 +103,4 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
