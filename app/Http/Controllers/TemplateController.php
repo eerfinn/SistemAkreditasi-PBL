@@ -33,12 +33,8 @@ class TemplateController extends Controller
             // Dosen hanya bisa melihat template untuk kriteria yang bisa mereka akses
             $allowedKriteriaIds = [];
 
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             $templates = Template::with(['kriteria', 'creator'])
@@ -55,7 +51,7 @@ class TemplateController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+        $allowedRoles = ['administrator', 'dosen'];
 
         // Cek apakah user memiliki izin untuk membuat template
         if (!in_array($user->role, $allowedRoles)) {
@@ -68,12 +64,8 @@ class TemplateController extends Controller
             $kriteria = Kriteria::all();
         } else {
             $allowedKriteriaIds = [];
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             $kriteria = Kriteria::whereIn('id', $allowedKriteriaIds)->get();
@@ -96,7 +88,7 @@ class TemplateController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+        $allowedRoles = ['administrator', 'dosen'];
 
         // Cek apakah user memiliki izin untuk membuat template
         if (!in_array($user->role, $allowedRoles)) {
@@ -115,12 +107,8 @@ class TemplateController extends Controller
         // Validasi tambahan untuk memastikan dosen hanya membuat template untuk kriteria yang mereka akses
         if ($user->role !== 'administrator') {
             $allowedKriteriaIds = [];
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             if (!in_array($validated['kriteria_id'], $allowedKriteriaIds)) {
@@ -149,12 +137,8 @@ class TemplateController extends Controller
         if ($user->role !== 'administrator') {
             $allowedKriteriaIds = [];
 
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
@@ -172,7 +156,7 @@ class TemplateController extends Controller
     public function edit(Template $template)
     {
         $user = Auth::user();
-        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+        $allowedRoles = ['administrator', 'dosen'];
 
         // Cek apakah user memiliki izin untuk mengedit template
         if (!in_array($user->role, $allowedRoles)) {
@@ -183,12 +167,8 @@ class TemplateController extends Controller
         // Jika bukan admin, cek apakah template ini berada dalam kriteria yang bisa diakses
         if ($user->role !== 'administrator') {
             $allowedKriteriaIds = [];
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
@@ -202,12 +182,8 @@ class TemplateController extends Controller
             $kriteria = Kriteria::all();
         } else {
             $allowedKriteriaIds = [];
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             $kriteria = Kriteria::whereIn('id', $allowedKriteriaIds)->get();
@@ -230,7 +206,7 @@ class TemplateController extends Controller
     public function update(Request $request, Template $template)
     {
         $user = Auth::user();
-        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+        $allowedRoles = ['administrator', 'dosen'];
 
         // Cek apakah user memiliki izin untuk memperbarui template
         if (!in_array($user->role, $allowedRoles)) {
@@ -241,12 +217,8 @@ class TemplateController extends Controller
         // Jika bukan admin, cek apakah template ini berada dalam kriteria yang bisa diakses
         if ($user->role !== 'administrator') {
             $allowedKriteriaIds = [];
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
@@ -266,12 +238,8 @@ class TemplateController extends Controller
         // Validasi tambahan untuk memastikan dosen hanya memperbarui template ke kriteria yang mereka akses
         if ($user->role !== 'administrator') {
             $allowedKriteriaIds = [];
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             if (!in_array($validated['kriteria_id'], $allowedKriteriaIds)) {
@@ -293,7 +261,7 @@ class TemplateController extends Controller
     public function destroy(Template $template)
     {
         $user = Auth::user();
-        $allowedRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3'];
+        $allowedRoles = ['administrator', 'dosen'];
 
         // Cek apakah user memiliki izin untuk menghapus template
         if (!in_array($user->role, $allowedRoles)) {
@@ -305,12 +273,8 @@ class TemplateController extends Controller
         // dan apakah template ini dibuat oleh user tersebut
         if ($user->role !== 'administrator') {
             $allowedKriteriaIds = [];
-            if ($user->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif ($user->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif ($user->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
             }
 
             if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
@@ -341,12 +305,8 @@ class TemplateController extends Controller
             // Jika bukan admin, cek apakah user memiliki akses ke kriteria ini
             $allowedKriteriaIds = [];
 
-            if (auth()->user()->role === 'dosen1') {
-                $allowedKriteriaIds = [1, 2, 3];
-            } elseif (auth()->user()->role === 'dosen2') {
-                $allowedKriteriaIds = [4, 5, 6];
-            } elseif (auth()->user()->role === 'dosen3') {
-                $allowedKriteriaIds = [7, 8, 9];
+            if (auth()->user()->role === 'dosen') {
+                $allowedKriteriaIds = auth()->user()->kriteria_access ?? [];
             }
 
             if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
@@ -355,24 +315,35 @@ class TemplateController extends Controller
             }
         }
 
-        // Buat nama file yang aman
-        $filename = Str::slug($template->name) . '-' . date('YmdHis') . '.docx';
-
-        // Header untuk download
-        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
-        // Konversi HTML ke Word menggunakan PhpWord
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
-        $section = $phpWord->addSection();
-
-        // Import HTML
-        \PhpOffice\PhpWord\Shared\Html::addHtml($section, $template->content);
-
-        // Simpan ke output
-        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-        $objWriter->save('php://output');
-        exit;
+        try {
+            // Buat nama file yang aman
+            $filename = Str::slug($template->name) . '-' . date('YmdHis') . '.docx';
+            
+            // Buat temporary file untuk menyimpan dokumen
+            $tempFile = tempnam(sys_get_temp_dir(), 'word_');
+            
+            // Konversi HTML ke Word menggunakan PhpWord
+            $phpWord = new \PhpOffice\PhpWord\PhpWord();
+            $section = $phpWord->addSection();
+            
+            // Import HTML
+            \PhpOffice\PhpWord\Shared\Html::addHtml($section, $template->content);
+            
+            // Simpan ke file temporary
+            $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+            $objWriter->save($tempFile);
+            
+            // Return file sebagai download
+            return response()->download($tempFile, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'max-age=0',
+            ])->deleteFileAfterSend(true);
+            
+        } catch (\Exception $e) {
+            Log::error('Template download error: ' . $e->getMessage());
+            return redirect()->route('templates.index')
+                ->with('error', 'Terjadi kesalahan saat mengunduh template: ' . $e->getMessage());
+        }
     }
 }

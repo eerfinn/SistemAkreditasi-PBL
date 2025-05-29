@@ -993,6 +993,36 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Kriteria yang Ditugaskan</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach($user->kriteria_access as $kriteriaId)
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">Kriteria {{ $kriteriaId }}</h5>
+                                    <p class="card-text">
+                                        @php
+                                            $kriteria = \App\Models\Kriteria::find($kriteriaId);
+                                            echo $kriteria ? $kriteria->nama_kriteria : 'Kriteria ' . $kriteriaId;
+                                        @endphp
+                                    </p>
+                                    <a href="{{ route('kriteria.show', $kriteriaId) }}" class="btn btn-primary">Kelola Dokumen</a>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('vendor-script')

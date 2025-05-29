@@ -121,7 +121,7 @@ $(document).ready(function() {
                             <h4 class="mb-1">{{ isset($kriteria) ? $kriteria->nama_kriteria : 'Nama Kriteria Tidak Ditemukan' }}</h4>
                             <p class="mb-0">{{ isset($kriteria) ? $kriteria->deskripsi : 'Deskripsi kriteria tidak tersedia.' }}</p>
                         </div>
-                        @if(auth()->user() && (auth()->user()->role === 'dosen1' || auth()->user()->role === 'dosen2' || auth()->user()->role === 'dosen3' || auth()->user()->role === 'administrator'))
+                        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
                         <div class="col-md-4 text-end">
                             <a href="{{ route('kriteria.upload.form', ['kriteria' => $kriteria->id, 'ppepp' => 'penetapan']) }}" class="btn btn-primary">
                                 <i class="fas fa-cog me-1"></i> Kelola Dokumen PPEPP
@@ -197,7 +197,7 @@ $(document).ready(function() {
         />
 
         <!-- Finalization Section for Dosen -->
-        @if(auth()->user() && (auth()->user()->role === 'dosen1' || auth()->user()->role === 'dosen2' || auth()->user()->role === 'dosen3' || auth()->user()->role === 'administrator'))
+        @if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator'))
             <div class="col-xl-12 mb-4">
                 <div class="card">
                     <div class="card-header bg-light">

@@ -1,5 +1,17 @@
 @extends('layouts.master')
 
+@section('css')
+<link href="{{ asset('assets/vendor/select2/css/select2.min.css') }}" rel="stylesheet">
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
+    .select2-selection--multiple {
+        border: 1px solid #ddd !important;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -62,6 +74,25 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3 kriteria-access-section">
+                            <label for="kriteria_access" class="form-label">Kriteria Access</label>
+                            <div class="alert alert-info">
+                                Select which kriteria this user can access.
+                            </div>
+                            <select class="form-control select2" id="kriteria_access" name="kriteria_access[]" multiple>
+                                @foreach($kriteria as $k)
+                                    <option value="{{ $k->id }}" {{ is_array(old('kriteria_access')) && in_array($k->id, old('kriteria_access')) ? 'selected' : '' }}>
+                                        {{ $k->nama_kriteria }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('kriteria_access')
+                                <span class="text-danger">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Back</a>
                             <button type="submit" class="btn btn-primary">Create User</button>
@@ -72,4 +103,18 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="{{ asset('assets/vendor/select2/js/select2.full.min.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Select2
+        $('.select2').select2({
+            placeholder: "Select kriteria",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+@endpush
 @endsection 

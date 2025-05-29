@@ -382,8 +382,17 @@ class KriteriaController extends Controller
     {
         $user = Auth::user();
         
-        if (!in_array($user->role, ['administrator', 'dosen1', 'dosen2', 'dosen3'])) {
+        if (!in_array($user->role, ['administrator', 'dosen'])) {
             abort(403, 'Unauthorized access');
+        }
+
+        // If user is dosen, check if they have access to this kriteria
+        if ($user->role === 'dosen') {
+            $allowedKriteriaIds = $user->kriteria_access ?? [];
+            if (!in_array($id, $allowedKriteriaIds)) {
+                return redirect()->route('kriteria.show', $id)
+                    ->with('error', 'Anda tidak memiliki akses untuk memfinalisasi dokumen kriteria ini.');
+            }
         }
 
         $kriteria = Kriteria::findOrFail($id);
@@ -441,7 +450,7 @@ class KriteriaController extends Controller
     {
         $user = Auth::user();
         
-        if (!in_array($user->role, ['administrator', 'dosen1', 'dosen2', 'dosen3'])) {
+        if (!in_array($user->role, ['administrator', 'dosen'])) {
             abort(403, 'Unauthorized access');
         }
 
@@ -495,5 +504,48 @@ class KriteriaController extends Controller
         $kriteria->updatePPEPPDescription($ppepp, null);
 
             return redirect()->back()->with('success', 'Deskripsi PPEPP berhasil dihapus.');
+    }
+
+    /**
+     * Show upload form for a specific kriteria and PPEPP stage
+     */
+    public function showUploadForm($kriteria_id, $ppepp)
+    {
+        $user = auth()->user();
+        
+        // Cek apakah user memiliki akses ke kriteria ini
+        if (!in_array($user->role, ['administrator', 'dosen'])) {
+            return redirect()->route('kriteria.show', $kriteria_id)
+                ->with('error', 'Anda tidak memiliki akses untuk mengelola dokumen kriteria ini.');
+        }
+
+        // Jika user adalah dosen, cek apakah kriteria ini ada dalam kriteria_access mereka
+        if ($user->role === 'dosen') {
+            $allowedKriteriaIds = $user->kriteria_access ?? [];
+            if (!in_array($kriteria_id, $allowedKriteriaIds)) {
+                return redirect()->route('kriteria.show', $kriteria_id)
+                    ->with('error', 'Anda tidak memiliki akses untuk mengelola dokumen kriteria ini.');
+            }
+        }
+
+        $kriteria = Kriteria::findOrFail($kriteria_id);
+        
+        // Validasi jenis PPEPP
+        $valid_ppepp = [
+            'penetapan', 'pelaksanaan', 'evaluasi', 'pengendalian', 'peningkatan'
+        ];
+        
+        if (!in_array($ppepp, $valid_ppepp)) {
+            return redirect()->route('kriteria.show', $kriteria_id)
+                ->with('error', 'Jenis PPEPP tidak valid.');
+        }
+
+        // Ambil dokumen yang sudah ada untuk kriteria dan PPEPP ini
+        $dokumen = Dokumen::where('kriteria_id', $kriteria_id)
+            ->where('jenis_ppepp', $ppepp)
+            ->where('user_id', $user->id)
+            ->get();
+        
+        return view('pages.kriteria.upload', compact('kriteria', 'ppepp', 'dokumen'));
     }
 }

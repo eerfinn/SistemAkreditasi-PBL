@@ -61,25 +61,11 @@
                     <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
                     @endif
 
-                    {{-- Dosen1 Menu Items - Only Kriteria 1-3 --}}
-                    @if(auth()->user()->role === 'dosen1')
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-            @endif
-
-            {{-- Dosen2 Menu Items - Only Kriteria 4-6 --}}
-            @if(auth()->user()->role === 'dosen2')
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    @endif
-
-                    {{-- Dosen3 Menu Items - Only Kriteria 7-9 --}}
-                    @if(auth()->user()->role === 'dosen3')
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    {{-- Dosen Menu Items - Based on kriteria_access --}}
+                    @if(auth()->user()->role === 'dosen' && !empty(auth()->user()->kriteria_access))
+                        @foreach(auth()->user()->kriteria_access as $kriteriaId)
+                            <li><a href="{{ route('kriteria.show', $kriteriaId) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == $kriteriaId ? 'active' : '' }}">Kriteria {{ $kriteriaId }}</a></li>
+                        @endforeach
                     @endif
 
                     {{-- Kaprodi, Kajur, KJM, Koordinator see all criteria --}}
@@ -110,8 +96,8 @@
                 </a>
             </li> --}}
 
-            {{-- Template Dokumen for non-admin roles --}}
-            @if (in_array(auth()->user()->role, ['administrator', 'dosen1', 'dosen2', 'dosen3']))
+            {{-- Template Dokumen for admin and dosen roles --}}
+            @if (in_array(auth()->user()->role, ['administrator', 'dosen']))
             <li>
                 <a href="{{ route('templates.index') }}" class="{{ request()->routeIs('templates.*') ? 'active' : '' }}">
                     <div class="menu-icon">

@@ -26,7 +26,8 @@ class User extends Authenticatable implements CanResetPassword
         'email',
         'password',
         'role',
-        'photo'
+        'photo',
+        'kriteria_access'
     ];
 
     /**
@@ -47,6 +48,7 @@ class User extends Authenticatable implements CanResetPassword
     protected $casts = [
         'password' => 'hashed',
         'email_verified_at' => 'datetime',
+        'kriteria_access' => 'array',
     ];
 
     /**
@@ -83,19 +85,50 @@ class User extends Authenticatable implements CanResetPassword
         return $this->role === 'dosen';
     }
 
+    /**
+     * Get the kriteria that the user has access to.
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function kriteria()
     {
-        if ($this->role === 'dosen1') {
-            return Kriteria::whereIn('id', [1, 2, 3])->get();
-        } elseif ($this->role === 'dosen2') {
-            return Kriteria::whereIn('id', [4, 5, 6])->get();
-        } elseif ($this->role === 'dosen3') {
-            return Kriteria::whereIn('id', [7, 8, 9])->get();
-        } elseif ($this->role === 'administrator') {
+        // Admin and non-dosen roles have access to all kriteria
+        if ($this->role === 'administrator' || $this->role !== 'dosen') {
             return Kriteria::all();
-        } else {
-            return collect();
         }
+        
+        // For dosen with kriteria_access, return those specific kriteria
+        if (!empty($this->kriteria_access)) {
+            return Kriteria::whereIn('id', $this->kriteria_access)->get();
+        }
+        
+        return collect();
+    }
+
+    /**
+     * Check if user has access to a specific kriteria
+     * 
+     * @param int $kriteriaId
+     * @return bool
+     */
+    public function hasKriteriaAccess($kriteriaId)
+    {
+        // Admin has access to all kriteria
+        if ($this->role === 'administrator') {
+            return true;
+        }
+        
+        // Non-dosen roles (koordinator, kjm, kaprodi, kajur) have access to all kriteria
+        if ($this->role !== 'dosen') {
+            return true;
+        }
+        
+        // For dosen, check the kriteria_access field
+        if (!empty($this->kriteria_access)) {
+            return in_array($kriteriaId, $this->kriteria_access);
+        }
+        
+        return false;
     }
 
     /**

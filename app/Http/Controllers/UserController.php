@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Kriteria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +18,8 @@ class UserController extends Controller
     public function create()
     {
         $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
-        return view('pages.admin.users.create', compact('roles'));
+        $kriteria = Kriteria::all();
+        return view('pages.admin.users.create', compact('roles', 'kriteria'));
     }
 
     public function store(Request $request)
@@ -25,18 +27,39 @@ class UserController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'username' => 'required|string|unique:users',
+            'email' => 'nullable|email|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur'
+            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur',
+            'kriteria_access' => 'nullable|array',
+            'kriteria_access.*' => 'integer|exists:kriteria,id',
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
+        
+        // Administrators don't need explicit kriteria access
+        if ($validated['role'] === 'administrator') {
+            $validated['kriteria_access'] = null;
+        } 
+        // Only dosen need specific kriteria access
+        else if ($validated['role'] === 'dosen') {
+            // For dosen, set the kriteria access as provided
+            $validated['kriteria_access'] = $request->kriteria_access ?? null;
+        }
+        // For all other roles, give access to all kriteria
+        else {
+            $allKriteriaIds = Kriteria::pluck('id')->toArray();
+            $validated['kriteria_access'] = $allKriteriaIds;
+        }
+        
         $user = User::create($validated);
 
         if ($request->ajax()) {
+            $allKriteria = Kriteria::all(['id', 'nama_kriteria']);
             return response()->json([
                 'success' => true,
                 'message' => 'User created successfully.',
-                'user' => $user
+                'user' => $user,
+                'allKriteria' => $allKriteria
             ]);
         }
 
@@ -51,7 +74,8 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
-        return view('pages.admin.users.edit', compact('user', 'roles'));
+        $kriteria = Kriteria::all();
+        return view('pages.admin.users.edit', compact('user', 'roles', 'kriteria'));
     }
 
     public function update(Request $request, User $user)
@@ -59,11 +83,29 @@ class UserController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'username' => 'required|string|unique:users,username,' . $user->id,
-            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur'
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
+            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur',
+            'kriteria_access' => 'nullable|array',
+            'kriteria_access.*' => 'integer|exists:kriteria,id',
         ]);
 
         if ($request->filled('password')) {
             $validated['password'] = bcrypt($request->password);
+        }
+        
+        // Administrators don't need explicit kriteria access
+        if ($validated['role'] === 'administrator') {
+            $validated['kriteria_access'] = null;
+        } 
+        // Only dosen need specific kriteria access
+        else if ($validated['role'] === 'dosen') {
+            // For dosen, set the kriteria access as provided
+            $validated['kriteria_access'] = $request->kriteria_access ?? null;
+        }
+        // For all other roles, give access to all kriteria
+        else {
+            $allKriteriaIds = Kriteria::pluck('id')->toArray();
+            $validated['kriteria_access'] = $allKriteriaIds;
         }
 
         $user->update($validated);
@@ -96,5 +138,54 @@ class UserController extends Controller
     public function showJson(User $user)
     {
         return response()->json($user);
+    }
+    
+    /**
+     * Update kriteria access for a user
+     */
+    public function updateKriteriaAccess(Request $request, User $user)
+    {
+        $request->validate([
+            'kriteria_access' => 'nullable|array',
+            'kriteria_access.*' => 'integer|exists:kriteria,id',
+        ]);
+        
+        // Administrators don't need explicit kriteria access as they have access to all
+        if ($user->role === 'administrator') {
+            $user->kriteria_access = null;
+        } 
+        // Only dosen need specific kriteria access, others get all access
+        else if ($user->role === 'dosen') {
+            // For dosen, set the kriteria access as provided
+            $user->kriteria_access = $request->kriteria_access ?? [];
+        }
+        else {
+            // For all other roles (koordinator, kjm, kaprodi, kajur), give access to all kriteria
+            $allKriteriaIds = Kriteria::pluck('id')->toArray();
+            $user->kriteria_access = $allKriteriaIds;
+        }
+        
+        $user->save();
+        
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Kriteria access updated successfully.',
+                'user' => $user
+            ]);
+        }
+        
+        return redirect()->back()->with('success', 'Kriteria access updated successfully.');
+    }
+    
+    /**
+     * Get kriteria names by IDs
+     */
+    public function getKriteriaNames(Request $request)
+    {
+        $ids = $request->get('ids', []);
+        $kriteria = Kriteria::whereIn('id', $ids)->get(['id', 'nama_kriteria']);
+        
+        return response()->json($kriteria);
     }
 }

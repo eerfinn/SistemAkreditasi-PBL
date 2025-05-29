@@ -21,39 +21,24 @@ class KriteriaAccessMiddleware
         if ($request->route('kriteria')) {
             $kriteriaId = $request->route('kriteria')->id ?? $request->route('kriteria');
 
-            // Role-based access restrictions for dosen roles
-            if ($user->role === 'dosen1' && !in_array($kriteriaId, [1, 2, 3])) {
-                abort(403, 'Forbidden: Dosen 1 can only access Kriteria 1-3.');
-            }
-
-            if ($user->role === 'dosen2' && !in_array($kriteriaId, [4, 5, 6])) {
-                abort(403, 'Forbidden: Dosen 2 can only access Kriteria 4-6.');
-            }
-
-            if ($user->role === 'dosen3' && !in_array($kriteriaId, [7, 8, 9])) {
-                abort(403, 'Forbidden: Dosen 3 can only access Kriteria 7-9.');
+            // Check if the user has access to this kriteria (for all roles except admin)
+            if ($user->role !== 'administrator' && !$user->hasKriteriaAccess($kriteriaId)) {
+                abort(403, 'Forbidden: You do not have access to this kriteria.');
             }
         }
 
         // For upload form access
         if ($request->routeIs('kriteria.upload.form')) {
-            if (!in_array($user->role, ['administrator', 'dosen1', 'dosen2', 'dosen3'])) {
-                abort(403, 'Forbidden: Only administrators and lecturers can manage documents.');
+            if (!in_array($user->role, ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'])) {
+                abort(403, 'Forbidden: You do not have permission to manage documents.');
             }
 
             // Additional check for kriteria access when uploading
             $kriteriaId = $request->route('kriteria')->id ?? $request->route('kriteria');
 
-            if ($user->role === 'dosen1' && !in_array($kriteriaId, [1, 2, 3])) {
-                abort(403, 'Forbidden: Dosen 1 can only access Kriteria 1-3.');
-            }
-
-            if ($user->role === 'dosen2' && !in_array($kriteriaId, [4, 5, 6])) {
-                abort(403, 'Forbidden: Dosen 2 can only access Kriteria 4-6.');
-            }
-
-            if ($user->role === 'dosen3' && !in_array($kriteriaId, [7, 8, 9])) {
-                abort(403, 'Forbidden: Dosen 3 can only access Kriteria 7-9.');
+            // Check if the user has access to this kriteria (for all roles except admin)
+            if ($user->role !== 'administrator' && !$user->hasKriteriaAccess($kriteriaId)) {
+                abort(403, 'Forbidden: You do not have access to this kriteria.');
             }
         }
 

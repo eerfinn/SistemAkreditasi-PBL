@@ -14,9 +14,7 @@ class DashboardController extends Controller
      */
     protected $dashboardViews = [
         'administrator' => 'admin',
-        'dosen1' => 'dosen',
-        'dosen2' => 'dosen',
-        'dosen3' => 'dosen',
+        'dosen' => 'dosen',
         'koordinator' => 'koordinator',
         'kjm' => 'kjm',
         'kaprodi' => 'kaprodi',
@@ -37,14 +35,7 @@ class DashboardController extends Controller
                 return redirect()->route('login')->with('error', 'Unauthorized access');
         }
 
-        // Map dosen1, dosen2, dosen3 to use dosenData method
-        $methodMap = [
-            'dosen1' => 'dosenData',
-            'dosen2' => 'dosenData',
-            'dosen3' => 'dosenData',
-        ];
-
-        $method = $methodMap[$role] ?? ($role . 'Data');
+        $method = $role . 'Data';
         $data = method_exists($this, $method) ? $this->{$method}() : ['user' => $user];
 
         return view('pages.dashboard.' . $this->dashboardViews[$role], $data);
@@ -89,9 +80,7 @@ class DashboardController extends Controller
 
         // Hitung jumlah pengguna per role
         $admin_count = User::where('role', 'administrator')->count();
-        $dosen1_count = User::where('role', 'dosen1')->count();
-        $dosen2_count = User::where('role', 'dosen2')->count();
-        $dosen3_count = User::where('role', 'dosen3')->count();
+        $dosen_count = User::where('role', 'dosen')->count();
         $koordinator_count = User::where('role', 'koordinator')->count();
         $kjm_count = User::where('role', 'kjm')->count();
         $kaprodi_count = User::where('role', 'kaprodi')->count();
@@ -125,9 +114,7 @@ class DashboardController extends Controller
             'ppepp_verified' => $ppepp_verified ?: [0, 0, 0, 0, 0],
             'ppepp_total' => $ppepp_total ?: [0, 0, 0, 0, 0],
             'admin_count' => $admin_count,
-            'dosen1_count' => $dosen1_count,
-            'dosen2_count' => $dosen2_count,
-            'dosen3_count' => $dosen3_count,
+            'dosen_count' => $dosen_count,
             'koordinator_count' => $koordinator_count,
             'kjm_count' => $kjm_count,
             'kaprodi_count' => $kaprodi_count,
@@ -210,7 +197,7 @@ class DashboardController extends Controller
             'ppepp_verified' => $ppepp_verified ?: [0, 0, 0, 0, 0],
             'ppepp_total' => $ppepp_total ?: [0, 0, 0, 0, 0]
         ];
-        }
+    }
 
     /**
      * Get calendar events and tasks for a user

@@ -43,7 +43,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">Daftar Template</h4>
-                    @if(in_array(auth()->user()->role, ['administrator', 'dosen1', 'dosen2', 'dosen3']))
+                    @if(in_array(auth()->user()->role, ['administrator', 'dosen']))
                     <a href="{{ route('templates.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-1"></i> Tambah Template Baru
                     </a>
@@ -100,16 +100,9 @@
                                                 if ($user->role === 'administrator') {
                                                     $canEdit = true;
                                                     $canDelete = true;
-                                                } else if (in_array($user->role, ['dosen1', 'dosen2', 'dosen3'])) {
+                                                } else if ($user->role === 'dosen') {
                                                     // Cek apakah template ini berada dalam kriteria yang bisa diakses oleh user
-                                                    $allowedKriteriaIds = [];
-                                                    if ($user->role === 'dosen1') {
-                                                        $allowedKriteriaIds = [1, 2, 3];
-                                                    } elseif ($user->role === 'dosen2') {
-                                                        $allowedKriteriaIds = [4, 5, 6];
-                                                    } elseif ($user->role === 'dosen3') {
-                                                        $allowedKriteriaIds = [7, 8, 9];
-                                                    }
+                                                    $allowedKriteriaIds = $user->kriteria_access ?? [];
 
                                                     if (in_array($template->kriteria_id, $allowedKriteriaIds)) {
                                                         $canEdit = true;

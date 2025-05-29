@@ -178,7 +178,11 @@ Route::middleware('auth')->group(function () {
             Route::put('/{user}', 'update')->name('update');
             Route::delete('/{user}', 'destroy')->name('destroy');
             Route::get('/{user}/json', 'showJson')->name('showJson');
+            Route::put('/{user}/kriteria-access', 'updateKriteriaAccess')->name('updateKriteriaAccess');
         });
+        
+        // Kriteria helper routes
+        Route::get('/kriteria/names', [UserController::class, 'getKriteriaNames'])->name('kriteria.names');
         
         // Error testing routes (admin only)
         Route::prefix('error-test')->name('error-test.')->group(function () {
