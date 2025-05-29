@@ -1,9 +1,6 @@
 <x-mail::layout>
-{{-- Header --}}
+{{-- Header (hidden since we're using banner) --}}
 <x-slot:header>
-<x-mail::header :url="config('app.url')">
-{{ config('app.name') }}
-</x-mail::header>
 </x-slot:header>
 
 {{-- Body --}}
@@ -21,6 +18,11 @@
 {{-- Footer --}}
 <x-slot:footer>
 <x-mail::footer>
+<div style="text-align: center; margin-bottom: 10px;">
+    <a href="{{ config('app.url') }}" style="text-decoration: none;">
+        <strong style="color: #055FC5; font-size: 16px;">Sistem Akreditasi</strong>
+    </a>
+</div>
 © {{ date('Y') }} {{ config('app.name') }}. @lang('All rights reserved.')
 </x-mail::footer>
 </x-slot:footer>

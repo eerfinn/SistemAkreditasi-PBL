@@ -49,12 +49,13 @@ class ResetPasswordNotification extends Notification
         
         return (new MailMessage)
             ->subject('Reset Password SistemAkreditasi')
-            ->greeting('Halo!')
+            ->greeting('Halo ' . explode('@', $notifiable->getEmailForPasswordReset())[0] . '!')
             ->line('Anda menerima email ini karena kami menerima permintaan reset password untuk akun Anda.')
+            ->line('Silakan klik tombol di bawah ini untuk melakukan reset password:')
             ->action('Reset Password', $url)
             ->line('Link reset password ini akan kedaluwarsa dalam 60 menit.')
             ->line('Jika Anda tidak meminta reset password, tidak ada tindakan lebih lanjut yang diperlukan.')
-            ->salutation('Salam,')
+            ->salutation('Terima kasih,')
             ->salutation('Tim SistemAkreditasi');
     }
 
