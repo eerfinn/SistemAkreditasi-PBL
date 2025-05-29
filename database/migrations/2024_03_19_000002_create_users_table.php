@@ -14,8 +14,11 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique()->nullable();
             $table->string('password');
-            $table->enum('role', ['administrator', 'dosen1','dosen2', 'dosen3', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi']);
+            $table->string('role', 20);
+            $table->json('kriteria_access')->nullable();
             $table->string('photo')->nullable();
+            $table->rememberToken();
+            $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
         });
     }
