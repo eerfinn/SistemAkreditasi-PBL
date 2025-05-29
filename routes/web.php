@@ -183,6 +183,9 @@ Route::middleware('auth')->group(function () {
         
         // Kriteria helper routes
         Route::get('/kriteria/names', [UserController::class, 'getKriteriaNames'])->name('kriteria.names');
+        Route::get('/kriteria/all', function() {
+            return App\Models\Kriteria::all();
+        })->name('kriteria.all');
         
         // Error testing routes (admin only)
         Route::prefix('error-test')->name('error-test.')->group(function () {
@@ -206,5 +209,10 @@ Route::middleware('auth')->group(function () {
                 throw new ServiceUnavailableHttpException(null, 'Service Unavailable Test');
             })->name('service-unavailable');
         });
+
+        // Add this route in the appropriate section, likely in the admin routes group
+        Route::get('/kriteria/all', function() {
+            return App\Models\Kriteria::all();
+        })->name('admin.kriteria.all');
     });
 });

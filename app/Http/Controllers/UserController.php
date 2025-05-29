@@ -123,6 +123,28 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        // Prevent deleting the last administrator
+        if ($user->role === 'administrator' && User::where('role', 'administrator')->count() <= 1) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete the last administrator account.'
+                ], 403);
+            }
+            return redirect()->route('admin.users.index')->with('error', 'Cannot delete the last administrator account.');
+        }
+        
+        // Check if trying to delete own account
+        if (Auth::id() === $user->id) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete your own account.'
+                ], 403);
+            }
+            return redirect()->route('admin.users.index')->with('error', 'Cannot delete your own account.');
+        }
+        
         $user->delete();
 
         if (request()->ajax()) {

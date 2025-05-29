@@ -75,7 +75,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3 kriteria-access-section">
+                        <div class="mb-3 kriteria-access-section" style="display: {{ $user->role === 'dosen' ? 'block' : 'none' }};">
                             <label for="kriteria_access" class="form-label">Kriteria Access</label>
                             <div class="alert alert-info">
                                 Select which kriteria this user can access.
@@ -108,12 +108,17 @@
 @push('scripts')
 <script src="{{ asset('assets/vendor/select2/js/select2.full.min.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    $(document).ready(function() {
         // Initialize Select2
-        $('.select2').select2({
-            placeholder: "Select kriteria",
-            allowClear: true,
-            width: '100%'
+        $('.select2').select2();
+        
+        // Show/hide kriteria access based on role
+        $('#role').change(function() {
+            if ($(this).val() === 'dosen') {
+                $('.kriteria-access-section').show();
+            } else {
+                $('.kriteria-access-section').hide();
+            }
         });
     });
 </script>
