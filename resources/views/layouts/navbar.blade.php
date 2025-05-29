@@ -34,9 +34,6 @@
                 <a class="nav-link" data-bs-toggle="tab" href="#notes">Notes</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#alerts">Alerts</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link active" data-bs-toggle="tab" href="#chat">Chat</a>
             </li>
         </ul>
@@ -408,49 +405,6 @@
                         </div>
                         <a href="javascript:void(0);"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M14.2928932,16.7071068 C13.9023689,16.3165825 13.9023689,15.6834175 14.2928932,15.2928932 C14.6834175,14.9023689 15.3165825,14.9023689 15.7071068,15.2928932 L19.7071068,19.2928932 C20.0976311,19.6834175 20.0976311,20.3165825 19.7071068,20.7071068 C19.3165825,21.0976311 18.6834175,21.0976311 18.2928932,20.7071068 L14.2928932,16.7071068 Z" fill="#000000" fill-rule="nonzero" opacity="1"/><path d="M11,16 C13.7614237,16 16,13.7614237 16,11 C16,8.23857625 13.7614237,6 11,6 C8.23857625,6 6,8.23857625 6,11 C6,13.7614237 8.23857625,16 11,16 Z M11,18 C7.13400675,18 4,14.8659932 4,11 C4,7.13400675 7.13400675,4 11,4 C14.8659932,4 18,7.13400675 18,11 C18,14.8659932 14.8659932,18 11,18 Z" fill="#000000" fill-rule="nonzero"/></g></svg></a>
                     </div>
-                    <div class="card-body contacts_body p-0 dz-scroll" id="DZ_W_Contacts_Body1">
-                        <ul class="contacts">
-                            <li class="name-first-letter">SEVER STATUS</li>
-                            <li class="active">
-                                <div class="d-flex bd-highlight">
-                                    <div class="img_cont primary">KK</div>
-                                    <div class="user_info">
-                                        <span>David Nester Birthday</span>
-                                        <p class="text-primary">Today</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="name-first-letter">SOCIAL</li>
-                            <li>
-                                <div class="d-flex bd-highlight">
-                                    <div class="img_cont success">RU</div>
-                                    <div class="user_info">
-                                        <span>Perfection Simplified</span>
-                                        <p>Jame Smith commented on your status</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="name-first-letter">SEVER STATUS</li>
-                            <li>
-                                <div class="d-flex bd-highlight">
-                                    <div class="img_cont primary">AU</div>
-                                    <div class="user_info">
-                                        <span>AharlieKane</span>
-                                        <p>Sami is online</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="d-flex bd-highlight">
-                                    <div class="img_cont info">MO</div>
-                                    <div class="user_info">
-                                        <span>Athan Jacoby</span>
-                                        <p>Nargis left 30 mins ago</p>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
                     <div class="card-footer"></div>
                 </div>
             </div>
@@ -613,70 +567,6 @@
                                 </defs>
                             </svg>
                             </a>
-                        </li>
-                        <li class="nav-item dropdown notification_dropdown">
-                            <a class="nav-link " href="javascript:void(0);" data-bs-toggle="dropdown">
-                            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 16.87V9.257H21.5V16.931C21.5 20.07 19.5241 22 16.3628 22H8.62733C5.49561 22 3.5 20.03 3.5 16.87ZM8.45938 14.41C8.00494 14.431 7.62953 14.07 7.60977 13.611C7.60977 13.151 7.96542 12.771 8.41987 12.75C8.86443 12.75 9.22997 13.101 9.23985 13.55C9.2596 14.011 8.90395 14.391 8.45938 14.41ZM12.5198 14.41C12.0653 14.431 11.6899 14.07 11.6701 13.611C11.6701 13.151 12.0258 12.771 12.4802 12.75C12.9248 12.75 13.2903 13.101 13.3002 13.55C13.32 14.011 12.9643 14.391 12.5198 14.41ZM16.5505 18.09C16.096 18.08 15.7305 17.7 15.7305 17.24C15.7206 16.78 16.0862 16.401 16.5406 16.391H16.5505C17.0148 16.391 17.3902 16.771 17.3902 17.24C17.3902 17.71 17.0148 18.09 16.5505 18.09ZM11.6701 17.24C11.6899 17.7 12.0653 18.061 12.5198 18.04C12.9643 18.021 13.32 17.641 13.3002 17.181C13.2903 16.731 12.9248 16.38 12.4802 16.38C12.0258 16.401 11.6701 16.78 11.6701 17.24ZM7.59989 17.24C7.61965 17.7 7.99506 18.061 8.44951 18.04C8.89407 18.021 9.24973 17.641 9.22997 17.181C9.22009 16.731 8.85456 16.38 8.40999 16.38C7.95554 16.401 7.59989 16.78 7.59989 17.24ZM15.7404 13.601C15.7404 13.141 16.096 12.771 16.5505 12.761C16.9951 12.761 17.3507 13.12 17.3705 13.561C17.3804 14.021 17.0247 14.401 16.5801 14.41C16.1257 14.42 15.7503 14.07 15.7404 13.611V13.601Z" fill="#222B40"/>
-                                <path opacity="0.4" d="M3.50336 9.2569C3.5162 8.6699 3.5656 7.5049 3.65846 7.1299C4.13267 5.0209 5.74298 3.6809 8.04485 3.4899H16.9559C19.238 3.6909 20.8681 5.0399 21.3423 7.1299C21.4342 7.4949 21.4836 8.6689 21.4964 9.2569H3.50336Z" fill="#222B40"/>
-                                <path d="M8.80489 6.59C9.23958 6.59 9.56559 6.261 9.56559 5.82V2.771C9.56559 2.33 9.23958 2 8.80489 2C8.3702 2 8.04419 2.33 8.04419 2.771V5.82C8.04419 6.261 8.3702 6.59 8.80489 6.59Z" fill="#222B40"/>
-                                <path d="M16.195 6.59C16.6198 6.59 16.9557 6.261 16.9557 5.82V2.771C16.9557 2.33 16.6198 2 16.195 2C15.7603 2 15.4343 2.33 15.4343 2.771V5.82C15.4343 6.261 15.7603 6.59 16.195 6.59Z" fill="#222B40"/>
-                            </svg>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <div id="DZ_W_TimeLine02" class="widget-timeline dz-scroll style-1 p-3 height370">
-                                    <ul class="timeline">
-                                        <li>
-                                            <div class="timeline-badge primary"></div>
-                                            <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                                <span>10 minutes ago</span>
-                                                <h6 class="mb-0">Youtube, a video-sharing website, goes live <strong class="text-primary">$500</strong>.</h6>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-badge info">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-                                                <p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-badge danger">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                                <span>30 minutes ago</span>
-                                                <h6 class="mb-0">john just buy your product <strong class="text-warning">Sell $250</strong></h6>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-badge success">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                                <span>15 minutes ago</span>
-                                                <h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-badge warning">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-badge dark">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
                         </li>
                             <li class="nav-item ps-3">
                                 <div class="dropdown header-profile2">
