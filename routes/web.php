@@ -2,46 +2,44 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\KriteriaController;
-use App\Http\Controllers\DokumenController;
-use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\DaftarTugasController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DokumenController;
+use App\Http\Controllers\KriteriaController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ValidasiController;
+use App\Models\Kriteria;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /*
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::view('/', 'welcome')->name('welcome');
 
 /*
 |--------------------------------------------------------------------------
 | Authentication Routes
 |--------------------------------------------------------------------------
 */
-// Guest routes (for non-authenticated users)
 Route::middleware('guest')->group(function () {
-    Route::get('/login', function () {
-        return view('auth.login');
-    })->name('login');
+    Route::view('/login', 'auth.login')->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     
     // Password Reset Routes
-    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
-    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+    Route::controller(AuthController::class)->group(function () {
+        Route::get('/forgot-password', 'showForgotPasswordForm')->name('password.request');
+        Route::post('/forgot-password', 'sendResetLinkEmail')->name('password.email');
+        Route::get('/reset-password/{token}', 'showResetPasswordForm')->name('password.reset');
+        Route::post('/reset-password', 'resetPassword')->name('password.update');
+    });
 });
 
 // Logout route
@@ -53,28 +51,18 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard Routes
-    |--------------------------------------------------------------------------
-    */
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Profile Routes
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/profile', [ProfileController::class, 'index']);
-    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
-    Route::post('/profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
+    // Profile Routes
+    Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/photo', 'updatePhoto')->name('updatePhoto');
+        Route::post('/upload', 'upload')->name('upload');
+    });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Notification Routes
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('notifications')->name('notifications.')->controller(NotificationController::class)->group(function () {
+    // Notification Routes
+    Route::controller(NotificationController::class)->prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/get-navbar', 'getNavbarNotifications')->name('getNavbar');
         Route::get('/read/{id}', 'read')->name('read');
@@ -83,11 +71,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/clear-all', 'clearAll')->name('clearAll');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dokumen Routes
-    |--------------------------------------------------------------------------
-    */
+    // Dokumen Routes
     Route::controller(DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/store', 'store')->name('store');
@@ -100,11 +84,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/finalisasi-all/{kriteria_id}', 'finalisasiAll')->name('finalisasi.all');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Template Routes
-    |--------------------------------------------------------------------------
-    */
+    // Template Routes
     Route::controller(TemplateController::class)->prefix('templates')->name('templates.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -116,17 +96,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/{template}/download', 'download')->name('download');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Kriteria Routes
-    |--------------------------------------------------------------------------
-    */
+    // Kriteria Routes
     Route::controller(KriteriaController::class)->prefix('kriteria')->name('kriteria.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{kriteria}', 'show')->name('show');
-        Route::get('/{kriteria}/upload/{ppepp}', 'uploadForm')->name('upload.form')->middleware('kriteria.access');
-        Route::get('/{kriteria}/kelola', 'kelola')->name('kelola')->middleware('kriteria.access');
-        Route::post('/{kriteria}/finalisasi', 'finalisasi')->name('finalisasi')->middleware('kriteria.access');
+        
+        // Routes with kriteria.access middleware
+        Route::middleware('kriteria.access')->group(function () {
+            Route::get('/{kriteria}/upload/{ppepp}', 'uploadForm')->name('upload.form');
+            Route::get('/{kriteria}/kelola', 'kelola')->name('kelola');
+            Route::post('/{kriteria}/finalisasi', 'finalisasi')->name('finalisasi');
+        });
+        
         Route::put('/{kriteria}/description/{ppepp}', 'updateDescription')->name('update.description');
         Route::delete('/{kriteria}/description/{ppepp}', 'deleteDescription')->name('delete.description');
         Route::post('/upload/store', 'storeDocument')->name('upload.store');
@@ -139,34 +120,22 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Routes
-    |--------------------------------------------------------------------------
-    */
+    // Validation Routes
     Route::controller(ValidasiController::class)->prefix('validasi')->name('validasi.')->middleware('kriteria.access')->group(function () {
         Route::post('/{dokumen}/update-status', 'updateStatus')->name('update-status');
         Route::post('/kriteria/{kriteria}/comment', 'addKriteriaComment')->name('kriteria-comment');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Task Management Routes
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('tugas')->name('tugas.')->group(function () {
-        Route::get('/', [DaftarTugasController::class, 'index'])->name('index');
-        Route::post('/', [DaftarTugasController::class, 'store'])->name('store');
-        Route::put('/{id}', [DaftarTugasController::class, 'update'])->name('update');
-        Route::patch('/{id}/status', [DaftarTugasController::class, 'updateStatus'])->name('update.status');
-        Route::delete('/{id}', [DaftarTugasController::class, 'destroy'])->name('destroy');
+    // Task Management Routes
+    Route::controller(DaftarTugasController::class)->prefix('tugas')->name('tugas.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{id}', 'update')->name('update');
+        Route::patch('/{id}/status', 'updateStatus')->name('update.status');
+        Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Administrator Routes
-    |--------------------------------------------------------------------------
-    */
+    // Administrator Routes
     Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
         // User management routes
         Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
@@ -184,10 +153,10 @@ Route::middleware('auth')->group(function () {
         // Kriteria helper routes
         Route::get('/kriteria/names', [UserController::class, 'getKriteriaNames'])->name('kriteria.names');
         Route::get('/kriteria/all', function() {
-            return App\Models\Kriteria::all();
+            return Kriteria::all();
         })->name('kriteria.all');
         
-        // Error testing routes (admin only)
+        // Error testing routes
         Route::prefix('error-test')->name('error-test.')->group(function () {
             Route::get('/400', function () {
                 throw new BadRequestHttpException('Bad Request Test');
@@ -209,10 +178,5 @@ Route::middleware('auth')->group(function () {
                 throw new ServiceUnavailableHttpException(null, 'Service Unavailable Test');
             })->name('service-unavailable');
         });
-
-        // Add this route in the appropriate section, likely in the admin routes group
-        Route::get('/kriteria/all', function() {
-            return App\Models\Kriteria::all();
-        })->name('admin.kriteria.all');
     });
 });

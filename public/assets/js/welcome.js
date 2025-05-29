@@ -50,6 +50,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Remove active class on hover for nav links
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            navLinks.forEach(item => item.classList.remove('active'));
+        });
+    });
+    
+    // Highlight active menu based on scroll position
+    function highlightActiveMenu() {
+        const sections = document.querySelectorAll('section[id]');
+        const scrollPosition = window.scrollY + 200; // Offset to trigger slightly earlier
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            const sectionId = section.getAttribute('id');
+            
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                document.querySelector('.navbar-nav .nav-link.active')?.classList.remove('active');
+                document.querySelector(`.navbar-nav .nav-link[href="#${sectionId}"]`)?.classList.add('active');
+            }
+        });
+    }
+    
+    // Call on load and scroll
+    highlightActiveMenu();
+    window.addEventListener('scroll', highlightActiveMenu);
 
     // Initialize AOS animation with enhanced settings
     AOS.init({

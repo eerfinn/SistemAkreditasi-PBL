@@ -47,7 +47,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#home">Beranda</a>
+                        <a class="nav-link" href="#home">Beranda</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#about">Profil</a>
