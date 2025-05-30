@@ -74,14 +74,13 @@ Route::middleware('auth')->group(function () {
     // Dokumen Routes
     Route::controller(DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::post('/store', 'store')->name('store');
-        Route::post('/store-ppepp', 'store')->name('store.ppepp');
+        Route::post('/', 'store')->name('store');
         Route::get('/{dokumen}', 'show')->name('show');
         Route::put('/{dokumen}', 'update')->name('update');
         Route::delete('/{dokumen}', 'destroy')->name('destroy');
         Route::delete('/{dokumen}/draft', 'destroyDraft')->name('destroy.draft');
         Route::post('/{dokumen}/submit-revision', 'submitRevision')->name('submit.revision');
-        Route::post('/finalisasi-all/{kriteria_id}', 'finalisasiAll')->name('finalisasi.all');
+        Route::post('/finalisasi/{kriteria}', 'finalisasiAll')->name('finalisasi.all');
     });
 
     // Template Routes
@@ -104,18 +103,17 @@ Route::middleware('auth')->group(function () {
         // Routes with kriteria.access middleware
         Route::middleware('kriteria.access')->group(function () {
             Route::get('/{kriteria}/upload/{ppepp}', 'uploadForm')->name('upload.form');
-            Route::get('/{kriteria}/kelola', 'kelola')->name('kelola');
             Route::post('/{kriteria}/finalisasi', 'finalisasi')->name('finalisasi');
+            Route::post('/store', 'storeDocument')->name('upload.store');
+            Route::delete('/draft/{dokumen}', 'destroyDraft')->name('upload.destroyDraft');
         });
         
         Route::put('/{kriteria}/description/{ppepp}', 'updateDescription')->name('update.description');
         Route::delete('/{kriteria}/description/{ppepp}', 'deleteDescription')->name('delete.description');
-        Route::post('/upload/store', 'storeDocument')->name('upload.store');
-        Route::delete('/upload/draft/{dokumen}', 'destroyDraft')->name('upload.destroyDraft');
 
         // Validation routes - admin only
         Route::middleware('role:administrator')->group(function() {
-            Route::get('/validasi/{id}', 'validasi')->name('validasi');
+            Route::get('/validasi/{kriteria}', 'validasi')->name('validasi');
             Route::post('/validasi/process/{dokumen}', 'processValidasi')->name('validasi.process');
         });
     });
@@ -179,4 +177,9 @@ Route::middleware('auth')->group(function () {
             })->name('service-unavailable');
         });
     });
+});
+
+// Fallback route for 404 errors
+Route::fallback(function () {
+    return response()->view('pages.errors.404', [], 404);
 });

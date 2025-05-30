@@ -7,29 +7,6 @@
     <link href="{{ asset('assets/css/kriteria.css') }}" rel="stylesheet">
 @endsection
 
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            // Script untuk menangani masalah backdrop modal
-            $(document).on('hidden.bs.modal', '.modal', function() {
-                $('body').removeClass('modal-open');
-                $('.modal-backdrop').remove();
-                setTimeout(function() {
-                    $('.modal-backdrop').remove();
-                }, 50);
-            });
-
-            // Hapus backdrop saat modal sudah sepenuhnya tampil
-            $(document).on('shown.bs.modal', '.modal', function() {
-                $('.modal-backdrop').remove();
-                setTimeout(function() {
-                    $('.modal-backdrop').remove();
-                }, 100);
-            });
-        });
-    </script>
-@endpush
-
 @section('content')
     <div class="container-fluid">
         <div class="row">
@@ -112,11 +89,6 @@
                 $hasFinalizedDocuments =
                     isset($statusCounts) &&
                     (($statusCounts['menunggu'] ?? 0) > 0 || ($statusCounts['diverifikasi'] ?? 0) > 0);
-
-                // Only disable button if:
-                // 1. There are some documents already
-                // 2. None of them are drafts or need revision
-                // 3. Some are already finalized (menunggu/diverifikasi)
                 $disableKelola =
                     $hasAnyDocuments && !$hasDraftDocuments && !$hasRevisionDocuments && $hasFinalizedDocuments;
             @endphp

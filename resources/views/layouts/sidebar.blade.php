@@ -34,7 +34,7 @@
 
             {{-- Kriteria Menu - Available for all roles --}}
             <li>
-                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="false">
+                <a class="has-arrow {{ request()->routeIs('kriteria.*') ? 'active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('kriteria.*') ? 'true' : 'false' }}">
                     <div class="menu-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#90959f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
                             <line x1="8" y1="6" x2="21" y2="6"></line>
@@ -47,38 +47,62 @@
                     </div>
                     <span class="nav-text">Kriteria</span>
                 </a>
-                <ul aria-expanded="false">
+                <ul aria-expanded="{{ request()->routeIs('kriteria.*') ? 'true' : 'false' }}">
                     @if(auth()->user()->role === 'administrator')
                     {{-- Admin sees all kriteria --}}
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    @php
+                        $currentKriteriaId = null;
+                        if (request()->routeIs('kriteria.show')) {
+                            $currentKriteriaId = request()->route('kriteria');
+                        } elseif (request()->routeIs('kriteria.upload.form')) {
+                            $currentKriteriaId = request()->route('kriteria');
+                        }
+                    @endphp
+                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ $currentKriteriaId == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ $currentKriteriaId == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ $currentKriteriaId == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ $currentKriteriaId == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ $currentKriteriaId == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ $currentKriteriaId == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ $currentKriteriaId == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ $currentKriteriaId == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ $currentKriteriaId == 9 ? 'active' : '' }}">Kriteria 9</a></li>
                     @endif
 
                     {{-- Dosen Menu Items - Based on kriteria_access --}}
                     @if(auth()->user()->role === 'dosen' && !empty(auth()->user()->kriteria_access))
+                        @php
+                            $currentKriteriaId = null;
+                            if (request()->routeIs('kriteria.show')) {
+                                $currentKriteriaId = request()->route('kriteria');
+                            } elseif (request()->routeIs('kriteria.upload.form')) {
+                                $currentKriteriaId = request()->route('kriteria');
+                            }
+                        @endphp
                         @foreach(auth()->user()->kriteria_access as $kriteriaId)
-                            <li><a href="{{ route('kriteria.show', $kriteriaId) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == $kriteriaId ? 'active' : '' }}">Kriteria {{ $kriteriaId }}</a></li>
+                            <li><a href="{{ route('kriteria.show', $kriteriaId) }}" class="{{ $currentKriteriaId == $kriteriaId ? 'active' : '' }}">Kriteria {{ $kriteriaId }}</a></li>
                         @endforeach
                     @endif
 
                     {{-- Kaprodi, Kajur, KJM, Koordinator see all criteria --}}
                     @if(in_array(auth()->user()->role, ['kaprodi', 'kajur', 'kjm', 'koordinator']))
-                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 1 ? 'active' : '' }}">Kriteria 1</a></li>
-                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 2 ? 'active' : '' }}">Kriteria 2</a></li>
-                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 3 ? 'active' : '' }}">Kriteria 3</a></li>
-                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 4 ? 'active' : '' }}">Kriteria 4</a></li>
-                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 5 ? 'active' : '' }}">Kriteria 5</a></li>
-                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 6 ? 'active' : '' }}">Kriteria 6</a></li>
-                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 7 ? 'active' : '' }}">Kriteria 7</a></li>
-                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 8 ? 'active' : '' }}">Kriteria 8</a></li>
-                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ request()->routeIs('kriteria.show') && request()->route('kriteria') == 9 ? 'active' : '' }}">Kriteria 9</a></li>
+                    @php
+                        $currentKriteriaId = null;
+                        if (request()->routeIs('kriteria.show')) {
+                            $currentKriteriaId = request()->route('kriteria');
+                        } elseif (request()->routeIs('kriteria.upload.form')) {
+                            $currentKriteriaId = request()->route('kriteria');
+                        }
+                    @endphp
+                    <li><a href="{{ route('kriteria.show', 1) }}" class="{{ $currentKriteriaId == 1 ? 'active' : '' }}">Kriteria 1</a></li>
+                    <li><a href="{{ route('kriteria.show', 2) }}" class="{{ $currentKriteriaId == 2 ? 'active' : '' }}">Kriteria 2</a></li>
+                    <li><a href="{{ route('kriteria.show', 3) }}" class="{{ $currentKriteriaId == 3 ? 'active' : '' }}">Kriteria 3</a></li>
+                    <li><a href="{{ route('kriteria.show', 4) }}" class="{{ $currentKriteriaId == 4 ? 'active' : '' }}">Kriteria 4</a></li>
+                    <li><a href="{{ route('kriteria.show', 5) }}" class="{{ $currentKriteriaId == 5 ? 'active' : '' }}">Kriteria 5</a></li>
+                    <li><a href="{{ route('kriteria.show', 6) }}" class="{{ $currentKriteriaId == 6 ? 'active' : '' }}">Kriteria 6</a></li>
+                    <li><a href="{{ route('kriteria.show', 7) }}" class="{{ $currentKriteriaId == 7 ? 'active' : '' }}">Kriteria 7</a></li>
+                    <li><a href="{{ route('kriteria.show', 8) }}" class="{{ $currentKriteriaId == 8 ? 'active' : '' }}">Kriteria 8</a></li>
+                    <li><a href="{{ route('kriteria.show', 9) }}" class="{{ $currentKriteriaId == 9 ? 'active' : '' }}">Kriteria 9</a></li>
                     @endif
                 </ul>
             </li>

@@ -113,7 +113,9 @@ class KriteriaController extends Controller
 
     /**
      * Show the kelola (management) view for a kriteria
+     * @deprecated Method ini tidak digunakan lagi, gunakan uploadForm() sebagai gantinya
      */
+    /*
     public function kelola($kriteria, Request $request)
     {
         $user = Auth::user();
@@ -148,6 +150,7 @@ class KriteriaController extends Controller
             'ppepp_descriptions' => $ppepp_descriptions,
         ]);
     }
+    */
 
     /**
      * Show the form for uploading documents
@@ -259,7 +262,7 @@ class KriteriaController extends Controller
     /**
      * Show the validation page for a specific kriteria
      */
-    public function validasi($id, Request $request)
+    public function validasi(Kriteria $kriteria, Request $request)
     {
         $user = Auth::user();
         
@@ -267,7 +270,6 @@ class KriteriaController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        $kriteria = Kriteria::findOrFail($id);
         $selected_ppepp = $request->query('ppepp', 'penetapan'); // Default to penetapan if not specified
 
         $ppepp_labels = [
@@ -298,7 +300,7 @@ class KriteriaController extends Controller
             $allPpeppStagesWithData[] = [
                 'key' => $key,
                 'label' => $label,
-                'route_kelola_tahap_ini' => route('kriteria.validasi', ['id' => $kriteria->id, 'ppepp' => $key])
+                'route_kelola_tahap_ini' => route('kriteria.validasi', ['kriteria' => $kriteria->id, 'ppepp' => $key])
             ];
         }
 

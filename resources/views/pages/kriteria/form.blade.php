@@ -17,14 +17,8 @@
                         <div class="row">
                             <div class="col-lg-8 col-md-7">
                                 <h3 class="mb-1 fw-bold">{{ $kriteria->deskripsi }}</h3>
-                                <nav aria-label="breadcrumb" class="mt-1">
-                                    <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item">
-                                            <a href="{{ route('kriteria.show', $kriteria->id) }}">{{ $kriteria->nama_kriteria }}</a>
-                                        </li>
-                                        <li class="breadcrumb-item active">Kelola Dokumen {{ $stageLabel }}</li>
-                                    </ol>
-                                </nav>
+                                <p class="text-muted mb-0">{{ $kriteria->nama_kriteria }} - Kelola Dokumen
+                                    {{ $stageLabel }}</p>
                             </div>
                             <div class="col-lg-4 col-md-5 text-md-end text-start mt-md-0 mt-3 title-actions">
                                 <a href="{{ route('kriteria.show', $kriteria->id) }}" class="btn btn-primary">
@@ -189,8 +183,8 @@
                                                 </button>
 
                                                 <!-- Modal Revisi untuk dokumen ini -->
-                                                <div class="modal fade" id="revisiModal{{ $doc->id }}"
-                                                    tabindex="-1" aria-labelledby="revisiModalLabel{{ $doc->id }}"
+                                                <div class="modal fade" id="revisiModal{{ $doc->id }}" tabindex="-1"
+                                                    aria-labelledby="revisiModalLabel{{ $doc->id }}"
                                                     aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
@@ -390,11 +384,26 @@
 
 @push('scripts')
     <script>
-        // Fungsi scroll ke form upload
-        function scrollToForm() {
-            document.getElementById('uploadForm').scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
+        $(document).ready(function() {
+            // Pastikan menu kriteria terbuka dan aktif
+            setTimeout(function() {
+                $('.metismenu > li').each(function() {
+                    if ($(this).find('a.has-arrow').first().text().trim() === 'Kriteria') {
+                        // Aktifkan menu utama
+                        $(this).addClass('mm-active');
+                        $(this).find('ul').addClass('mm-show');
+
+                        // Aktifkan submenu yang sesuai
+                        var kriteriaId = {{ $kriteria->id }};
+                        $(this).find('ul li a').each(function() {
+                            if ($(this).text().includes('Kriteria ' + kriteriaId)) {
+                                $(this).addClass('mm-active');
+                                $(this).parent().addClass('mm-active');
+                            }
+                        });
+                    }
+                });
+            }, 300);
+        });
     </script>
 @endpush

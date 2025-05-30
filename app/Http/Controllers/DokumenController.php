@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Dokumen;
 use App\Models\Kriteria;
+use App\Models\Komen;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\History;
-use App\Services\NotificationService;
 
 class DokumenController extends Controller
 {
@@ -382,69 +383,57 @@ class DokumenController extends Controller
                         ->with('success', 'Dokumen berhasil dihapus.');
     }
 
-    public function finalisasiAll($kriteria_id)
+    /**
+     * Finalize all draft documents for a kriteria
+     */
+    public function finalisasiAll(Kriteria $kriteria)
     {
-        try {
-            // Ambil semua dokumen draft untuk kriteria ini
-            $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria_id)
-                ->where('status', Dokumen::STATUS_DRAFT)
-                ->get();
-
-            if ($dokumenDrafts->isEmpty()) {
-                return redirect()->back()->with('error', 'Tidak ada dokumen draft yang dapat difinalisasi.');
-            }
-
-            // Pastikan semua tahapan PPEPP memiliki setidaknya satu dokumen draft
-            $ppepp_stages = [
-                Dokumen::PPEPP_PENETAPAN,
-                Dokumen::PPEPP_PELAKSANAAN,
-                Dokumen::PPEPP_EVALUASI,
-                Dokumen::PPEPP_PENGENDALIAN,
-                Dokumen::PPEPP_PENINGKATAN
-            ];
-
-            $dokumenPerPPEPP = [];
-            foreach ($ppepp_stages as $stage) {
-                $dokumenPerPPEPP[$stage] = $dokumenDrafts->where('jenis_ppepp', $stage)->count();
-            }
-
-            // Periksa apakah semua tahap memiliki setidaknya satu dokumen
-            $missingStages = array_filter($dokumenPerPPEPP, function($count) {
-                return $count === 0;
-            });
-
-            if (!empty($missingStages)) {
-                $missingStageNames = array_map(function($stage) {
-                    return ucfirst($stage);
-                }, array_keys($missingStages));
-
-                return redirect()->back()->with('error', 'Beberapa tahapan belum memiliki dokumen: ' . implode(', ', $missingStageNames) . '. Harap upload dokumen untuk semua tahapan sebelum finalisasi.');
-            }
-
-            // Update status semua dokumen menjadi menunggu
-            foreach ($dokumenDrafts as $dokumen) {
-                $dokumen->update([
-                    'status' => Dokumen::STATUS_MENUNGGU
-                ]);
-            }
-
-            $kriteria = Kriteria::find($kriteria_id);
-            if ($kriteria) {
-                // Buat notifikasi untuk admin bahwa semua dokumen telah difinalisasi
-                $this->notificationService->notifyRole('administrator', 'Dokumen Difinalisasi',
-                    "Semua dokumen untuk kriteria {$kriteria->nama_kriteria} telah difinalisasi dan menunggu verifikasi", [
-                    'type' => 'kriteria',
-                    'kriteria_id' => $kriteria_id,
-                    'icon' => 'fa-check-double',
-                    'color' => 'success',
-                    'link' => "/kriteria/{$kriteria_id}"
-                ]);
-            }
-
-            return redirect()->back()->with('success', 'Semua dokumen draft berhasil difinalisasi dan status diubah menjadi Menunggu Validasi.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat memfinalisasi dokumen: ' . $e->getMessage());
+        $user = Auth::user();
+        
+        if (!in_array($user->role, ['administrator', 'dosen'])) {
+            abort(403, 'Unauthorized access');
         }
+        
+        // If user is dosen, check if they have access to this kriteria
+        if ($user->role === 'dosen') {
+            $allowedKriteriaIds = $user->kriteria_access ?? [];
+            if (!in_array($kriteria->id, $allowedKriteriaIds)) {
+                return redirect()->route('kriteria.show', $kriteria->id)
+                    ->with('error', 'Anda tidak memiliki akses untuk memfinalisasi dokumen kriteria ini.');
+            }
+        }
+        
+        // Get only draft documents to finalize
+        $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria->id)
+                       ->where('status', Dokumen::STATUS_DRAFT)
+                       ->whereNotNull('path')
+                       ->get();
+                       
+        if ($dokumenDrafts->count() === 0) {
+            return redirect()->back()
+                            ->with('info', 'Tidak ada dokumen draft yang perlu difinalisasi.');
+        }
+        
+        $berhasilFinalisasi = 0;
+        foreach ($dokumenDrafts as $dokumen) {
+            $dokumen->status = Dokumen::STATUS_MENUNGGU; // Change status to menunggu (waiting for validation)
+            $dokumen->save();
+            $berhasilFinalisasi++;
+            
+            Log::info('Document finalized successfully', [
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $kriteria->id,
+                'user_id' => $user->id
+            ]);
+        }
+        
+        if ($berhasilFinalisasi > 0) {
+            return redirect()->back()
+                            ->with('success', "{$berhasilFinalisasi} dokumen draft berhasil difinalisasi dan menunggu validasi.");
+        }
+        
+        return redirect()->back()
+                        ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file.');
     }
 
     /**
