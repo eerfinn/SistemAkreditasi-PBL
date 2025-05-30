@@ -1,5 +1,7 @@
 @extends('layouts.master')
 
+@section('title', 'Add New User')
+
 @section('css')
 <link href="{{ asset('assets/vendor/select2/css/select2.min.css') }}" rel="stylesheet">
 <style>
@@ -26,7 +28,7 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="nama" class="form-label">Nama</label>
+                            <label for="nama">Nama</label>
                             <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama') }}" required>
                             @error('nama')
                                 <span class="invalid-feedback" role="alert">
@@ -36,7 +38,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
+                            <label for="username">Username</label>
                             <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username') }}" required>
                             @error('username')
                                 <span class="invalid-feedback" role="alert">
@@ -46,7 +48,17 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}">
+                            @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password">Password</label>
                             <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
                             @error('password')
                                 <span class="invalid-feedback" role="alert">
@@ -56,7 +68,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
+                            <label for="role">Role</label>
                             <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
                                 <option value="">Select Role</option>
                                 <option value="administrator" {{ old('role') == 'administrator' ? 'selected' : '' }}>Administrator</option>
@@ -74,14 +86,14 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3 kriteria-access-section" style="display: none;">
-                            <label for="kriteria_access" class="form-label">Kriteria Access</label>
+                        <div class="mb-3" id="kriteria-access-container" style="display: {{ old('role') === 'dosen' ? 'block' : 'none' }};">
+                            <label for="kriteria_access">Kriteria Access</label>
                             <div class="alert alert-info">
-                                Select which kriteria this user can access.
+                                <i class="fas fa-info-circle"></i> Kriteria access hanya berlaku untuk dosen. Role lain secara otomatis memiliki akses ke semua kriteria.
                             </div>
-                            <select class="form-control select2" id="kriteria_access" name="kriteria_access[]" multiple>
+                            <select class="form-control select2" id="kriteria-access" name="kriteria_access[]" multiple>
                                 @foreach($kriteria as $k)
-                                    <option value="{{ $k->id }}">
+                                    <option value="{{ $k->id }}" {{ is_array(old('kriteria_access')) && in_array($k->id, old('kriteria_access')) ? 'selected' : '' }}>
                                         {{ $k->nama_kriteria }}
                                     </option>
                                 @endforeach
@@ -114,9 +126,9 @@
         // Show/hide kriteria access based on role
         $('#role').change(function() {
             if ($(this).val() === 'dosen') {
-                $('.kriteria-access-section').show();
+                $('#kriteria-access-container').show();
             } else {
-                $('.kriteria-access-section').hide();
+                $('#kriteria-access-container').hide();
             }
         });
     });

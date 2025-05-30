@@ -11,6 +11,26 @@ class UserController extends Controller
 {
     public function index()
     {
+        // Check if there's a role filter and format request
+        if (request()->has('role') && request()->has('format') && request()->format === 'json') {
+            $users = User::where('role', request()->role)->get();
+            
+            // Transform data for JSON response
+            $users->transform(function($user) {
+                return [
+                    'id' => $user->id,
+                    'nama' => $user->nama,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'kriteria_access' => $user->kriteria_access ?? []
+                ];
+            });
+            
+            return response()->json($users);
+        }
+        
+        // Regular web request
         $users = User::all();
         return view('pages.admin.users.index', compact('users'));
     }

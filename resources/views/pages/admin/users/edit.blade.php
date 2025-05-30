@@ -1,5 +1,7 @@
 @extends('layouts.master')
 
+@section('title', 'Edit User')
+
 @section('css')
 <link href="{{ asset('assets/vendor/select2/css/select2.min.css') }}" rel="stylesheet">
 <style>
@@ -27,8 +29,8 @@
                         @method('PUT')
 
                         <div class="mb-3">
-                            <label for="nama" class="form-label">Nama</label>
-                            <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $user->nama) }}" required>
+                            <label for="edit-nama">Nama</label>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" id="edit-nama" name="nama" value="{{ old('nama', $user->nama) }}" required>
                             @error('nama')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -37,8 +39,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username', $user->username) }}" required>
+                            <label for="edit-username">Username</label>
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" id="edit-username" name="username" value="{{ old('username', $user->username) }}" required>
                             @error('username')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -47,8 +49,18 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password (Kosongkan jika tidak ingin diubah)</label>
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
+                            <label for="edit-email">Email</label>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="edit-email" name="email" value="{{ old('email', $user->email) }}">
+                            @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit-password">Password (Kosongkan jika tidak ingin diubah)</label>
+                            <input type="password" class="form-control @error('password') is-invalid @enderror" id="edit-password" name="password">
                             @error('password')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -57,8 +69,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
+                            <label for="edit-role">Role</label>
+                            <select class="form-control @error('role') is-invalid @enderror" id="edit-role" name="role" required>
                                 <option value="">Select Role</option>
                                 <option value="administrator" {{ old('role', $user->role) == 'administrator' ? 'selected' : '' }}>Administrator</option>
                                 <option value="dosen" {{ old('role', $user->role) == 'dosen' ? 'selected' : '' }}>Dosen</option>
@@ -75,24 +87,14 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3 kriteria-access-section" style="display: {{ $user->role === 'dosen' ? 'block' : 'none' }};">
-                            <label for="kriteria_access" class="form-label">Kriteria Access</label>
+                        @if($user->role === 'dosen')
+                        <div class="mb-3">
+                            <label>Kriteria Access</label>
                             <div class="alert alert-info">
-                                Select which kriteria this user can access.
+                                <i class="fas fa-info-circle"></i> Kriteria access untuk dosen dikelola melalui fitur "Manage Dosen Criteria Access" pada halaman utama pengguna.
                             </div>
-                            <select class="form-control select2" id="kriteria_access" name="kriteria_access[]" multiple>
-                                @foreach($kriteria as $k)
-                                    <option value="{{ $k->id }}" {{ is_array(old('kriteria_access', $user->kriteria_access ?? [])) && in_array($k->id, old('kriteria_access', $user->kriteria_access ?? [])) ? 'selected' : '' }}>
-                                        {{ $k->nama_kriteria }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('kriteria_access')
-                                <span class="text-danger">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
                         </div>
+                        @endif
 
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Back</a>
@@ -107,20 +109,5 @@
 
 @push('scripts')
 <script src="{{ asset('assets/vendor/select2/js/select2.full.min.js') }}"></script>
-<script>
-    $(document).ready(function() {
-        // Initialize Select2
-        $('.select2').select2();
-        
-        // Show/hide kriteria access based on role
-        $('#role').change(function() {
-            if ($(this).val() === 'dosen') {
-                $('.kriteria-access-section').show();
-            } else {
-                $('.kriteria-access-section').hide();
-            }
-        });
-    });
-</script>
 @endpush
 @endsection 
