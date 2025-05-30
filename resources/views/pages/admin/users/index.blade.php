@@ -82,16 +82,16 @@
             color: white;
             margin-right: 5px;
         }
-        #dosenCriteriaTable {
+        #dosenCriteriaTable, #usersTable {
             border-collapse: separate;
             border-spacing: 0;
         }
-        #dosenCriteriaTable th {
+        #dosenCriteriaTable th, #usersTable th {
             background-color: #f8f9fa;
             font-weight: 600;
             padding: 12px 15px;
         }
-        #dosenCriteriaTable td {
+        #dosenCriteriaTable td, #usersTable td {
             padding: 12px 15px;
             vertical-align: middle;
         }
@@ -104,6 +104,146 @@
             border-right-color: transparent;
             border-radius: 50%;
             animation: spinner-border .75s linear infinite;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 15px 20px;
+        }
+        .card-title {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .btn {
+            border-radius: 5px;
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
+            transition: all 0.2s;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background-color: #2196f3;
+            border-color: #2196f3;
+        }
+        .btn-primary:hover {
+            background-color: #0d87e9;
+            border-color: #0d87e9;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+            color: white;
+        }
+        .btn i {
+            margin-right: 4px;
+        }
+        .badge {
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 30px;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+        }
+        .badge-primary {
+            background-color: #2196f3;
+        }
+        .badge-info {
+            background-color: #17a2b8;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            padding: 0.375rem 0.75rem;
+        }
+        .form-control:focus {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+        }
+        .user-role {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .role-administrator {
+            background-color: #ffefef;
+            color: #dc3545;
+        }
+        .role-dosen {
+            background-color: #e9f5fe;
+            color: #2196f3;
+        }
+        .role-koordinator, .role-kjm, .role-kaprodi, .role-kajur, .role-kps {
+            background-color: #e3f9f7;
+            color: #17a2b8;
+        }
+        
+        .table-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.85);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .table-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2196f3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        .loader-text {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 @endsection
@@ -126,7 +266,13 @@
                 </div>
                 <div class="card-body">
                     <div id="alert-container"></div>
-                    <div class="table-responsive">
+                    <div class="table-responsive position-relative">
+                        <div class="table-loading-overlay" id="usersTableLoading">
+                            <div class="table-loader">
+                                <div class="loader-spinner"></div>
+                                <div class="loader-text">Loading users data...</div>
+                            </div>
+                        </div>
                         <table id="usersTable" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
@@ -146,11 +292,15 @@
                                     <td>{{ $user->nama }}</td>
                                     <td>{{ $user->username }}</td>
                                     <td>{{ $user->email ?? '-' }}</td>
-                                    <td><span class="badge badge-{{ $user->role == 'administrator' ? 'danger' : ($user->role == 'dosen' ? 'primary' : 'info') }}">{{ ucfirst($user->role) }}</span></td>
+                                    <td>
+                                        <span class="user-role role-{{ $user->role }}">
+                                            {{ ucfirst($user->role) }}
+                                        </span>
+                                    </td>
                                     <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-info btn-sm mr-1 edit-user-link" data-id="{{ $user->id }}" title="Edit">
+                                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-info btn-sm me-2 edit-user-link" data-id="{{ $user->id }}" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->id }}" title="Delete">
@@ -181,31 +331,31 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="nama">Nama</label>
+                        <label for="nama" class="form-label">Nama</label>
                         <input type="text" class="form-control" id="nama" name="nama" required>
                         <span class="invalid-feedback" role="alert" id="nama-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="username">Username</label>
+                        <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" required>
                         <span class="invalid-feedback" role="alert" id="username-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email">
                         <span class="invalid-feedback" role="alert" id="email-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                         <span class="invalid-feedback" role="alert" id="password-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="role">Role</label>
+                        <label for="role" class="form-label">Role</label>
                         <select class="form-control" id="role" name="role" required>
                             <option value="">Select Role</option>
                             <option value="administrator">Administrator</option>
@@ -221,8 +371,8 @@
 
                     <div id="kriteria-access-container" style="display: none;">
                         <div class="form-group">
-                            <label>Kriteria Access</label>
-                            <div class="alert alert-info">
+                            <label class="form-label">Kriteria Access</label>
+                            <div class="alert alert-info mb-3">
                                 <i class="fas fa-info-circle"></i> Kriteria access hanya berlaku untuk dosen. Role lain secara otomatis memiliki akses ke semua kriteria.
                             </div>
                             <select class="form-control select2" id="kriteria-access" name="kriteria_access[]" multiple>
@@ -237,8 +387,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save User</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save User
+                    </button>
                 </div>
             </form>
         </div>
@@ -259,27 +413,27 @@
                 <input type="hidden" id="edit-id" name="id">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="edit-nama">Nama</label>
+                        <label for="edit-nama" class="form-label">Nama</label>
                         <input type="text" class="form-control" id="edit-nama" name="nama" required>
                         <span class="invalid-feedback" role="alert" id="edit-nama-error"></span>
                     </div>
                     <div class="form-group">
-                        <label for="edit-username">Username</label>
+                        <label for="edit-username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="edit-username" name="username" required>
                         <span class="invalid-feedback" role="alert" id="edit-username-error"></span>
                     </div>
                     <div class="form-group">
-                        <label for="edit-email">Email</label>
+                        <label for="edit-email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="edit-email" name="email">
                         <span class="invalid-feedback" role="alert" id="edit-email-error"></span>
                     </div>
                     <div class="form-group">
-                        <label for="edit-password">Password (Kosongkan jika tidak ingin diubah)</label>
+                        <label for="edit-password" class="form-label">Password (Kosongkan jika tidak ingin diubah)</label>
                         <input type="password" class="form-control" id="edit-password" name="password">
                         <span class="invalid-feedback" role="alert" id="edit-password-error"></span>
                     </div>
                     <div class="form-group">
-                        <label for="edit-role">Role</label>
+                        <label for="edit-role" class="form-label">Role</label>
                         <select class="form-control" id="edit-role" name="role" required>
                             <option value="">Select Role</option>
                             <option value="administrator">Administrator</option>
@@ -294,14 +448,18 @@
                     </div>
 
                     <div id="edit-dosen-info" style="display: none;">
-                        <div class="alert alert-info">
+                        <div class="alert alert-info mb-3">
                             <i class="fas fa-info-circle"></i> Kriteria access untuk dosen dikelola melalui tombol "Manage Dosen Criteria Access" pada halaman utama.
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update User</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Update User
+                    </button>
                 </div>
             </form>
         </div>
@@ -411,20 +569,28 @@
 <script src="{{ asset('assets/vendor/select2/js/select2.full.min.js') }}"></script>
 <script>
 $(document).ready(function() {
+    // Sembunyikan loading overlay setelah halaman dimuat
+    setTimeout(function() {
+        $('#usersTableLoading').fadeOut(300);
+        initializeDataTable();
+    }, 800);
+    
     // Initialize DataTable
-    let userTable = $('#usersTable').DataTable({
-        responsive: true,
-        autoWidth: false,
-        order: [[0, 'asc']],
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search...",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+    function initializeDataTable() {
+        let userTable = $('#usersTable').DataTable({
+            responsive: true,
+            autoWidth: false,
+            order: [[0, 'asc']],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search...",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
             }
-        }
-    });
+        });
+    }
 
     // Initialize Select2
     initializeSelect2();
