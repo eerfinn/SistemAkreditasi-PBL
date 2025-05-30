@@ -4,36 +4,48 @@
     <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h4 class="card-title">{{ $title }}</h4>
+                <h4 class="card-title mb-0">{{ $title }}</h4>
             </div>
             <p class="mb-2 mt-1">{{ $description }}</p>
         </div>
         <div class="card-body">
+            <div class="mb-3 p-3 bg-light rounded">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    <strong>Deskripsi:</strong>
+                </div>
+                <p class="mb-0">{{ $ppepp_descriptions[$ppepp_key] ?? '-' }}</p>
+            </div>
+            
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th>Nama Dokumen</th>
-                            <th>Pemilik</th>
-                            <th>Status</th>
-                            <th class="text-end">Aksi</th>
+                            <th style="width: 5%">No</th>
+                            <th style="width: 35%" class="nama-dokumen-cell text-center">Nama Dokumen</th>
+                            <th style="width: 15%">Pemilik</th>
+                            <th style="width: 15%">Status</th>
+                            <th style="width: 15%">Tanggal</th>
+                            <th style="width: 15%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($documents ?? [] as $dokumen)
-                        <tr>
-                            <td>
+                        @forelse($documents ?? [] as $index => $dokumen)
+                        <tr class="table-row">
+                            <td>{{ $index + 1 }}</td>
+                            <td class="nama-dokumen-cell">
                                 {{ $dokumen->nama_dokumen }}
-                                {{-- <span class="small d-block text-muted">ID: {{ $dokumen->id }}</span> --}}
                             </td>
                             <td>
                                 {{ $dokumen->user->nama ?? 'Unknown' }}
-                                {{-- <span class="small d-block text-muted">{{ $dokumen->user->role ?? '' }}</span> --}}
                             </td>
                             <td>
                                 <x-dokumen-status-badge :status="$dokumen->status" />
                             </td>
-                            <td class="text-end">
+                            <td class="date-column">
+                                {{ \Carbon\Carbon::parse($dokumen->created_at)->format('d M Y') }}
+                            </td>
+                            <td class="text-center">
                                 @if($dokumen->path)
                                     @php
                                         // Get document comments
@@ -51,9 +63,8 @@
 
                                     <!-- Comments button -->
                                     @if($commentCount > 0)
-                                        <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat {{ $commentCount }} Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
+                                        <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
                                             <i class="fas fa-comments"></i>
-                                            <span class="badge bg-danger text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px;">{{ $commentCount }}</span>
                                         </button>
                                     @endif
 
@@ -87,18 +98,15 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center">Belum ada dokumen untuk {{ $title }}</td>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-folder-open me-2 fa-2x"></i><br>
+                                    Belum ada dokumen untuk {{ $title }}
+                                </div>
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>
-                    <tfoot>
-                        <tr class="bg-light">
-                            <td colspan="4">
-                                <strong>Deskripsi:</strong>
-                                <p class="mb-0 mt-1">{{ $ppepp_descriptions[$ppepp_key] ?? '-' }}</p>
-                            </td>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>

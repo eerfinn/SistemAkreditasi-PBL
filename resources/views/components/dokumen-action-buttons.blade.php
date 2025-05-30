@@ -5,11 +5,8 @@
 </a>
 
 @if($commentCount > 0)
-    <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat {{ $commentCount }} Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
+    <button type="button" class="btn btn-secondary btn-xs sharp me-1" title="Lihat Komentar" data-bs-toggle="modal" data-bs-target="#commentModal{{ $dokumen->id }}">
         <i class="fas fa-comments"></i>
-        @if($commentCount > 0)
-            <span class="badge bg-danger text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px;">{{ $commentCount }}</span>
-        @endif
     </button>
 @endif
 

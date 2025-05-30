@@ -4,8 +4,10 @@
 <div class="modal fade" id="commentModal{{ $dokumen->id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ $dokumen->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-truncate w-75" id="commentModalLabel{{ $dokumen->id }}">Komentar untuk Dokumen: {{ $dokumen->nama_dokumen }}</h5>
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title text-truncate w-75" id="commentModalLabel{{ $dokumen->id }}">
+                    <i class="fas fa-comments me-2"></i>Komentar untuk Dokumen: {{ $dokumen->nama_dokumen }} ({{ $commentCount }})
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -13,12 +15,10 @@
                     @foreach($dokumenComments as $comment)
                     <div class="border-bottom pb-3 mb-3">
                         <div class="d-flex align-items-center mb-2">
-                            <div class="avatar avatar-xs me-2">
-                                <span class="avatar-initial rounded-circle bg-primary">
-                                    {{ substr($comment->user->name ?? 'U', 0, 1) }}
-                                </span>
+                            <div class="comment-avatar me-2">
+                                <img src="{{ ($comment->user && $comment->user->photo) ? asset('storage/profile/' . $comment->user->photo) : asset('assets/images/avatar/1.png') }}" alt="{{ optional($comment->user)->nama ?? 'User' }}" class="rounded-circle" width="40" height="40">
                             </div>
-                            <h6 class="mb-0">{{ $comment->user->name ?? 'User' }}</h6>
+                            <h6 class="mb-0">{{ $comment->user->nama ?? 'User' }}</h6>
                             <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
                             <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
                         </div>
@@ -32,7 +32,9 @@
                 @endif
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Tutup
+                </button>
             </div>
         </div>
     </div>

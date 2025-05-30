@@ -158,17 +158,7 @@
                                                         <div class="list-group-item d-flex justify-content-between align-items-center document-item">
                                                             <div>
                                                                 <strong class="d-block">{{ $dokumen->nama_dokumen }}</strong>
-                                                                @if($dokumen->status == 'draft')
-                                                                    <span class="badge bg-info">Draft</span>
-                                                                @elseif($dokumen->status == 'menunggu')
-                                                                    <span class="badge bg-warning">Menunggu</span>
-                                                                @elseif($dokumen->status == 'revisi')
-                                                                    <span class="badge bg-danger">Revisi</span>
-                                                                @elseif($dokumen->status == 'diterima')
-                                                                    <span class="badge bg-success">Diterima</span>
-                                                                @elseif($dokumen->status == 'diverifikasi')
-                                                                    <span class="badge bg-primary">Terverifikasi</span>
-                                                                @endif
+                                                                <x-dokumen-status-badge :status="$dokumen->status" />
                                                             </div>
                                                             <div>
                                                                 @if($dokumen->path)

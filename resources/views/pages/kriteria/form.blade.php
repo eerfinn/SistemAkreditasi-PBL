@@ -8,332 +8,393 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
-    <!-- Breadcrumb & Judul -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Kelola Dokumen - {{ $kriteria->nama_kriteria }}</h4>
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('kriteria.show', $kriteria->id) }}">{{ $kriteria->nama_kriteria }}</a></li>
-                        <li class="breadcrumb-item active">Kelola Dokumen</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tombol Kembali -->
-    <div class="row mb-3">
-        <div class="col-12 text-end">
-            <a href="{{ route('kriteria.show', $kriteria->id) }}" class="btn btn-light">
-                <i class="fas fa-arrow-left me-1"></i> Kembali ke Detail Kriteria
-            </a>
-        </div>
-    </div>
-
-    <!-- Navigasi Tahapan PPEPP -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <ul class="nav nav-pills nav-justified nav-ppepp" id="ppeppTab" role="tablist">
-                @foreach($allPpeppStagesWithData as $stage)
-                    @php
-                        $colorClass = match($stage['key']) {
-                            'penetapan' => 'primary',
-                            'pelaksanaan' => 'success',
-                            'evaluasi' => 'info',
-                            'pengendalian' => 'warning',
-                            'peningkatan' => 'danger',
-                            default => 'primary'
-                        };
-                        $iconClass = match($stage['key']) {
-                            'penetapan' => 'file-contract',
-                            'pelaksanaan' => 'tasks',
-                            'evaluasi' => 'chart-line',
-                            'pengendalian' => 'shield-alt',
-                            'peningkatan' => 'arrow-up',
-                            default => 'file-alt'
-                        };
-                    @endphp
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link{{ $stage['key'] === $stageKey ? ' active' : '' }} bg-{{ $stage['key'] === $stageKey ? $colorClass : 'light' }} text-{{ $stage['key'] === $stageKey ? 'white' : $colorClass }}"
-                           href="{{ $stage['route_kelola_tahap_ini'] }}">
-                            <i class="fas fa-{{ $iconClass }} me-1"></i> {{ $stage['label'] }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
-
-    <!-- Alert Informasi -->
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle me-2"></i> Semua dokumen yang diunggah akan disimpan sebagai <strong>draft</strong>. Setelah semua dokumen lengkap, Anda perlu melakukan finalisasi dari halaman detail kriteria.
-    </div>
-
-    <!-- Dokumen yang Ada -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i> Dokumen {{ $stageLabel }}</h5>
-            <span class="badge bg-light text-primary fs-6">{{ count($existingDocsForStage) }} Dokumen</span>
-        </div>
-        <div class="card-body">
-            @php
-                $hasDescription = isset($ppepp_descriptions[$stageKey]) && !empty($ppepp_descriptions[$stageKey]);
-            @endphp
-
-            @if($hasDescription)
-            <div class="alert alert-info mb-4">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="alert-heading fw-bold mb-2"><i class="fas fa-info-circle me-2"></i>Deskripsi Umum {{ $stageLabel }}</h6>
-                        <p class="mb-0">{{ $ppepp_descriptions[$stageKey] ?? '' }}</p>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editDescriptionModal">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <form action="{{ route('kriteria.delete.description', ['kriteria' => $kriteria->id, 'ppepp' => $stageKey]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus deskripsi umum ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th width="50">No</th>
-                            <th>Nama Dokumen</th>
-                            @if(auth()->user()->role === 'administrator')
-                            <th>Dosen</th>
-                            @endif
-                            <th>Status</th>
-                            <th>Tanggal Update</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($existingDocsForStage as $index => $doc)
-                        <tr class="document-item">
-                            <td>{{ $index + 1 }}</td>
-                            <td>
-                                <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank" class="text-primary">
-                                    <i class="fas fa-file-alt me-1"></i> {{ $doc->nama_dokumen }}
+    <div class="container-fluid">
+        <!-- Title Card -->
+        <div class="row mb-4">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8 col-md-7">
+                                <h3 class="mb-1 fw-bold">{{ $kriteria->deskripsi }}</h3>
+                                <nav aria-label="breadcrumb" class="mt-1">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ route('kriteria.show', $kriteria->id) }}">{{ $kriteria->nama_kriteria }}</a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Kelola Dokumen {{ $stageLabel }}</li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div class="col-lg-4 col-md-5 text-md-end text-start mt-md-0 mt-3 title-actions">
+                                <a href="{{ route('kriteria.show', $kriteria->id) }}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-left me-1"></i> Kembali ke Detail Kriteria
                                 </a>
-                            </td>
-                            @if(auth()->user()->role === 'administrator')
-                            <td>{{ $doc->user->name ?? 'Unknown' }}</td>
-                            @endif
-                            <td>
-                                @if($doc->status == 'draft')
-                                    <span class="badge bg-secondary">Draft</span>
-                                @elseif($doc->status == 'revisi')
-                                    <span class="badge bg-warning">Revisi</span>
-                                @else
-                                    <span class="badge bg-success">{{ ucfirst($doc->status) }}</span>
-                                @endif
-                            </td>
-                            <td>{{ $doc->updated_at->format('d-m-Y H:i') }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank" class="btn btn-info btn-sm" title="Lihat File">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                    @if($doc->status == 'draft')
-                                        <form action="{{ route('dokumen.destroy.draft', $doc->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus dokumen draft ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Hapus Draft">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @elseif($doc->status == 'revisi')
-                                        <button type="button" class="btn btn-warning btn-sm" title="Perbarui Revisi"
-                                            data-bs-toggle="modal" data-bs-target="#revisiModal{{ $doc->id }}">
-                                            <i class="fas fa-sync-alt"></i>
-                                        </button>
-
-                                        <!-- Modal Revisi untuk dokumen ini -->
-                                        <div class="modal fade" id="revisiModal{{ $doc->id }}" tabindex="-1" aria-labelledby="revisiModalLabel{{ $doc->id }}" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <form action="{{ route('dokumen.submit.revision', $doc->id) }}" method="POST" enctype="multipart/form-data">
-                                                        @csrf
-                                                        <div class="modal-header bg-warning">
-                                                            <h5 class="modal-title" id="revisiModalLabel{{ $doc->id }}">Perbarui Revisi Dokumen</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold">Nama Dokumen</label>
-                                                                <input type="text" class="form-control" value="{{ $doc->nama_dokumen }}" readonly>
-                                                            </div>
-
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold">Unggah File Revisi</label>
-                                                                <input type="file" class="form-control" name="file" required>
-                                                                <small class="text-muted">Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX. Maksimal 5MB.</small>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                            <button type="submit" class="btn btn-primary">Kirim Revisi</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="{{ auth()->user()->role === 'administrator' ? '6' : '5' }}" class="text-center py-3">
-                                <div class="text-muted">
-                                    <i class="fas fa-folder-open me-2 fa-2x"></i><br>
-                                    @if(auth()->user()->role === 'administrator')
-                                        Belum ada dokumen yang diunggah untuk tahap {{ $stageLabel }}
-                                    @else
-                                        Belum ada dokumen untuk tahap {{ $stageLabel }}
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Deskripsi Umum Tahap -->
-    @if(!$hasDescription)
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Tambah Deskripsi Umum Tahap {{ $stageLabel }}</h5>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('kriteria.update.description', ['kriteria' => $kriteria->id, 'ppepp' => $stageKey]) }}" method="POST" id="deskripsiForm">
-                @csrf
-                @method('PUT')
-
-                <div class="mb-3">
-                    <textarea class="form-control @error('description') is-invalid @enderror"
-                        name="description" rows="4"
-                        placeholder="Deskripsi umum untuk tahap ini..."></textarea>
-                    @error('description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small class="text-muted">Deskripsi ini akan ditampilkan sebagai informasi umum untuk tahap {{ $stageLabel }}.</small>
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-info">
-                        <i class="fas fa-save me-1"></i> Simpan Deskripsi
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    @endif
-
-    <!-- Modal Edit Deskripsi -->
-    <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('kriteria.update.description', ['kriteria' => $kriteria->id, 'ppepp' => $stageKey]) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="modal-header bg-info text-white">
-                        <h5 class="modal-title" id="editDescriptionModalLabel"><i class="fas fa-edit me-2"></i>Edit Deskripsi Umum {{ $stageLabel }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Deskripsi:</label>
-                            <textarea class="form-control" name="description" rows="6" required>{{ $ppepp_descriptions[$stageKey] ?? '' }}</textarea>
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i> Deskripsi ini akan ditampilkan sebagai informasi umum untuk tahap {{ $stageLabel }}.
-                            </small>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i> Batal
-                        </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigasi Tahapan PPEPP -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="nav nav-pills nav-justified nav-ppepp" id="ppeppTab" role="tablist">
+                            @foreach ($allPpeppStagesWithData as $stage)
+                                @php
+                                    $colorClass = match ($stage['key']) {
+                                        'penetapan' => 'primary',
+                                        'pelaksanaan' => 'success',
+                                        'evaluasi' => 'info',
+                                        'pengendalian' => 'warning',
+                                        'peningkatan' => 'danger',
+                                        default => 'primary',
+                                    };
+                                    $iconClass = match ($stage['key']) {
+                                        'penetapan' => 'file-contract',
+                                        'pelaksanaan' => 'tasks',
+                                        'evaluasi' => 'chart-line',
+                                        'pengendalian' => 'shield-alt',
+                                        'peningkatan' => 'arrow-up',
+                                        default => 'file-alt',
+                                    };
+                                @endphp
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link{{ $stage['key'] === $stageKey ? ' active' : '' }} bg-{{ $stage['key'] === $stageKey ? $colorClass : 'light' }} text-{{ $stage['key'] === $stageKey ? 'white' : $colorClass }}"
+                                        href="{{ $stage['route_kelola_tahap_ini'] }}">
+                                        <i class="fas fa-{{ $iconClass }} me-1"></i> {{ $stage['label'] }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Informasi -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading">Informasi Unggah Dokumen</h5>
+                            <p class="mb-0">Semua dokumen yang diunggah akan disimpan sebagai <strong>draft</strong>.
+                                Setelah semua dokumen lengkap, Anda perlu melakukan finalisasi dari halaman detail kriteria.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dokumen yang Ada -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i> Dokumen {{ $stageLabel }}</h5>
+                <span class="badge bg-light text-primary fs-6">{{ count($existingDocsForStage) }} Dokumen</span>
+            </div>
+            <div class="card-body">
+                @php
+                    $hasDescription = isset($ppepp_descriptions[$stageKey]) && !empty($ppepp_descriptions[$stageKey]);
+                @endphp
+
+                @if ($hasDescription)
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="alert-heading fw-bold mb-2"><i class="fas fa-info-circle me-2"></i>Deskripsi Umum
+                                    {{ $stageLabel }}</h6>
+                                <p class="mb-0">{{ $ppepp_descriptions[$stageKey] ?? '' }}</p>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                    data-bs-target="#editDescriptionModal">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form
+                                    action="{{ route('kriteria.delete.description', ['kriteria' => $kriteria->id, 'ppepp' => $stageKey]) }}"
+                                    method="POST" onsubmit="return confirm('Yakin ingin menghapus deskripsi umum ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead>
+                            <tr>
+                                <th class="col-no">No</th>
+                                <th class="col-nama-dokumen nama-dokumen-cell text-center">Nama Dokumen</th>
+                                @if (auth()->user()->role === 'administrator')
+                                    <th class="col-dosen">Dosen</th>
+                                @endif
+                                <th class="col-status">Status</th>
+                                <th class="col-tanggal">Tanggal Update</th>
+                                <th class="col-aksi text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($existingDocsForStage as $index => $doc)
+                                <tr class="document-item">
+                                    <td>{{ $index + 1 }}</td>
+                                    <td class="nama-dokumen-cell">
+                                        <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank"
+                                            class="text-primary">
+                                            <i class="fas fa-file-alt me-1"></i> {{ $doc->nama_dokumen }}
+                                        </a>
+                                    </td>
+                                    @if (auth()->user()->role === 'administrator')
+                                        <td>{{ $doc->user->name ?? 'Unknown' }}</td>
+                                    @endif
+                                    <td>
+                                        <x-dokumen-status-badge :status="$doc->status" />
+                                    </td>
+                                    <td class="date-column">{{ $doc->updated_at->format('d M Y') }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank"
+                                                class="btn btn-info btn-xs sharp me-1" title="Lihat File">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            @if ($doc->status == 'draft')
+                                                <form action="{{ route('dokumen.destroy.draft', $doc->id) }}"
+                                                    method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Yakin ingin menghapus dokumen draft ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-xs sharp me-1"
+                                                        title="Hapus Draft">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @elseif($doc->status == 'revisi')
+                                                <button type="button" class="btn btn-warning btn-xs sharp me-1"
+                                                    title="Perbarui Revisi" data-bs-toggle="modal"
+                                                    data-bs-target="#revisiModal{{ $doc->id }}">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+
+                                                <!-- Modal Revisi untuk dokumen ini -->
+                                                <div class="modal fade" id="revisiModal{{ $doc->id }}"
+                                                    tabindex="-1" aria-labelledby="revisiModalLabel{{ $doc->id }}"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <form
+                                                                action="{{ route('dokumen.submit.revision', $doc->id) }}"
+                                                                method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-header bg-warning">
+                                                                    <h5 class="modal-title text-white"
+                                                                        id="revisiModalLabel{{ $doc->id }}">
+                                                                        Perbarui Revisi Dokumen
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label fw-bold">Nama
+                                                                            Dokumen</label>
+                                                                        <input type="text" class="form-control"
+                                                                            value="{{ $doc->nama_dokumen }}" readonly>
+                                                                    </div>
+
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label fw-bold">Unggah File
+                                                                            Revisi</label>
+                                                                        <input type="file" class="form-control"
+                                                                            name="file" required>
+                                                                        <small class="text-muted">Format yang diizinkan:
+                                                                            PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX. Maksimal
+                                                                            5MB.</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        data-bs-dismiss="modal">
+                                                                        <i class="fas fa-times me-1"></i> Batal
+                                                                    </button>
+                                                                    <button type="submit" class="btn btn-primary">
+                                                                        <i class="fas fa-save me-1"></i> Kirim Revisi
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="{{ auth()->user()->role === 'administrator' ? '6' : '5' }}"
+                                        class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-folder-open me-2 fa-2x"></i><br>
+                                            @if (auth()->user()->role === 'administrator')
+                                                Belum ada dokumen yang diunggah untuk tahap {{ $stageLabel }}
+                                            @else
+                                                Belum ada dokumen untuk tahap {{ $stageLabel }}
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deskripsi Umum Tahap -->
+        @if (!$hasDescription)
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Tambah Deskripsi Umum Tahap
+                        {{ $stageLabel }}</h5>
+                </div>
+                <div class="card-body">
+                    <form
+                        action="{{ route('kriteria.update.description', ['kriteria' => $kriteria->id, 'ppepp' => $stageKey]) }}"
+                        method="POST" id="deskripsiForm">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="mb-3">
+                            <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="4"
+                                placeholder="Deskripsi umum untuk tahap ini..."></textarea>
+                            @error('description')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">Deskripsi ini akan ditampilkan sebagai informasi umum untuk tahap
+                                {{ $stageLabel }}.</small>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-save me-1"></i> Simpan Deskripsi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endif
+
+        <!-- Modal Edit Deskripsi -->
+        <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form
+                        action="{{ route('kriteria.update.description', ['kriteria' => $kriteria->id, 'ppepp' => $stageKey]) }}"
+                        method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title" id="editDescriptionModalLabel">
+                                <i class="fas fa-edit me-2"></i>Edit Deskripsi Umum {{ $stageLabel }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Deskripsi:</label>
+                                <textarea class="form-control" name="description" rows="6" required>{{ $ppepp_descriptions[$stageKey] ?? '' }}</textarea>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i> Deskripsi ini akan ditampilkan sebagai
+                                    informasi umum untuk tahap {{ $stageLabel }}.
+                                </small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i> Batal
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Upload Dokumen -->
+        <div class="card" id="uploadForm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-upload me-2"></i> Unggah Dokumen untuk Tahap {{ $stageLabel }}</h5>
+            </div>
+            <div class="card-body">
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <form action="{{ route('dokumen.store') }}" method="POST" enctype="multipart/form-data"
+                    id="dokumenForm">
+                    @csrf
+                    <input type="hidden" name="kriteria_id" value="{{ $kriteria->id }}">
+                    <input type="hidden" name="jenis_ppepp" value="{{ $stageKey }}">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Pilih File</label>
+                        <input type="file" class="form-control @error('files') is-invalid @enderror" name="files[]"
+                            id="fileInput" multiple>
+                        @error('files')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i> Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT,
+                            PPTX. Maksimal 5MB per file.
+                        </small>
+                    </div>
+
+                    <div class="text-end">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i> Simpan Perubahan
+                            <i class="fas fa-save me-1"></i> Simpan ke Draft
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
-    <!-- Form Upload Dokumen -->
-    <div class="card" id="uploadForm">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="fas fa-upload me-2"></i> Unggah Dokumen untuk Tahap {{ $stageLabel }}</h5>
-        </div>
-        <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show">
-                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <form action="{{ route('dokumen.store') }}" method="POST" enctype="multipart/form-data" id="dokumenForm">
-                @csrf
-                <input type="hidden" name="kriteria_id" value="{{ $kriteria->id }}">
-                <input type="hidden" name="jenis_ppepp" value="{{ $stageKey }}">
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Pilih File</label>
-                    <input type="file" class="form-control @error('files') is-invalid @enderror" name="files[]" id="fileInput" multiple>
-                    @error('files')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i> Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX. Maksimal 5MB per file.
-                    </small>
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Simpan ke Draft
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
-<script>
-// Fungsi scroll ke form upload
-function scrollToForm() {
-    document.getElementById('uploadForm').scrollIntoView({ behavior: 'smooth' });
-}
-</script>
+    <script>
+        // Fungsi scroll ke form upload
+        function scrollToForm() {
+            document.getElementById('uploadForm').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    </script>
 @endpush
