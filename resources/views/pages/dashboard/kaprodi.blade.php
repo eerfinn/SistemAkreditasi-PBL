@@ -325,7 +325,7 @@
         <canvas id="networkCanvas"></canvas>
         <div class="welcome-card">
             <h1 class="mb-0">Selamat Datang, {{ $user->nama }}!</h1>
-            <p class="mt-3">Dashboard Ketua Program Studi</p>
+            {{-- <p class="mt-3">Dashboard Ketua Program Studi</p> --}}
         </div>
     </div>
 
