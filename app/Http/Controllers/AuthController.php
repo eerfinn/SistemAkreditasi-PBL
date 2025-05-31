@@ -9,11 +9,19 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
+use App\Services\HistoryService;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules;
 
 class AuthController extends Controller
 {
+    protected $historyService;
+    
+    public function __construct(HistoryService $historyService)
+    {
+        $this->historyService = $historyService;
+    }
+    
     public function login(Request $request)
     {
         try {
@@ -54,6 +62,9 @@ class AuthController extends Controller
                     $request->session()->regenerateToken();
                     return redirect()->route('login')->with('error', 'Peran pengguna tidak valid.');
                 }
+                
+                // Catat aktivitas login
+                $this->historyService->recordLogin($user);
 
                 return redirect()->intended('dashboard');
             }

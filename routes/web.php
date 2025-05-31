@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DaftarTugasController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DokumenController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -32,7 +33,7 @@ Route::view('/', 'welcome')->name('welcome');
 Route::middleware('guest')->group(function () {
     Route::view('/login', 'auth.login')->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-    
+
     // Password Reset Routes
     Route::controller(AuthController::class)->group(function () {
         Route::get('/forgot-password', 'showForgotPasswordForm')->name('password.request');
@@ -99,7 +100,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(KriteriaController::class)->prefix('kriteria')->name('kriteria.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{kriteria}', 'show')->name('show');
-        
+
         // Routes with kriteria.access middleware
         Route::middleware('kriteria.access')->group(function () {
             Route::get('/{kriteria}/upload/{ppepp}', 'uploadForm')->name('upload.form');
@@ -107,7 +108,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/store', 'storeDocument')->name('upload.store');
             Route::delete('/draft/{dokumen}', 'destroyDraft')->name('upload.destroyDraft');
         });
-        
+
         Route::put('/{kriteria}/description/{ppepp}', 'updateDescription')->name('update.description');
         Route::delete('/{kriteria}/description/{ppepp}', 'deleteDescription')->name('delete.description');
 
@@ -147,31 +148,37 @@ Route::middleware('auth')->group(function () {
             Route::get('/{user}/json', 'showJson')->name('showJson');
             Route::put('/{user}/kriteria-access', 'updateKriteriaAccess')->name('updateKriteriaAccess');
         });
-        
+
+        // Activity log routes
+        Route::controller(HistoryController::class)->prefix('history')->name('history.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/export', 'export')->name('export');
+        });
+
         // Kriteria helper routes
         Route::get('/kriteria/names', [UserController::class, 'getKriteriaNames'])->name('kriteria.names');
         Route::get('/kriteria/all', function() {
             return Kriteria::all();
         })->name('kriteria.all');
-        
+
         // Error testing routes
         Route::prefix('error-test')->name('error-test.')->group(function () {
             Route::get('/400', function () {
                 throw new BadRequestHttpException('Bad Request Test');
             })->name('bad-request');
-            
+
             Route::get('/403', function () {
                 throw new HttpException(403, 'Forbidden Test');
             })->name('forbidden');
-            
+
             Route::get('/404', function () {
                 throw new NotFoundHttpException('Not Found Test');
             })->name('not-found');
-            
+
             Route::get('/500', function () {
                 abort(500, 'Internal Server Error Test');
             })->name('server-error');
-            
+
             Route::get('/503', function () {
                 throw new ServiceUnavailableHttpException(null, 'Service Unavailable Test');
             })->name('service-unavailable');

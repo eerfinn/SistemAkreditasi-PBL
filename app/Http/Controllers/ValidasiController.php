@@ -7,6 +7,7 @@ use App\Models\Validasi;
 use App\Models\Komen;
 use App\Models\Kriteria;
 use App\Models\History;
+use App\Services\HistoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -15,11 +16,13 @@ use App\Services\NotificationService;
 class ValidasiController extends Controller
 {
     protected $notificationService;
+    protected $historyService;
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(NotificationService $notificationService, HistoryService $historyService)
     {
         $this->middleware('auth');
         $this->notificationService = $notificationService;
+        $this->historyService = $historyService;
     }
 
     /**
@@ -50,6 +53,9 @@ class ValidasiController extends Controller
         $oldStatus = $dokumen->status;
         $dokumen->status = $request->status;
         $dokumen->save();
+        
+        // Catat validasi menggunakan historyService
+        $this->historyService->recordValidation($dokumen, $request->status);
 
         // Simpan validasi
         $validasi = new Validasi();
@@ -118,13 +124,6 @@ class ValidasiController extends Controller
                 ]);
             }
         }
-
-        // Catat history
-        $history = new History();
-        $history->user_id = $user->id;
-        $history->dokumen_id = $dokumen->id;
-        $history->aktivitas = "Mengubah status dokumen dari {$oldStatus} menjadi {$dokumen->status}";
-        $history->save();
 
         // Buat notifikasi untuk pemilik dokumen tentang perubahan status
         if ($dokumen->status === Dokumen::STATUS_REVISI) {

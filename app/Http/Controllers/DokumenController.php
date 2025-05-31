@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dokumen;
 use App\Models\Kriteria;
 use App\Models\Komen;
+use App\Services\HistoryService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +17,9 @@ use App\Models\History;
 class DokumenController extends Controller
 {
     protected $notificationService;
+    protected $historyService;
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(NotificationService $notificationService, HistoryService $historyService)
     {
         // Menerapkan middleware auth ke semua method kecuali yang mungkin publik
         // Sesuaikan 'except' jika ada method yang tidak memerlukan autentikasi
@@ -26,6 +28,7 @@ class DokumenController extends Controller
         // $this->middleware('role:dosen')->only(['create', 'store', 'destroyDraft']);
 
         $this->notificationService = $notificationService;
+        $this->historyService = $historyService;
     }
 
     /**
@@ -139,6 +142,9 @@ class DokumenController extends Controller
                         'status' => Dokumen::STATUS_DRAFT,
                     ]);
 
+                    // Catat aktivitas unggah dokumen
+                    $this->historyService->recordUpload($newDokumen);
+
                     Log::info('New document created', [
                         'dokumen_id' => $newDokumen->id
                     ]);
@@ -191,6 +197,10 @@ class DokumenController extends Controller
 
         // File fisik akan otomatis terhapus oleh event 'deleting' di model Dokumen
         $dokumen->delete();
+
+        // Catat aktivitas penghapusan dokumen draft
+        $this->historyService->recordDelete($dokumen);
+
         Log::info('Dokumen draft dihapus', ['dokumen_id' => $dokumen->id]);
 
         // Buat notifikasi untuk user yang mengunggah dokumen
