@@ -183,6 +183,17 @@
                                                     <i class="fas fa-sync-alt"></i>
                                                 </button>
 
+                                                <form action="{{ route('dokumen.destroy', $doc->id) }}"
+                                                    method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Yakin ingin menghapus dokumen revisi ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-xs sharp me-1"
+                                                        title="Hapus Dokumen">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+
                                                 <!-- Modal Revisi untuk dokumen ini -->
                                                 <div class="modal fade" id="revisiModal{{ $doc->id }}" tabindex="-1"
                                                     aria-labelledby="revisiModalLabel{{ $doc->id }}"

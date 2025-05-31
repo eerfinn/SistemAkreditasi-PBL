@@ -14,6 +14,14 @@
     <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
         <i class="fas fa-upload"></i>
     </button>
+
+    <form action="{{ route('dokumen.destroy', $dokumen->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus dokumen revisi ini?')">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger btn-xs sharp me-1" title="Hapus Dokumen">
+            <i class="fas fa-trash"></i>
+        </button>
+    </form>
 @endif
 
 @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))

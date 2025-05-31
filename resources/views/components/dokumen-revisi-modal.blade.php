@@ -16,22 +16,33 @@
                         <p class="mb-1"><strong>{{ $dokumen->nama_dokumen }}</strong></p>
                         <small class="text-muted">Status saat ini: <span class="badge bg-warning">Perlu Revisi</span></small>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="file{{ $dokumen->id }}" class="form-label fw-bold">File Revisi:</label>
                         <input type="file" class="form-control" id="file{{ $dokumen->id }}" name="file" required>
                         <small class="text-muted">Format: PDF, Word, Excel, PowerPoint. Maks: 5MB</small>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-between">
+                    <div>
+                        <form action="{{ route('dokumen.destroy', $dokumen->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus dokumen revisi ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> Hapus Dokumen
+                            </button>
+                        </form>
+                    </div>
+                    <div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i> Batal
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-upload me-1"></i> Upload Revisi
                     </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
-</div> 
+</div>
