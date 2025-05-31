@@ -47,7 +47,7 @@ class AuthController extends Controller
                 $request->session()->regenerate();
 
                 // Check if user has a valid role for dashboard access
-                $validRoles = ['administrator', 'dosen1', 'dosen2', 'dosen3', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
+                $validRoles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur'];
                 if (!in_array($user->role, $validRoles)) {
                     Auth::logout();
                     $request->session()->invalidate();

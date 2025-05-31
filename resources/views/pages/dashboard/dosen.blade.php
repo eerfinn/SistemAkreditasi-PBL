@@ -992,7 +992,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @section('vendor-script')

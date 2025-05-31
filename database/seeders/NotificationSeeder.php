@@ -68,17 +68,9 @@ class NotificationSeeder extends Seeder
             }
 
             // Notifikasi untuk dosen
-            if (in_array($user->role, ['dosen1', 'dosen2', 'dosen3']) && !$kriterias->isEmpty()) {
-                // Tentukan kriteria yang relevan untuk dosen ini
-                $relevantKriteriaIds = [];
-                if ($user->role === 'dosen1') {
-                    $relevantKriteriaIds = [1, 2, 3];
-                } elseif ($user->role === 'dosen2') {
-                    $relevantKriteriaIds = [4, 5, 6];
-                } elseif ($user->role === 'dosen3') {
-                    $relevantKriteriaIds = [7, 8, 9];
-                }
-
+            if ($user->role === 'dosen' && !$kriterias->isEmpty() && !empty($user->kriteria_access)) {
+                // Gunakan kriteria_access untuk menentukan kriteria yang relevan
+                $relevantKriteriaIds = $user->kriteria_access;
                 $relevantKriteria = $kriterias->whereIn('id', $relevantKriteriaIds)->first();
 
                 if ($relevantKriteria) {

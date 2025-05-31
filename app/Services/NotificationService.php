@@ -169,23 +169,15 @@ class NotificationService
             $this->create($admin->id, $title, $message, $options);
         }
 
-        // Determine which dosen role is responsible for this kriteria
         $kriteriaId = $kriteria->id;
-        $dosenRole = null;
-
-        if (in_array($kriteriaId, [1, 2, 3])) {
-            $dosenRole = 'dosen1';
-        } elseif (in_array($kriteriaId, [4, 5, 6])) {
-            $dosenRole = 'dosen2';
-        } elseif (in_array($kriteriaId, [7, 8, 9])) {
-            $dosenRole = 'dosen3';
-        }
-
-        if ($dosenRole) {
-            $dosens = User::where('role', $dosenRole)->get();
-            foreach ($dosens as $dosen) {
-                $this->create($dosen->id, $title, $message, $options);
-            }
+        
+        // Find users with the 'dosen' role who have access to this kriteria
+        $dosenUsers = User::where('role', 'dosen')
+            ->whereJsonContains('kriteria_access', $kriteriaId)
+            ->get();
+            
+        foreach ($dosenUsers as $dosen) {
+            $this->create($dosen->id, $title, $message, $options);
         }
     }
 }

@@ -212,6 +212,26 @@
                 saveNote();
             });
 
+            // Additional script for managing active sidebar menu in kriteria.upload.form route
+            @if(request()->routeIs('kriteria.upload.form'))
+                // Pastikan menu Kriteria terbuka dan aktif
+                $('.metismenu > li').each(function() {
+                    if ($(this).find('a.has-arrow').first().hasClass('active')) {
+                        $(this).addClass('mm-active');
+                        $(this).find('ul').addClass('mm-show');
+                        
+                        // Cari dan aktifkan sub-menu kriteria yang sesuai
+                        var kriteriaId = "{{ request()->route('kriteria') }}";
+                        $(this).find('ul li a').each(function() {
+                            if ($(this).attr('href').includes('/kriteria/' + kriteriaId)) {
+                                $(this).addClass('mm-active');
+                                $(this).parent().addClass('mm-active');
+                            }
+                        });
+                    }
+                });
+            @endif
+
             // Function to load events
             function loadEvents() {
                 $('#events-loading').show();

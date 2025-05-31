@@ -92,6 +92,16 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(-2px);
 }
 
+/* Add styles for navigation hover effects */
+.navbar-nav:hover .nav-link.active:before {
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover:before {
+    width: 100% !important;
+}
+
 /* Profile Navigation Styles */
 .nav-profile {
     display: flex;

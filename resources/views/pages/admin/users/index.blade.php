@@ -2,52 +2,317 @@
 
 @section('title', 'Users Management')
 
+@section('vendor-style')
+    <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/select2/css/select2.min.css') }}" rel="stylesheet">
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+        .select2-selection--multiple {
+            border: 1px solid #ddd !important;
+        }
+        .kriteria-badge {
+            display: inline-block;
+            margin: 2px;
+            padding: 3px 8px;
+            background-color: #e9f5fe;
+            color: #2196f3;
+            border-radius: 30px;
+            font-size: 12px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .modal-xl {
+            max-width: 1140px;
+        }
+        #dosenCriteriaEditor {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        #dosenCriteriaEditor .card {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e5e5;
+        }
+        #dosenCriteriaEditor .card-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        #dosenCriteriaEditor .card-body {
+            padding: 20px;
+        }
+        #closeDosenEditor {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #closeDosenEditor:hover {
+            transform: scale(1.1);
+        }
+        .edit-mode-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 10;
+            display: none;
+            border-radius: 8px;
+        }
+        .table-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .edit-dosen-kriteria:focus {
+            box-shadow: none !important;
+            outline: none !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white;
+            margin-right: 5px;
+        }
+        #dosenCriteriaTable, #usersTable {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        #dosenCriteriaTable th, #usersTable th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            padding: 12px 15px;
+        }
+        #dosenCriteriaTable td, #usersTable td {
+            padding: 12px 15px;
+            vertical-align: middle;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.5rem;
+            border: 0.15em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border .75s linear infinite;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 15px 20px;
+        }
+        .card-title {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .btn {
+            border-radius: 5px;
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
+            transition: all 0.2s;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background-color: #2196f3;
+            border-color: #2196f3;
+        }
+        .btn-primary:hover {
+            background-color: #0d87e9;
+            border-color: #0d87e9;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+            color: white;
+        }
+        .btn i {
+            margin-right: 4px;
+        }
+        .badge {
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 30px;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+        }
+        .badge-primary {
+            background-color: #2196f3;
+        }
+        .badge-info {
+            background-color: #17a2b8;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            padding: 0.375rem 0.75rem;
+        }
+        .form-control:focus {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+        }
+        .user-role {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .role-administrator {
+            background-color: #ffefef;
+            color: #dc3545;
+        }
+        .role-dosen {
+            background-color: #e9f5fe;
+            color: #2196f3;
+        }
+        .role-koordinator, .role-kjm, .role-kaprodi, .role-kajur, .role-kps {
+            background-color: #e3f9f7;
+            color: #17a2b8;
+        }
+        
+        .table-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.85);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .table-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2196f3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        .loader-text {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Users Management</h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title">Users Management</h4>
+                    <div>
+                        <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus"></i> Add New User
+                        </a>
+                        <button type="button" class="btn btn-info btn-sm" id="manageCriteriaAccess">
+                            <i class="fas fa-cog"></i> Manage Dosen Criteria Access
                         </button>
                     </div>
                 </div>
                 <div class="card-body">
                     <div id="alert-container"></div>
-                    <table id="usersTable" class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nama</th>
-                                <th>Username</th>
-                                <th>Role</th>
-                                <th>Created At</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($users as $index => $user)
-                            <tr id="user-{{ $user->id }}">
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $user->nama }}</td>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ ucfirst($user->role) }}</td>
-                                <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
-                                <td>
-                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-info btn-sm" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->id }}" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive position-relative">
+                        <div class="table-loading-overlay" id="usersTableLoading">
+                            <div class="table-loader">
+                                <div class="loader-spinner"></div>
+                                <div class="loader-text">Loading users data...</div>
+                            </div>
+                        </div>
+                        <table id="usersTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="5%">No</th>
+                                    <th width="20%">Nama</th>
+                                    <th width="15%">Username</th>
+                                    <th width="20%">Email</th>
+                                    <th width="10%">Role</th>
+                                    <th width="15%">Created At</th>
+                                    <th width="15%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($users as $index => $user)
+                                <tr id="user-{{ $user->id }}">
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $user->nama }}</td>
+                                    <td>{{ $user->username }}</td>
+                                    <td>{{ $user->email ?? '-' }}</td>
+                                    <td>
+                                        <span class="user-role role-{{ $user->role }}">
+                                            {{ ucfirst($user->role) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-info btn-sm me-2 edit-user-link" data-id="{{ $user->id }}" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->id }}" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,31 +325,37 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-                <!-- Tombol close (X) dihapus sesuai permintaan -->
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="addUserForm">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="nama">Nama</label>
+                        <label for="nama" class="form-label">Nama</label>
                         <input type="text" class="form-control" id="nama" name="nama" required>
                         <span class="invalid-feedback" role="alert" id="nama-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="username">Username</label>
+                        <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" required>
                         <span class="invalid-feedback" role="alert" id="username-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                        <span class="invalid-feedback" role="alert" id="email-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                         <span class="invalid-feedback" role="alert" id="password-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="role">Role</label>
+                        <label for="role" class="form-label">Role</label>
                         <select class="form-control" id="role" name="role" required>
                             <option value="">Select Role</option>
                             <option value="administrator">Administrator</option>
@@ -93,13 +364,35 @@
                             <option value="kjm">KJM</option>
                             <option value="kaprodi">Kaprodi</option>
                             <option value="kajur">Kajur</option>
+                            <option value="kps">KPS</option>
                         </select>
                         <span class="invalid-feedback" role="alert" id="role-error"></span>
                     </div>
+
+                    <div id="kriteria-access-container" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Kriteria Access</label>
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-info-circle"></i> Kriteria access hanya berlaku untuk dosen. Role lain secara otomatis memiliki akses ke semua kriteria.
+                            </div>
+                            <select class="form-control select2" id="kriteria-access" name="kriteria_access[]" multiple>
+                                @foreach(App\Models\Kriteria::all() as $kriteria)
+                                <option value="{{ $kriteria->id }}">
+                                    {{ $kriteria->nama_kriteria }}
+                                </option>
+                                @endforeach
+                            </select>
+                            <span class="invalid-feedback" role="alert" id="kriteria_access-error"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save User</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save User
+                    </button>
                 </div>
             </form>
         </div>
@@ -108,186 +401,395 @@
 
 <!-- Edit User Modal -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-              <!-- Tombol X dihapus, hanya tombol close teks yang berfungsi -->
-          </div>
-          <form id="editUserForm">
-              @csrf
-              @method('PUT')
-              <input type="hidden" id="edit-id" name="id">
-              <div class="modal-body">
-                  <div class="form-group">
-                      <label for="edit-nama">Nama</label>
-                      <input type="text" class="form-control" id="edit-nama" name="nama" required>
-                      <span class="invalid-feedback" role="alert" id="edit-nama-error"></span>
-                  </div>
-                  <div class="form-group">
-                      <label for="edit-username">Username</label>
-                      <input type="text" class="form-control" id="edit-username" name="username" required>
-                      <span class="invalid-feedback" role="alert" id="edit-username-error"></span>
-                  </div>
-                  <div class="form-group">
-                      <label for="edit-password">Password (Kosongkan jika tidak ingin diubah)</label>
-                      <input type="password" class="form-control" id="edit-password" name="password">
-                      <span class="invalid-feedback" role="alert" id="edit-password-error"></span>
-                  </div>
-                  <div class="form-group">
-                      <label for="edit-role">Role</label>
-                      <select class="form-control" id="edit-role" name="role" required>
-                          <option value="">Select Role</option>
-                          <option value="administrator">Administrator</option>
-                          <option value="dosen">Dosen</option>
-                          <option value="koordinator">Koordinator</option>
-                          <option value="kjm">KJM</option>
-                          <option value="kaprodi">Kaprodi</option>
-                          <option value="kajur">Kajur</option>
-                      </select>
-                      <span class="invalid-feedback" role="alert" id="edit-role-error"></span>
-                  </div>
-              </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editUserForm">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="edit-id" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="edit-nama" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="edit-nama" name="nama" required>
+                        <span class="invalid-feedback" role="alert" id="edit-nama-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="edit-username" name="username" required>
+                        <span class="invalid-feedback" role="alert" id="edit-username-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit-email" name="email">
+                        <span class="invalid-feedback" role="alert" id="edit-email-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-password" class="form-label">Password (Kosongkan jika tidak ingin diubah)</label>
+                        <input type="password" class="form-control" id="edit-password" name="password">
+                        <span class="invalid-feedback" role="alert" id="edit-password-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-role" class="form-label">Role</label>
+                        <select class="form-control" id="edit-role" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="administrator">Administrator</option>
+                            <option value="dosen">Dosen</option>
+                            <option value="koordinator">Koordinator</option>
+                            <option value="kjm">KJM</option>
+                            <option value="kaprodi">Kaprodi</option>
+                            <option value="kajur">Kajur</option>
+                            <option value="kps">KPS</option>
+                        </select>
+                        <span class="invalid-feedback" role="alert" id="edit-role-error"></span>
+                    </div>
+
+                    <div id="edit-dosen-info" style="display: none;">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i> Kriteria access untuk dosen dikelola melalui tombol "Manage Dosen Criteria Access" pada halaman utama.
+                        </div>
+                    </div>
+                </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Update User</button>
-              </div>
-          </form>
-      </div>
-  </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Update User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Criteria Access Modal -->
+<div class="modal fade" id="manageCriteriaModal" tabindex="-1" role="dialog" aria-labelledby="manageCriteriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageCriteriaModalLabel">Manage Dosen Criteria Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="criteria-alert-container"></div>
+                
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i> Kelola akses kriteria untuk semua dosen. Gunakan tombol Edit untuk mengatur akses ke kriteria tertentu.
+                </div>
+                
+                <div class="row mb-4" id="dosenCriteriaEditor" style="display: none;">
+                    <div class="col-md-12">
+                        <div class="card border">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0" id="editing-dosen-name">Edit Access for: <span></span></h5>
+                                <button type="button" class="btn-close" id="closeDosenEditor" aria-label="Close"></button>
+                            </div>
+                            <div class="card-body">
+                                <form id="editDosenCriteriaForm">
+                                    @csrf
+                                    <input type="hidden" id="edit-dosen-id" name="dosen_id">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="edit-dosen-kriteria" class="mb-2 form-label">Kriteria Access:</label>
+                                                <div id="kriteria-select-loading" class="d-flex align-items-center mb-2" style="display: none !important;">
+                                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <span class="text-muted small">Loading kriteria data...</span>
+                                                </div>
+                                                <select class="form-control select2-kriteria" id="edit-dosen-kriteria" name="kriteria_access[]" multiple>
+                                                    @foreach(App\Models\Kriteria::all() as $kriteria)
+                                                    <option value="{{ $kriteria->id }}">
+                                                        {{ $kriteria->nama_kriteria }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="form-text mt-2">
+                                                    <i class="fas fa-info-circle text-info"></i> Pilih kriteria yang dapat diakses oleh dosen ini.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 d-flex justify-content-end">
+                                            <button type="button" class="btn btn-secondary me-2" id="cancelDosenEdit">
+                                                <i class="fas fa-times me-1"></i> Cancel
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-1"></i> Save Changes
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="edit-mode-overlay"></div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="dosenCriteriaTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px">No</th>
+                                    <th style="width: 250px">Nama Dosen</th>
+                                    <th>Kriteria Access</th>
+                                    <th style="width: 100px">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dosenCriteriaTableBody">
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <div class="loading-spinner"></div>
+                                            <span>Loading dosen data...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
 @push('scripts')
+<script src="{{ asset('assets/vendor/select2/js/select2.full.min.js') }}"></script>
 <script>
 $(document).ready(function() {
+    // Sembunyikan loading overlay setelah halaman dimuat
+    setTimeout(function() {
+        $('#usersTableLoading').fadeOut(300);
+        initializeDataTable();
+    }, 800);
+    
     // Initialize DataTable
-    let table = $('#usersTable').DataTable({
-        responsive: true,
-        autoWidth: false,
-        order: [[0, 'asc']],
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search...",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+    function initializeDataTable() {
+        let userTable = $('#usersTable').DataTable({
+            responsive: true,
+            autoWidth: false,
+            order: [[0, 'asc']],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search...",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
             }
+        });
+    }
+
+    // Initialize Select2
+    initializeSelect2();
+    
+    // Show/hide kriteria access based on role in Add form
+    $('#role').change(function() {
+        if ($(this).val() === 'dosen') {
+            $('#kriteria-access-container').show();
+        } else {
+            $('#kriteria-access-container').hide();
         }
     });
-
-    // Reset form and error state when modal is shown
-    $('#addUserModal').on('show.bs.modal', function () {
-        $('#addUserForm')[0].reset();
-        $('.is-invalid').removeClass('is-invalid');
-        $('.invalid-feedback').text('');
+    
+    // Show info message if user is dosen in Edit form
+    $('#edit-role').change(function() {
+        if ($(this).val() === 'dosen') {
+            $('#edit-dosen-info').show();
+        } else {
+            $('#edit-dosen-info').hide();
+        }
     });
-    $('#editUserModal').on('show.bs.modal', function () {
-        $('#editUserForm')[0].reset();
-        $('.is-invalid').removeClass('is-invalid');
-        $('.invalid-feedback').text('');
-    });
-
-    // Remove modal-open and backdrop on modal hidden
-    $('#addUserModal').on('hidden.bs.modal', function () {
-        $('body').removeClass('modal-open');
-        $('.modal-backdrop').remove();
-    });
-    $('#editUserModal').on('hidden.bs.modal', function () {
-        $('body').removeClass('modal-open');
-        $('.modal-backdrop').remove();
-    });
-
-    // Hapus backdrop saat modal benar-benar sudah tampil
-    $('#addUserModal').on('shown.bs.modal', function () {
-        $('.modal-backdrop').remove();
-        setTimeout(function() {
-            $('.modal-backdrop').remove();
-        }, 100);
-    });
-    $('#editUserModal').on('shown.bs.modal', function () {
-        $('.modal-backdrop').remove();
-        setTimeout(function() {
-            $('.modal-backdrop').remove();
-        }, 100);
-    });
-
-    // Add User Form Submit
-    $('#addUserForm').off('submit').on('submit', function(e) {
+    
+    // When loading the edit modal, check if role is dosen
+    var editUserModal = document.getElementById('editUserModal');
+    if (editUserModal) {
+        editUserModal.addEventListener('shown.bs.modal', function() {
+            if ($('#edit-role').val() === 'dosen') {
+                $('#edit-dosen-info').show();
+            } else {
+                $('#edit-dosen-info').hide();
+            }
+        });
+    }
+    
+    // Handle edit user link click
+    $(document).on('click', '.edit-user-link', function(e) {
         e.preventDefault();
-
-        // Reset previous errors
-        $('.is-invalid').removeClass('is-invalid');
-        $('.invalid-feedback').text('');
-
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        $.ajax({
-            url: '{{ route("admin.users.store") }}',
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                console.log('Success:', response);
-                if(response.success) {
-                    // Add new row to DataTable
-                    let newRow = table.row.add([
-                        table.rows().count() + 1,
-                        response.user.nama,
-                        response.user.username,
-                        response.user.role.charAt(0).toUpperCase() + response.user.role.slice(1),
-                        response.user.created_at,
-                        `<a href="${'{{ route("admin.users.edit", ":id") }}'.replace(':id', response.user.id)}" class="btn btn-info btn-sm" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button class="btn btn-danger btn-sm delete-user" data-id="${response.user.id}" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </button>`
-                    ]).draw().node();
-
-                    // Add row ID
-                    $(newRow).attr('id', 'user-' + response.user.id);
-
-                    // Show success message
-                    $('#alert-container').html(
-                        `<div class="alert alert-success alert-dismissible fade show">
-                            ${response.message}
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        </div>`
-                    );
-
-                    // Reset form and close modal
-                    $('#addUserForm')[0].reset();
-                    $('#addUserModal').modal('hide');
-                }
-            },
-            error: function(xhr) {
-                console.log('Error:', xhr);
-                if(xhr.status === 422) {
-                    let errors = xhr.responseJSON.errors;
-                    Object.keys(errors).forEach(function(key) {
-                        $(`#${key}`).addClass('is-invalid');
-                        $(`#${key}-error`).text(errors[key][0]);
-                    });
-                } else {
-                    $('#alert-container').html(
-                        `<div class="alert alert-danger alert-dismissible fade show">
-                            An error occurred while creating the user.
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        </div>`
-                    );
-                }
-                $('#addUserModal').modal('hide');
-            }
-        });
+        const userId = $(this).data('id');
+        handleEditUser(userId);
     });
-
-    // Delete User
+    
+    // Add User Form Submit
+    $('#addUserForm').on('submit', function(e) {
+        e.preventDefault();
+        createUser();
+    });
+    
+    // Edit User Form Submit
+    $('#editUserForm').on('submit', function(e) {
+        e.preventDefault();
+        updateUser();
+    });
+    
+    // Handle delete user
     $(document).on('click', '.delete-user', function() {
-        let userId = $(this).data('id');
+        const userId = $(this).data('id');
+        deleteUser(userId);
+    });
+    
+    // Initialize manage criteria button
+    $('#manageCriteriaAccess').on('click', function() {
+        loadDosenCriteria();
+    });
+    
+    // Handle edit dosen kriteria form submission
+    $('#editDosenCriteriaForm').on('submit', function(e) {
+        e.preventDefault();
+        updateDosenKriteria();
+    });
+    
+    // Handle clicking cancel edit button
+    $('#cancelDosenEdit, #closeDosenEditor').on('click', function() {
+        hideDosenEditor();
+    });
+    
+    // Initialize Select2
+    function initializeSelect2() {
+        $('.select2').select2({
+            placeholder: "Pilih kriteria",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        $('.select2-kriteria').select2({
+            placeholder: "Pilih kriteria untuk dosen ini",
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('#dosenCriteriaEditor')
+        });
+    }
+    
+    // Function to handle edit user
+    function handleEditUser(userId) {
+        if (!userId) return;
+        
+        // Show loader
+        showLoader('Loading...', 'Getting user data');
+        
+        // Get user data
+        $.ajax({
+            url: `/admin/users/${userId}/json`,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                hideLoader();
+                
+                // Populate form fields
+                $('#edit-id').val(response.id);
+                $('#edit-nama').val(response.nama);
+                $('#edit-username').val(response.username);
+                $('#edit-email').val(response.email || '');
+                $('#edit-role').val(response.role);
+                
+                // Show role-specific info
+                if (response.role === 'dosen') {
+                    $('#edit-dosen-info').show();
+                } else {
+                    $('#edit-dosen-info').hide();
+                }
+                
+                // Show modal
+                var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                editModal.show();
+            },
+            error: function(xhr, status, error) {
+                showError('Error', 'Failed to get user data: ' + (xhr.responseJSON?.message || error));
+            }
+        });
+    }
+    
+    // Function to create user
+    function createUser() {
+        // Show loader
+        showLoader('Processing...', 'Creating new user');
+        
+        // Submit form
+        $.ajax({
+            url: '/admin/users',
+            type: 'POST',
+            data: $('#addUserForm').serialize(),
+            dataType: 'json',
+            success: function(response) {
+                showSuccess('Success', 'User created successfully', function() {
+                    var addModal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                    if (addModal) {
+                        addModal.hide();
+                    }
+                    window.location.reload();
+                });
+            },
+            error: function(xhr, status, error) {
+                hideLoader();
+                
+                if (xhr.status === 422) {
+                    handleValidationErrors(xhr.responseJSON.errors, '');
+                } else {
+                    showError('Error', 'Failed to create user: ' + (xhr.responseJSON?.message || error));
+                }
+            }
+        });
+    }
+    
+    // Function to update user
+    function updateUser() {
+        const userId = $('#edit-id').val();
+        const formData = $('#editUserForm').serialize();
+        
+        // Show loader
+        showLoader('Processing...', 'Updating user data');
+        
+        // Submit form
+        $.ajax({
+            url: `/admin/users/${userId}`,
+            type: 'PUT',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                showSuccess('Success', 'User updated successfully', function() {
+                    var editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                    if (editModal) {
+                        editModal.hide();
+                    }
+                    window.location.reload();
+                });
+            },
+            error: function(xhr, status, error) {
+                hideLoader();
+                
+                if (xhr.status === 422) {
+                    handleValidationErrors(xhr.responseJSON.errors, 'edit-');
+                } else {
+                    showError('Error', 'Failed to update user: ' + (xhr.responseJSON?.message || error));
+                }
+            }
+        });
+    }
+    
+    // Function to delete user
+    function deleteUser(userId) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -298,105 +800,294 @@ $(document).ready(function() {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
+                // Show loader
+                showLoader('Processing...', 'Deleting user');
+                
+                // Delete user
                 $.ajax({
-                    url: '{{ route("admin.users.destroy", ":id") }}'.replace(':id', userId),
+                    url: `/admin/users/${userId}`,
                     type: 'DELETE',
                     data: {
-                        _token: '{{ csrf_token() }}'
+                        _token: $('meta[name="csrf-token"]').attr('content')
                     },
+                    dataType: 'json',
                     success: function(response) {
-                        if(response.success) {
-                            table.row($('#user-' + userId)).remove().draw();
-                            Swal.fire(
-                                'Deleted!',
-                                'User has been deleted.',
-                                'success'
-                            );
-                        }
+                        showSuccess('Success', 'User deleted successfully', function() {
+                            // Remove row from table
+                            $(`#user-${userId}`).remove();
+                            // Reorder table numbers
+                            reorderTableNumbers();
+                        });
                     },
-                    error: function(xhr) {
-                        Swal.fire(
-                            'Error!',
-                            'Error deleting user.',
-                            'error'
-                        );
+                    error: function(xhr, status, error) {
+                        showError('Error', 'Failed to delete user: ' + (xhr.responseJSON?.message || error));
                     }
                 });
             }
         });
-    });
-
-    // Handle Edit Button Click
-    $(document).on('click', '.btn-info.btn-sm', function(e) {
-        e.preventDefault();
-        let url = $(this).attr('href');
-        $.get(url.replace('/edit', '/json'), function(user) {
-            $('#edit-id').val(user.id);
-            $('#edit-nama').val(user.nama);
-            $('#edit-username').val(user.username);
-            $('#edit-password').val('');
-            $('#edit-role').val(user.role);
-            $('.is-invalid').removeClass('is-invalid');
-            $('.invalid-feedback').text('');
-            $('#editUserModal').modal('show');
-        });
-    });
-
-    // Handle Edit User Form Submit
-    $('#editUserForm').off('submit').on('submit', function(e) {
-        e.preventDefault();
-        let userId = $('#edit-id').val();
-        let url = '{{ route("admin.users.update", ":id") }}'.replace(':id', userId);
-        let data = $(this).serialize();
+    }
+    
+    // Function to load dosen criteria
+    function loadDosenCriteria() {
+        // Show loader
+        showLoader('Loading...', 'Getting dosen data');
+        
+        // Get all dosen with their kriteria access
         $.ajax({
-            url: url,
-            type: 'POST',
-            data: data,
-            success: function(response) {
-                if(response.success) {
-                    // Update row in DataTable
-                    let row = $('#user-' + userId);
-                    row.find('td').eq(1).text(response.user.nama);
-                    row.find('td').eq(2).text(response.user.username);
-                    row.find('td').eq(3).text(response.user.role.charAt(0).toUpperCase() + response.user.role.slice(1));
-                    $('#editUserModal').modal('hide');
-                    $('#alert-container').html(
-                        `<div class="alert alert-success alert-dismissible fade show">
-                            ${response.message}
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        </div>`
-                    );
-                }
+            url: '/admin/users',
+            type: 'GET',
+            data: { 
+                role: 'dosen', 
+                format: 'json' 
             },
-            error: function(xhr) {
-                if(xhr.status === 422) {
-                    let errors = xhr.responseJSON.errors;
-                    Object.keys(errors).forEach(function(key) {
-                        $(`#edit-${key}`).addClass('is-invalid');
-                        $(`#edit-${key}-error`).text(errors[key][0]);
-                    });
-                } else {
-                    $('#alert-container').html(
-                        `<div class="alert alert-danger alert-dismissible fade show">
-                            An error occurred while updating the user.
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        </div>`
-                    );
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            dataType: 'json',
+            success: function(dosenList) {
+                hideLoader();
+                
+                // Clear previous content
+                $('#dosenCriteriaTableBody').empty();
+                
+                // Hide editor if visible
+                hideDosenEditor();
+                
+                // If no dosen found
+                if (dosenList.length === 0) {
+                    $('#dosenCriteriaTableBody').html('<tr><td colspan="4" class="text-center">No dosen found</td></tr>');
+                    var criteriaModal = new bootstrap.Modal(document.getElementById('manageCriteriaModal'));
+                    criteriaModal.show();
+                    return;
                 }
+                
+                // Get all kriteria for reference
+                $.ajax({
+                    url: '/admin/kriteria/all',
+                    type: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    dataType: 'json',
+                    success: function(allKriteria) {
+                        // Create a map of kriteria ID to name
+                        const kriteriaMap = {};
+                        allKriteria.forEach(k => {
+                            kriteriaMap[k.id] = k.nama_kriteria;
+                        });
+                        
+                        // Populate table with dosen data
+                        dosenList.forEach((dosen, index) => {
+                            let kriteriaHtml = '';
+                            
+                            // Display kriteria badges if any
+                            if (dosen.kriteria_access && dosen.kriteria_access.length > 0) {
+                                dosen.kriteria_access.forEach(kId => {
+                                    if (kriteriaMap[kId]) {
+                                        kriteriaHtml += `<span class="kriteria-badge">${kriteriaMap[kId]}</span>`;
+                                    }
+                                });
+                            } else {
+                                kriteriaHtml = '<span class="text-muted">No access assigned</span>';
+                            }
+                            
+                            const row = `
+                                <tr data-dosen-id="${dosen.id}">
+                                    <td>${index + 1}</td>
+                                    <td>${dosen.nama} <br><small class="text-muted">${dosen.username}</small></td>
+                                    <td>${kriteriaHtml}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm edit-dosen-kriteria" 
+                                                data-id="${dosen.id}" 
+                                                data-nama="${dosen.nama}"
+                                                data-kriteria='${JSON.stringify(dosen.kriteria_access || [])}'>
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                            
+                            $('#dosenCriteriaTableBody').append(row);
+                        });
+                        
+                        // Show modal
+                        var criteriaModal = new bootstrap.Modal(document.getElementById('manageCriteriaModal'));
+                        criteriaModal.show();
+                        
+                        // Handle edit dosen kriteria click
+                        $('.edit-dosen-kriteria').off('click').on('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const dosenId = $(this).data('id');
+                            const dosenNama = $(this).data('nama');
+                            const dosenKriteria = $(this).data('kriteria');
+                            
+                            // Populate edit form
+                            $('#edit-dosen-id').val(dosenId);
+                            $('#editing-dosen-name span').text(dosenNama);
+                            
+                            // Show loading indicator
+                            $('#kriteria-select-loading').css('display', 'flex !important').show();
+                            
+                            // Reset and set kriteria selection
+                            if ($('#edit-dosen-kriteria').hasClass('select2-hidden-accessible')) {
+                                $('#edit-dosen-kriteria').select2('destroy');
+                            }
+                            
+                            // Initialize select2 with short delay to ensure proper rendering
+                            setTimeout(function() {
+                                $('.select2-kriteria').select2({
+                                    placeholder: "Pilih kriteria untuk dosen ini",
+                                    allowClear: true,
+                                    width: '100%',
+                                    dropdownParent: $('#dosenCriteriaEditor')
+                                });
+                                
+                                $('#edit-dosen-kriteria').val(dosenKriteria).trigger('change');
+                                
+                                // Hide loading indicator
+                                $('#kriteria-select-loading').hide();
+                                
+                                // Show editor section
+                                showDosenEditor();
+                            }, 300);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error getting kriteria data:', error);
+                        showError('Error', 'Failed to get kriteria data: ' + (xhr.responseJSON?.message || error));
+                    }
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error getting dosen data:', error);
+                showError('Error', 'Failed to get dosen data: ' + (xhr.responseJSON?.message || error));
             }
         });
-    });
+    }
+    
+    // Function to show dosen editor
+    function showDosenEditor() {
+        // Show the editor
+        $('#dosenCriteriaEditor').slideDown(300);
+        
+        // Show the overlay to prevent interaction with the table
+        $('.edit-mode-overlay').fadeIn(300);
+        
+        // Highlight the active row
+        const dosenId = $('#edit-dosen-id').val();
+        $(`#dosenCriteriaTableBody tr[data-dosen-id="${dosenId}"]`).addClass('table-primary');
+        
+        // Scroll to the editor
+        $('html, body').animate({
+            scrollTop: $('#dosenCriteriaEditor').offset().top - 100
+        }, 300);
+    }
+    
+    // Function to hide dosen editor
+    function hideDosenEditor() {
+        // Hide the editor
+        $('#dosenCriteriaEditor').slideUp(300);
+        
+        // Hide the overlay
+        $('.edit-mode-overlay').fadeOut(300);
+        
+        // Remove highlight from all rows
+        $('#dosenCriteriaTableBody tr').removeClass('table-primary');
+    }
+    
+    // Function to update dosen kriteria
+    function updateDosenKriteria() {
+        const dosenId = $('#edit-dosen-id').val();
+        const kriteriaAccess = $('#edit-dosen-kriteria').val() || [];
+        
+        // Show loader
+        showLoader('Processing...', 'Updating kriteria access');
+        
+        // Update kriteria access
+        $.ajax({
+            url: `/admin/users/${dosenId}/kriteria-access`,
+            type: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                kriteria_access: kriteriaAccess
+            },
+            dataType: 'json',
+            success: function(response) {
+                showSuccess('Success', 'Kriteria access updated successfully', function() {
+                    // Hide the editor and refresh the table
+                    hideDosenEditor();
+                    loadDosenCriteria();
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating kriteria access:', error);
+                showError('Error', 'Failed to update kriteria access: ' + (xhr.responseJSON?.message || error));
+            }
+        });
+    }
+    
+    // Function to reorder table numbers after deletion
+    function reorderTableNumbers() {
+        $('#usersTable tbody tr').each(function(index) {
+            $(this).find('td:first').text(index + 1);
+        });
+    }
+    
+    // Helper function to show loader
+    function showLoader(title, text) {
+        Swal.fire({
+            title: title,
+            text: text,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    }
+    
+    // Helper function to hide loader
+    function hideLoader() {
+        Swal.close();
+    }
+    
+    // Helper function to show success message
+    function showSuccess(title, text, callback) {
+        Swal.fire({
+            icon: 'success',
+            title: title,
+            text: text
+        }).then(() => {
+            if (typeof callback === 'function') {
+                callback();
+            }
+        });
+    }
+    
+    // Helper function to show error message
+    function showError(title, text) {
+        Swal.fire({
+            icon: 'error',
+            title: title,
+            text: text
+        });
+    }
+    
+    // Helper function to handle validation errors
+    function handleValidationErrors(errors, prefix) {
+        // Clear previous errors
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').text('');
+        
+        // Display new errors
+        for (const field in errors) {
+            $(`#${prefix}${field}`).addClass('is-invalid');
+            $(`#${prefix}${field}-error`).text(errors[field][0]);
+        }
+    }
 });
 </script>
-@endpush
-
-@push('styles')
-<style>
-.modal-backdrop {
-    z-index: 1040 !important;
-}
-.modal {
-    z-index: 1051 !important;
-}
-</style>
 @endpush 

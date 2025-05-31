@@ -32,6 +32,19 @@ width: 100% !important;
 <table class="content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
 {{ $header ?? '' }}
 
+<!-- Email Banner -->
+<tr>
+<td>
+<table class="inner-body" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
+<tr>
+<td class="email-banner">
+<h1 style="color: #ffffff; margin-top: 15px; font-size: 24px;">Sistem Akreditasi</h1>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
 <!-- Email Body -->
 <tr>
 <td class="body" width="100%" cellpadding="0" cellspacing="0" style="border: hidden !important;">
