@@ -16,7 +16,7 @@
                 </div>
                 <p class="mb-0">{{ $ppepp_descriptions[$ppepp_key] ?? '-' }}</p>
             </div>
-            
+
             <div class="table-responsive">
                 <table class="table table-hover table-bordered">
                     <thead>
@@ -69,7 +69,7 @@
                                     @endif
 
                                     <!-- Revision button - only show in non-validation view -->
-                                    @if(!$is_validation_view && $dokumen->status === 'revisi')
+                                    @if(!$is_validation_view && $dokumen->status === 'revisi' && (auth()->user()->id == $dokumen->user_id || auth()->user()->role === 'administrator'))
                                         <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
                                             <i class="fas fa-upload"></i>
                                         </button>
@@ -86,7 +86,7 @@
                                         <x-dokumen-comments-modal :dokumen="$dokumen" :dokumenComments="$dokumenComments" :commentCount="$commentCount" />
                                     @endif
 
-                                    @if(!$is_validation_view && $dokumen->status === 'revisi')
+                                    @if(!$is_validation_view && $dokumen->status === 'revisi' && (auth()->user()->id == $dokumen->user_id || auth()->user()->role === 'administrator'))
                                         <x-dokumen-revisi-modal :dokumen="$dokumen" />
                                     @endif
 

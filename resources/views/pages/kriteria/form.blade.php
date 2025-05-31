@@ -176,6 +176,7 @@
                                                     </button>
                                                 </form>
                                             @elseif($doc->status == 'revisi')
+                                                @if(auth()->user()->id == $doc->user_id || auth()->user()->role === 'administrator')
                                                 <button type="button" class="btn btn-warning btn-xs sharp me-1"
                                                     title="Perbarui Revisi" data-bs-toggle="modal"
                                                     data-bs-target="#revisiModal{{ $doc->id }}">
@@ -232,6 +233,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                @endif
                                             @endif
                                         </div>
                                     </td>

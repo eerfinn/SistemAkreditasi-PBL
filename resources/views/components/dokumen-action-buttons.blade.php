@@ -10,7 +10,7 @@
     </button>
 @endif
 
-@if(auth()->user() && (auth()->user()->role === 'dosen' || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
+@if(auth()->user() && ($dokumen->user_id == auth()->user()->id || auth()->user()->role === 'administrator') && $dokumen->status === 'revisi')
     <button type="button" class="btn btn-warning btn-xs sharp me-1" title="Upload Revisi" data-bs-toggle="modal" data-bs-target="#revisiModal{{ $dokumen->id }}">
         <i class="fas fa-upload"></i>
     </button>
@@ -20,4 +20,4 @@
     <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
         <i class="fas fa-check-double"></i>
     </button>
-@endif 
+@endif
