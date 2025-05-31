@@ -211,7 +211,7 @@ class DokumenController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         // Get documents visible to the current user
         $dokumen = Dokumen::with(['user', 'kriteria'])
             ->visibleToUser($user)
@@ -224,12 +224,12 @@ class DokumenController extends Controller
     public function show(Dokumen $dokumen)
     {
         $user = Auth::user();
-        
+
         // Check if the document should be visible to the current user
         $isVisible = Dokumen::where('id', $dokumen->id)
             ->visibleToUser($user)
             ->exists();
-            
+
         if (!$isVisible) {
             abort(403, 'Anda tidak memiliki akses untuk melihat dokumen ini.');
         }
@@ -356,11 +356,11 @@ class DokumenController extends Controller
     public function finalisasiAll(Kriteria $kriteria)
     {
         $user = Auth::user();
-        
+
         if (!in_array($user->role, ['administrator', 'dosen'])) {
             abort(403, 'Unauthorized access');
         }
-        
+
         // If user is dosen, check if they have access to this kriteria
         if ($user->role === 'dosen') {
             $allowedKriteriaIds = $user->kriteria_access ?? [];
@@ -369,36 +369,41 @@ class DokumenController extends Controller
                     ->with('error', 'Anda tidak memiliki akses untuk memfinalisasi dokumen kriteria ini.');
             }
         }
-        
+
         // Get only draft documents to finalize
         $dokumenDrafts = Dokumen::where('kriteria_id', $kriteria->id)
                        ->where('status', Dokumen::STATUS_DRAFT)
                        ->whereNotNull('path')
                        ->get();
-                       
+
         if ($dokumenDrafts->count() === 0) {
             return redirect()->back()
                             ->with('info', 'Tidak ada dokumen draft yang perlu difinalisasi.');
         }
-        
+
         $berhasilFinalisasi = 0;
         foreach ($dokumenDrafts as $dokumen) {
             $dokumen->status = Dokumen::STATUS_MENUNGGU; // Change status to menunggu (waiting for validation)
             $dokumen->save();
             $berhasilFinalisasi++;
-            
+
+            // Notify koordinator about the finalized document
+            $this->notificationService->notifyKoordinatorAboutDocument($dokumen, 'finalized');
+
             Log::info('Document finalized successfully', [
                 'dokumen_id' => $dokumen->id,
                 'kriteria_id' => $kriteria->id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
+                'new_status' => $dokumen->status,
+                'notification_sent' => true
             ]);
         }
-        
+
         if ($berhasilFinalisasi > 0) {
             return redirect()->back()
                             ->with('success', "{$berhasilFinalisasi} dokumen draft berhasil difinalisasi dan menunggu validasi.");
         }
-        
+
         return redirect()->back()
                         ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file.');
     }
@@ -464,6 +469,9 @@ class DokumenController extends Controller
                 'dokumen_id' => $dokumen->id,
                 'new_path' => $path
             ]);
+
+            // Notify koordinator about the revised document
+            $this->notificationService->notifyKoordinatorAboutDocument($dokumen, 'revised');
 
             // Buat notifikasi untuk admin bahwa revisi telah disubmit
             $this->notificationService->notifyRole('administrator', 'Revisi Dokumen Disubmit',

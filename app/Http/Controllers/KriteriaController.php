@@ -9,13 +9,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Services\NotificationService;
 
 class KriteriaController extends Controller
 {
-    public function __construct()
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
     {
         $this->middleware('auth');
         $this->middleware('kriteria.access')->only(['show', 'uploadForm', 'finalisasiDokumen']);
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -238,7 +242,7 @@ class KriteriaController extends Controller
             foreach ($request->file('files') as $file) {
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 $path = $file->storeAs('public/dokumen_akreditasi/kriteria_' . $kriteria->id, $fileName);
-                
+
                 $dokumen = new Dokumen();
                 $dokumen->kriteria_id = $kriteria->id;
                 $dokumen->user_id = $user->id;
@@ -248,9 +252,9 @@ class KriteriaController extends Controller
                 $dokumen->status = Dokumen::STATUS_DRAFT;
                 $dokumen->is_admin_upload = $user->role === 'administrator';
                 $dokumen->save();
-                
+
                 $uploadedCount++;
-                
+
                 Log::info('User uploaded document', [
                     'dokumen_id' => $dokumen->id,
                     'kriteria_id' => $kriteria->id,
@@ -273,7 +277,7 @@ class KriteriaController extends Controller
     public function validasi(Kriteria $kriteria, Request $request)
     {
         $user = Auth::user();
-        
+
         if ($user->role !== 'administrator') {
             abort(403, 'Unauthorized access');
         }
@@ -295,7 +299,7 @@ class KriteriaController extends Controller
                 ->where('jenis_ppepp', $stage)
                 ->whereNotNull('path')
                 ->with('user');
-                
+
             // For validation, show documents that need validation (menunggu/revisi)
             $query->whereIn('status', [Dokumen::STATUS_MENUNGGU, Dokumen::STATUS_REVISI]);
 
@@ -355,7 +359,7 @@ class KriteriaController extends Controller
     public function processValidasi(Request $request, Dokumen $dokumen)
     {
         $user = Auth::user();
-        
+
         if ($user->role !== 'administrator') {
             abort(403, 'Unauthorized access');
         }
@@ -366,11 +370,11 @@ class KriteriaController extends Controller
         ]);
 
         $dokumen->status = $request->status;
-        
+
         if ($request->filled('komentar')) {
             $dokumen->komentar = $request->komentar;
         }
-        
+
         $dokumen->save();
 
         Log::info('Admin validated document', [
@@ -381,7 +385,7 @@ class KriteriaController extends Controller
         ]);
 
         $statusText = ($request->status === Dokumen::STATUS_DIVERIFIKASI) ? 'diverifikasi' : 'perlu direvisi';
-        
+
         return redirect()->back()->with('success', "Dokumen berhasil divalidasi dengan status: {$statusText}");
     }
 
@@ -391,7 +395,7 @@ class KriteriaController extends Controller
     public function finalisasi(Request $request, $id)
     {
         $user = Auth::user();
-        
+
         if (!in_array($user->role, ['administrator', 'dosen'])) {
             abort(403, 'Unauthorized access');
         }
@@ -432,9 +436,14 @@ class KriteriaController extends Controller
             $dokumen->save();
             $berhasilFinalisasi++;
 
+            // Notify koordinator about the finalized document
+            $this->notificationService->notifyKoordinatorAboutDocument($dokumen, 'finalized');
+
             Log::info('Document finalized successfully', [
                 'dokumen_id' => $dokumen->id,
-                'jenis_ppepp' => $dokumen->jenis_ppepp
+                'jenis_ppepp' => $dokumen->jenis_ppepp,
+                'new_status' => $dokumen->status,
+                'notification_sent' => true
             ]);
         }
 
@@ -452,14 +461,14 @@ class KriteriaController extends Controller
         return redirect()->back()
                         ->with('error', 'Gagal memfinalisasi dokumen. Pastikan dokumen memiliki file.');
     }
-    
+
     /**
      * Delete draft document
      */
     public function destroyDraft(Dokumen $dokumen)
     {
         $user = Auth::user();
-        
+
         if (!in_array($user->role, ['administrator', 'dosen'])) {
             abort(403, 'Unauthorized access');
         }
@@ -478,7 +487,7 @@ class KriteriaController extends Controller
 
         // Delete database record
         $dokumen->delete();
-        
+
         Log::info('User deleted draft document', [
             'user_id' => $user->id,
             'user_role' => $user->role,
@@ -522,7 +531,7 @@ class KriteriaController extends Controller
     public function showUploadForm($kriteria_id, $ppepp)
     {
         $user = auth()->user();
-        
+
         // Cek apakah user memiliki akses ke kriteria ini
         if (!in_array($user->role, ['administrator', 'dosen'])) {
             return redirect()->route('kriteria.show', $kriteria_id)
@@ -539,12 +548,12 @@ class KriteriaController extends Controller
         }
 
         $kriteria = Kriteria::findOrFail($kriteria_id);
-        
+
         // Validasi jenis PPEPP
         $valid_ppepp = [
             'penetapan', 'pelaksanaan', 'evaluasi', 'pengendalian', 'peningkatan'
         ];
-        
+
         if (!in_array($ppepp, $valid_ppepp)) {
             return redirect()->route('kriteria.show', $kriteria_id)
                 ->with('error', 'Jenis PPEPP tidak valid.');
@@ -555,7 +564,7 @@ class KriteriaController extends Controller
             ->where('jenis_ppepp', $ppepp)
             ->where('user_id', $user->id)
             ->get();
-        
+
         return view('pages.kriteria.upload', compact('kriteria', 'ppepp', 'dokumen'));
     }
 }

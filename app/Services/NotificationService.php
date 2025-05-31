@@ -170,14 +170,74 @@ class NotificationService
         }
 
         $kriteriaId = $kriteria->id;
-        
+
         // Find users with the 'dosen' role who have access to this kriteria
         $dosenUsers = User::where('role', 'dosen')
             ->whereJsonContains('kriteria_access', $kriteriaId)
             ->get();
-            
+
         foreach ($dosenUsers as $dosen) {
             $this->create($dosen->id, $title, $message, $options);
+        }
+    }
+
+    /**
+     * Notify koordinator users about document activity
+     *
+     * @param Dokumen $dokumen
+     * @param string $action
+     * @return void
+     */
+    public function notifyKoordinatorAboutDocument($dokumen, $action)
+    {
+        // Jangan kirim notifikasi jika dokumen masih draft
+        if ($dokumen->status === 'draft') {
+            return;
+        }
+
+        // Get all users with koordinator role
+        $koordinators = User::where('role', 'koordinator')->get();
+
+        // Get the uploader's name for the notification message
+        $uploader = User::find($dokumen->user_id);
+        $uploaderName = $uploader ? $uploader->nama : 'User';
+
+        // Get kriteria name
+        $kriteria = Kriteria::find($dokumen->kriteria_id);
+        $kriteriaName = $kriteria ? $kriteria->nama_kriteria : 'Kriteria';
+
+        $title = '';
+        $message = '';
+        $icon = 'fa-file-alt';
+        $color = 'primary';
+
+        switch ($action) {
+            case 'finalized':
+                $title = 'Dokumen Baru Menunggu Validasi';
+                $message = "Dokumen '{$dokumen->nama_dokumen}' untuk {$kriteriaName} telah difinalisasi oleh {$uploaderName} dan menunggu validasi";
+                $icon = 'fa-clock';
+                $color = 'info';
+                break;
+            case 'revised':
+                $title = 'Revisi Dokumen Disubmit';
+                $message = "Revisi untuk dokumen '{$dokumen->nama_dokumen}' untuk {$kriteriaName} telah disubmit oleh {$uploaderName}";
+                $icon = 'fa-sync-alt';
+                $color = 'warning';
+                break;
+            default:
+                $title = 'Aktivitas Dokumen';
+                $message = "Ada aktivitas pada dokumen '{$dokumen->nama_dokumen}' untuk {$kriteriaName}";
+        }
+
+        foreach ($koordinators as $koordinator) {
+            $this->create($koordinator->id, $title, $message, [
+                'type' => 'dokumen',
+                'dokumen_id' => $dokumen->id,
+                'kriteria_id' => $dokumen->kriteria_id,
+                'icon' => $icon,
+                'color' => $color,
+                'link' => "/dokumen/{$dokumen->id}"
+            ]);
         }
     }
 }
