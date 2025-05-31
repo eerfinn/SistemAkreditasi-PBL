@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class NotificationController extends Controller
 {
@@ -56,6 +57,14 @@ class NotificationController extends Controller
 
         // Redirect to the notification link if available
         if ($notification->link) {
+            // Redirect dokumen links to kriteria page
+            if ($notification->type === 'dokumen' && Str::startsWith($notification->link, '/dokumen/')) {
+                if ($notification->kriteria_id) {
+                    return redirect("/kriteria/{$notification->kriteria_id}");
+                }
+            }
+
+            // For all other notifications, use the original link
             return redirect($notification->link);
         }
 

@@ -74,13 +74,13 @@ class ValidasiController extends Controller
 
             // Buat notifikasi untuk pemilik dokumen tentang komentar baru
             $this->notificationService->create($dokumen->user_id, 'Komentar Baru pada Dokumen',
-                "Admin telah menambahkan komentar pada dokumen '{$dokumen->nama_dokumen}'", [
+                ucfirst($user->role) . " telah menambahkan komentar pada dokumen '{$dokumen->nama_dokumen}'", [
                 'type' => 'komentar',
                 'dokumen_id' => $dokumen->id,
                 'kriteria_id' => $dokumen->kriteria_id,
                 'icon' => 'fa-comment',
                 'color' => 'info',
-                'link' => "/dokumen/{$dokumen->id}"
+                'link' => "/kriteria/{$dokumen->kriteria_id}"
             ]);
         }
 
@@ -103,7 +103,7 @@ class ValidasiController extends Controller
                 $kriteria = Kriteria::find($dokumen->kriteria_id);
                 if ($kriteria) {
                     $this->notificationService->notifyKriteriaUsers($kriteria, 'Komentar Baru pada Kriteria',
-                        "Admin telah menambahkan komentar pada kriteria {$kriteria->nama_kriteria}", [
+                        ucfirst($user->role) . " telah menambahkan komentar pada kriteria {$kriteria->nama_kriteria}", [
                         'type' => 'kriteria',
                         'kriteria_id' => $dokumen->kriteria_id,
                         'icon' => 'fa-comment',
@@ -129,23 +129,23 @@ class ValidasiController extends Controller
         // Buat notifikasi untuk pemilik dokumen tentang perubahan status
         if ($dokumen->status === Dokumen::STATUS_REVISI) {
             $this->notificationService->create($dokumen->user_id, 'Dokumen Perlu Direvisi',
-                "Dokumen '{$dokumen->nama_dokumen}' perlu direvisi", [
+                ucfirst($user->role) . " meminta dokumen '{$dokumen->nama_dokumen}' untuk direvisi", [
                 'type' => 'dokumen',
                 'dokumen_id' => $dokumen->id,
                 'kriteria_id' => $dokumen->kriteria_id,
                 'icon' => 'fa-exclamation-circle',
                 'color' => 'warning',
-                'link' => "/dokumen/{$dokumen->id}"
+                'link' => "/kriteria/{$dokumen->kriteria_id}"
             ]);
         } else if ($dokumen->status === Dokumen::STATUS_DIVERIFIKASI) {
             $this->notificationService->create($dokumen->user_id, 'Dokumen Diverifikasi',
-                "Dokumen '{$dokumen->nama_dokumen}' telah diverifikasi", [
+                ucfirst($user->role) . " telah memverifikasi dokumen '{$dokumen->nama_dokumen}'", [
                 'type' => 'dokumen',
                 'dokumen_id' => $dokumen->id,
                 'kriteria_id' => $dokumen->kriteria_id,
                 'icon' => 'fa-check-circle',
                 'color' => 'success',
-                'link' => "/dokumen/{$dokumen->id}"
+                'link' => "/kriteria/{$dokumen->kriteria_id}"
             ]);
         }
 
@@ -184,7 +184,7 @@ class ValidasiController extends Controller
 
             // Buat notifikasi untuk dosen yang bertanggung jawab atas kriteria ini
             $this->notificationService->notifyKriteriaUsers($kriteria, 'Komentar Baru pada Kriteria',
-                "Admin telah menambahkan komentar pada kriteria {$kriteria->nama_kriteria}", [
+                ucfirst($user->role) . " telah menambahkan komentar pada kriteria {$kriteria->nama_kriteria}", [
                 'type' => 'kriteria',
                 'kriteria_id' => $kriteria->id,
                 'icon' => 'fa-comment',

@@ -151,7 +151,7 @@ class DokumenController extends Controller
                         'kriteria_id' => $kriteriaId,
                         'icon' => 'fa-file-alt',
                         'color' => 'success',
-                        'link' => "/dokumen/{$newDokumen->id}"
+                        'link' => "/kriteria/{$kriteriaId}"
                     ]);
 
                         $uploadedCount++;
@@ -297,7 +297,7 @@ class DokumenController extends Controller
             'kriteria_id' => $dokumen->kriteria_id,
             'icon' => 'fa-edit',
             'color' => 'info',
-            'link' => "/dokumen/{$dokumen->id}"
+            'link' => "/kriteria/{$dokumen->kriteria_id}"
         ]);
 
         // Jika dokumen divalidasi oleh admin, buat notifikasi untuk admin
@@ -309,7 +309,7 @@ class DokumenController extends Controller
                 'kriteria_id' => $dokumen->kriteria_id,
                 'icon' => 'fa-check-circle',
                 'color' => 'success',
-                'link' => "/dokumen/{$dokumen->id}"
+                'link' => "/kriteria/{$dokumen->kriteria_id}"
             ]);
         }
 
@@ -322,7 +322,7 @@ class DokumenController extends Controller
                 'kriteria_id' => $dokumen->kriteria_id,
                 'icon' => 'fa-exclamation-circle',
                 'color' => 'warning',
-                'link' => "/dokumen/{$dokumen->id}"
+                'link' => "/kriteria/{$dokumen->kriteria_id}"
             ]);
         }
 
@@ -475,13 +475,13 @@ class DokumenController extends Controller
 
             // Buat notifikasi untuk admin bahwa revisi telah disubmit
             $this->notificationService->notifyRole('administrator', 'Revisi Dokumen Disubmit',
-                "Revisi untuk dokumen '{$dokumen->nama_dokumen}' telah disubmit dan menunggu verifikasi", [
+                "Revisi untuk dokumen '{$dokumen->nama_dokumen}' telah disubmit", [
                 'type' => 'dokumen',
                 'dokumen_id' => $dokumen->id,
                 'kriteria_id' => $dokumen->kriteria_id,
-                'icon' => 'fa-file-alt',
+                'icon' => 'fa-sync-alt',
                 'color' => 'info',
-                'link' => "/dokumen/{$dokumen->id}"
+                'link' => "/kriteria/{$dokumen->kriteria_id}"
             ]);
 
             return redirect()->route('kriteria.show', $dokumen->kriteria_id)

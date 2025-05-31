@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
@@ -36,6 +37,7 @@ class Dokumen extends Model
         'komentar',
         'validated_at',
         'is_admin_upload',
+        'deskripsi_dokumen',
     ];
 
     public function user(): BelongsTo
@@ -48,6 +50,11 @@ class Dokumen extends Model
         return $this->belongsTo(Kriteria::class, 'kriteria_id');
     }
 
+    public function komentar(): HasMany
+    {
+        return $this->hasMany(Komen::class, 'dokumen_id');
+    }
+
     public function getFileUrlAttribute(): ?string
     {
         if ($this->path) {
@@ -58,7 +65,7 @@ class Dokumen extends Model
                     'dokumen_id' => $this->id,
                     'path' => $this->path
                 ]);
-                
+
                 return asset('storage/' . $this->path);
             } else {
                 Log::warning('File not found in storage', [
@@ -86,12 +93,21 @@ class Dokumen extends Model
      */
     public function scopeVisibleToUser($query, $user)
     {
-        // Only admin and dosen can see draft documents
-        if ($user->role === 'administrator' || $user->role === 'dosen') {
+        // Admin can see all documents
+        if ($user->role === 'administrator') {
             return $query;
         }
 
-        // Other roles (koordinator, kjm, kaprodi, kajur) can only see non-draft documents
+        // Dosen can see all their own documents
+        if ($user->role === 'dosen') {
+            // Show own drafts and all other non-draft documents
+            return $query->where(function($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere('status', '!=', self::STATUS_DRAFT);
+            });
+        }
+
+        // Koordinator and other roles can see non-draft documents
         return $query->where('status', '!=', self::STATUS_DRAFT);
     }
 }

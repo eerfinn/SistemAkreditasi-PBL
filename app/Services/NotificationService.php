@@ -88,7 +88,7 @@ class NotificationService
             'kriteria_id' => $dokumen->kriteria_id,
             'icon' => $icon,
             'color' => $color,
-            'link' => "/dokumen/{$dokumen->id}"
+            'link' => "/kriteria/{$dokumen->kriteria_id}"
         ]);
     }
 
@@ -236,7 +236,7 @@ class NotificationService
                 'kriteria_id' => $dokumen->kriteria_id,
                 'icon' => $icon,
                 'color' => $color,
-                'link' => "/dokumen/{$dokumen->id}"
+                'link' => "/kriteria/{$dokumen->kriteria_id}"
             ]);
         }
     }
