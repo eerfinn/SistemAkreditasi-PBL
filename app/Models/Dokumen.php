@@ -80,4 +80,18 @@ class Dokumen extends Model
             }
         });
     }
+
+    /**
+     * Scope to filter documents based on user role and status
+     */
+    public function scopeVisibleToUser($query, $user)
+    {
+        // Only admin and dosen can see draft documents
+        if ($user->role === 'administrator' || $user->role === 'dosen') {
+            return $query;
+        }
+
+        // Other roles (koordinator, kjm, kaprodi, kajur) can only see non-draft documents
+        return $query->where('status', '!=', self::STATUS_DRAFT);
+    }
 }

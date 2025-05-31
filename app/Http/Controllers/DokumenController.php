@@ -210,64 +210,31 @@ class DokumenController extends Controller
     // Placeholder untuk method resource lainnya
     public function index()
     {
-        // Logika untuk menampilkan daftar semua dokumen (mungkin untuk admin)
-        // $dokumens = Dokumen::with(['user', 'kriteria'])->latest()->paginate(15);
-        // return view('pages.dokumen.index', compact('dokumens'));
-        return redirect()->route('dashboard'); // Atau halaman lain yang sesuai
+        $user = Auth::user();
+        
+        // Get documents visible to the current user
+        $dokumen = Dokumen::with(['user', 'kriteria'])
+            ->visibleToUser($user)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.dokumen.index', compact('dokumen'));
     }
 
     public function show(Dokumen $dokumen)
     {
-        try {
-            // Pastikan user memiliki akses ke dokumen ini
-            if (Auth::id() !== $dokumen->user_id && !in_array(Auth::user()->role, ['administrator', 'koordinator', 'kps', 'kajur', 'kjm', 'kaprodi'])) {
-                return back()->with('error', 'Anda tidak memiliki akses ke dokumen ini.');
-            }
-
-            // Periksa apakah path ada dan file ada di storage
-            if (!$dokumen->path) {
-                return back()->with('error', 'File dokumen tidak ditemukan (path kosong).');
-            }
-
-            // Coba akses file dari storage public
-            if (Storage::disk('public')->exists($dokumen->path)) {
-                $filePath = storage_path('app/public/' . $dokumen->path);
-                $fileName = basename($dokumen->path);
-                $extension = pathinfo($dokumen->path, PATHINFO_EXTENSION);
-
-                // Tentukan content type berdasarkan ekstensi file
-                $contentType = match(strtolower($extension)) {
-                    'pdf' => 'application/pdf',
-                    'doc' => 'application/msword',
-                    'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'xls' => 'application/vnd.ms-excel',
-                    'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    'ppt' => 'application/vnd.ms-powerpoint',
-                    'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                    default => 'application/octet-stream'
-                };
-
-                // Tampilkan file langsung di browser
-                return response()->file($filePath, [
-                    'Content-Type' => $contentType,
-                    'Content-Disposition' => 'inline; filename="' . $fileName . '"'
-                ]);
-            }
-
-            Log::error('File tidak ditemukan di storage', [
-                'dokumen_id' => $dokumen->id,
-                'path' => $dokumen->path,
-                'full_path' => storage_path('app/public/' . $dokumen->path)
-            ]);
-
-            return back()->with('error', 'File dokumen tidak ditemukan di sistem.');
-        } catch (\Exception $e) {
-            Log::error('Error saat membuka file dokumen', [
-                'dokumen_id' => $dokumen->id,
-                'error' => $e->getMessage()
-            ]);
-            return back()->with('error', 'Terjadi kesalahan saat membuka file: ' . $e->getMessage());
+        $user = Auth::user();
+        
+        // Check if the document should be visible to the current user
+        $isVisible = Dokumen::where('id', $dokumen->id)
+            ->visibleToUser($user)
+            ->exists();
+            
+        if (!$isVisible) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat dokumen ini.');
         }
+
+        return view('pages.dokumen.show', compact('dokumen'));
     }
 
     public function edit(Dokumen $dokumen)

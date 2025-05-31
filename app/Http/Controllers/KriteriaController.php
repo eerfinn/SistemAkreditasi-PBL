@@ -54,12 +54,16 @@ class KriteriaController extends Controller
         // Get existing documents for all PPEPP stages
         $dokumenPerPPEPP = [];
         foreach (array_keys($ppepp_labels) as $stage) {
-                $query = Dokumen::where('kriteria_id', $kriteria->id)
-                    ->where('jenis_ppepp', $stage)
-                    ->whereNotNull('path') // Only get actual documents, not descriptions
+            $query = Dokumen::where('kriteria_id', $kriteria->id)
+                ->where('jenis_ppepp', $stage)
+                ->whereNotNull('path') // Only get actual documents, not descriptions
                 ->with('user'); // Eager load the user relationship
 
-            // Show all documents for admin, both admin-uploaded and user-uploaded
+            // Apply visibility rules based on user role
+            if (!in_array($user->role, ['administrator', 'dosen'])) {
+                $query->where('status', '!=', Dokumen::STATUS_DRAFT);
+            }
+
             $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
@@ -177,7 +181,11 @@ class KriteriaController extends Controller
                 ->whereNotNull('path') // Only get actual documents, not descriptions
                 ->with('user'); // Eager load the user relationship
 
-            // Show all documents
+            // Apply visibility rules based on user role
+            if (!in_array($user->role, ['administrator', 'dosen'])) {
+                $query->where('status', '!=', Dokumen::STATUS_DRAFT);
+            }
+
             $dokumenPerPPEPP[$stage] = $query->orderBy('updated_at', 'desc')->get();
         }
 
