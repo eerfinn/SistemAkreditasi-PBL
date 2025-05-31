@@ -10,16 +10,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Services\NotificationService;
+use App\Services\HistoryService;
 
 class KriteriaController extends Controller
 {
     protected $notificationService;
+    protected $historyService;
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(NotificationService $notificationService, HistoryService $historyService)
     {
         $this->middleware('auth');
         $this->middleware('kriteria.access')->only(['show', 'uploadForm', 'finalisasiDokumen']);
         $this->notificationService = $notificationService;
+        $this->historyService = $historyService;
     }
 
     /**
@@ -438,6 +441,9 @@ class KriteriaController extends Controller
 
             // Notify koordinator about the finalized document
             $this->notificationService->notifyKoordinatorAboutDocument($dokumen, 'finalized');
+            
+            // Record finalization in history log
+            $this->historyService->recordFinalization($dokumen);
 
             Log::info('Document finalized successfully', [
                 'dokumen_id' => $dokumen->id,

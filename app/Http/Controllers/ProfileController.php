@@ -6,8 +6,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Models\History;
+use App\Services\HistoryService;
+
 class ProfileController extends Controller
 {
+    protected $historyService;
+    
+    public function __construct(HistoryService $historyService)
+    {
+        $this->historyService = $historyService;
+    }
+    
     /**
      * Tampilkan halaman profil pengguna.
      */
@@ -39,6 +49,9 @@ class ProfileController extends Controller
 
         // Update nama file ke kolom foto
         User::where('id', $user->id)->update(['photo' => $filename]);
+        
+        // Catat aktivitas perubahan foto profil
+        $this->historyService->recordProfileUpdate($user, 'foto');
 
         return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
     }
@@ -65,13 +78,16 @@ class ProfileController extends Controller
 
         // Update nama file ke kolom foto
         User::where('id', $user->id)->update(['photo' => $filename]);
+        
+        // Catat aktivitas perubahan foto profil
+        $this->historyService->recordProfileUpdate($user, 'foto');
 
         if ($request->ajax()) {
-        return response()->json([
-            'message' => 'Foto profil berhasil diperbarui.',
-            'photo_url' => asset('storage/profile/' . $filename)
-        ]);
-    }
+            return response()->json([
+                'message' => 'Foto profil berhasil diperbarui.',
+                'photo_url' => asset('storage/profile/' . $filename)
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
     }

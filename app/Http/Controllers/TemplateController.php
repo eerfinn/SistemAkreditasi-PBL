@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Template;
 use App\Models\Kriteria;
+use App\Services\HistoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -11,12 +12,15 @@ use Illuminate\Support\Str;
 
 class TemplateController extends Controller
 {
+    protected $historyService;
+
     /**
      * Konstruktor
      */
-    public function __construct()
+    public function __construct(HistoryService $historyService)
     {
         $this->middleware('auth');
+        $this->historyService = $historyService;
     }
 
     /**
@@ -121,6 +125,9 @@ class TemplateController extends Controller
         $template = new Template($validated);
         $template->created_by = Auth::id();
         $template->save();
+        
+        // Catat aktivitas pembuatan template
+        $this->historyService->recordTemplateActivity('create', $template->name);
 
         return redirect()->route('templates.index')
             ->with('success', 'Template berhasil dibuat.');
@@ -214,17 +221,10 @@ class TemplateController extends Controller
                 ->with('error', 'Anda tidak memiliki izin untuk memperbarui template.');
         }
 
-        // Jika bukan admin, cek apakah template ini berada dalam kriteria yang bisa diakses
-        if ($user->role !== 'administrator') {
-            $allowedKriteriaIds = [];
-            if ($user->role === 'dosen') {
-                $allowedKriteriaIds = $user->kriteria_access ?? [];
-            }
-
-            if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
-                return redirect()->route('templates.index')
-                    ->with('error', 'Anda hanya dapat memperbarui template untuk kriteria yang ditugaskan kepada Anda.');
-            }
+        // Cek apakah dosen hanya dapat mengupdate template yang mereka buat
+        if ($user->role === 'dosen' && $template->created_by !== $user->id) {
+            return redirect()->route('templates.index')
+                ->with('error', 'Anda hanya dapat memperbarui template yang Anda buat.');
         }
 
         $validated = $request->validate([
@@ -250,6 +250,9 @@ class TemplateController extends Controller
         }
 
         $template->update($validated);
+        
+        // Catat aktivitas update template
+        $this->historyService->recordTemplateActivity('update', $template->name);
 
         return redirect()->route('templates.index')
             ->with('success', 'Template berhasil diperbarui.');
@@ -269,27 +272,20 @@ class TemplateController extends Controller
                 ->with('error', 'Anda tidak memiliki izin untuk menghapus template.');
         }
 
-        // Jika bukan admin, cek apakah template ini berada dalam kriteria yang bisa diakses
-        // dan apakah template ini dibuat oleh user tersebut
-        if ($user->role !== 'administrator') {
-            $allowedKriteriaIds = [];
-            if ($user->role === 'dosen') {
-                $allowedKriteriaIds = $user->kriteria_access ?? [];
-            }
-
-            if (!in_array($template->kriteria_id, $allowedKriteriaIds)) {
-                return redirect()->route('templates.index')
-                    ->with('error', 'Anda hanya dapat menghapus template untuk kriteria yang ditugaskan kepada Anda.');
-            }
-
-            // Tambahan: Dosen hanya bisa menghapus template yang mereka buat
-            if ($template->created_by !== $user->id) {
-                return redirect()->route('templates.index')
-                    ->with('error', 'Anda hanya dapat menghapus template yang Anda buat.');
-            }
+        // Cek apakah dosen hanya dapat menghapus template yang mereka buat
+        if ($user->role === 'dosen' && $template->created_by !== $user->id) {
+            return redirect()->route('templates.index')
+                ->with('error', 'Anda hanya dapat menghapus template yang Anda buat.');
         }
 
+        // Simpan nama template sebelum dihapus untuk log
+        $templateName = $template->name;
+        
+        // Hapus template
         $template->delete();
+        
+        // Catat aktivitas penghapusan template
+        $this->historyService->recordTemplateActivity('delete', $templateName);
 
         return redirect()->route('templates.index')
             ->with('success', 'Template berhasil dihapus.');

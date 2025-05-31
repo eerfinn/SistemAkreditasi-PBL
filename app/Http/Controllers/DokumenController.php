@@ -468,12 +468,8 @@ class DokumenController extends Controller
             $dokumen->updated_at = now();
             $dokumen->save();
 
-            // Record the history
-            $history = new History();
-            $history->user_id = $user->id;
-            $history->dokumen_id = $dokumen->id;
-            $history->aktivitas = "Mengupload revisi dokumen {$dokumen->nama_dokumen}";
-            $history->save();
+            // Record revision submission in history
+            $this->historyService->recordRevisionSubmit($dokumen);
 
             Log::info('Document revision submitted successfully', [
                 'dokumen_id' => $dokumen->id,
@@ -483,28 +479,16 @@ class DokumenController extends Controller
             // Notify koordinator about the revised document
             $this->notificationService->notifyKoordinatorAboutDocument($dokumen, 'revised');
 
-            // Buat notifikasi untuk admin bahwa revisi telah disubmit
-            $this->notificationService->notifyRole('administrator', 'Revisi Dokumen Disubmit',
-                "Revisi untuk dokumen '{$dokumen->nama_dokumen}' telah disubmit", [
-                'type' => 'dokumen',
-                'dokumen_id' => $dokumen->id,
-                'kriteria_id' => $dokumen->kriteria_id,
-                'icon' => 'fa-sync-alt',
-                'color' => 'info',
-                'link' => "/kriteria/{$dokumen->kriteria_id}"
-            ]);
-
             return redirect()->route('kriteria.show', $dokumen->kriteria_id)
-                ->with('success', 'Revisi dokumen berhasil diunggah dan menunggu validasi.');
+                            ->with('success', 'Revisi dokumen berhasil diunggah dan menunggu validasi.');
 
         } catch (\Exception $e) {
-            Log::error('Error submitting document revision', [
-                'dokumen_id' => $dokumen->id,
-                'error' => $e->getMessage()
+            Log::error('Error submitting revision', [
+                'message' => $e->getMessage(),
+                'dokumen_id' => $dokumen->id
             ]);
-
-            return back()->with('error', 'Terjadi kesalahan saat mengunggah revisi: ' . $e->getMessage())
-                ->withInput();
+            
+            return back()->with('error', 'Gagal mengajukan revisi: ' . $e->getMessage());
         }
     }
 

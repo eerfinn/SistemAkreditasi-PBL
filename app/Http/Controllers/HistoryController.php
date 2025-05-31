@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class HistoryController extends Controller
 {
@@ -27,6 +28,17 @@ class HistoryController extends Controller
      */
     public function index(Request $request)
     {
+        // Parse form daterange if submitted
+        if ($request->has('daterange') && !empty($request->daterange)) {
+            $dateRange = explode(' - ', $request->daterange);
+            if (count($dateRange) == 2) {
+                $request->merge([
+                    'from_date' => trim($dateRange[0]),
+                    'to_date' => trim($dateRange[1])
+                ]);
+            }
+        }
+        
         // Fetch histories with relationships eager loaded
         $query = History::with(['user', 'dokumen', 'dokumen.kriteria'])
             ->orderBy('created_at', 'desc');
@@ -38,28 +50,91 @@ class HistoryController extends Controller
         
         // Filter by activity type
         if ($request->has('activity_type') && $request->activity_type) {
-            $query->where('aktivitas', 'like', '%' . $request->activity_type . '%');
+            // Use a more precise filter for different activity types
+            switch ($request->activity_type) {
+                case 'mengunggah':
+                    $query->where('aktivitas', 'like', '%Mengunggah dokumen:%');
+                    break;
+                case 'memperbarui':
+                    $query->where('aktivitas', 'like', '%Memperbarui dokumen:%');
+                    break;
+                case 'menghapus':
+                    $query->where('aktivitas', 'like', '%Menghapus dokumen:%');
+                    break;
+                case 'memvalidasi':
+                    $query->where('aktivitas', 'like', '%Validator memvalidasi%');
+                    break;
+                case 'revisi':
+                    $query->where(function($q) {
+                        $q->where('aktivitas', 'like', '%Validator meminta revisi%')
+                          ->orWhere('aktivitas', 'like', '%Mengajukan revisi%')
+                          ->orWhere('aktivitas', 'like', '%revisi dokumen%');
+                    });
+                    break;
+                case 'komentar':
+                    $query->where('aktivitas', 'like', '%komentar%');
+                    break;
+                case 'login':
+                    $query->where('aktivitas', 'like', '%Login ke sistem%');
+                    break;
+                case 'profil':
+                    $query->where('aktivitas', 'like', '%Memperbarui % profil%');
+                    break;
+                case 'finalisasi':
+                    $query->where(function($q) {
+                        $q->where('aktivitas', 'like', '%Memfinalisasi dokumen:%')
+                          ->orWhere('aktivitas', 'like', '%finalisasi dokumen%')
+                          ->orWhere('aktivitas', 'like', '%berhasil difinalisasi%');
+                    });
+                    break;
+                case 'template':
+                    $query->where('aktivitas', 'like', '%template dokumen%');
+                    break;
+                default:
+                    $query->where('aktivitas', 'like', '%' . $request->activity_type . '%');
+            }
         }
         
         // Filter by date range if provided
         if ($request->has('from_date') && $request->from_date) {
-            $fromDate = Carbon::parse($request->from_date)->startOfDay();
-            $query->where('created_at', '>=', $fromDate);
+            try {
+                $fromDate = Carbon::parse($request->from_date)->startOfDay();
+                $query->where('created_at', '>=', $fromDate);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+                report($e);
+            }
         }
         
         if ($request->has('to_date') && $request->to_date) {
-            $toDate = Carbon::parse($request->to_date)->endOfDay();
-            $query->where('created_at', '<=', $toDate);
+            try {
+                $toDate = Carbon::parse($request->to_date)->endOfDay();
+                $query->where('created_at', '<=', $toDate);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+                report($e);
+            }
         }
         
-        // Paginate the results
-        $histories = $query->paginate(20)->appends($request->except('page'));
+        // Paginate the results - change to 10 per page
+        $histories = $query->paginate(10)->appends($request->except('page'));
         
         // Get unique users for filter
         $users = User::orderBy('nama')->get();
         
-        // Define activity types for filter - expanded with more types
-        $activityTypes = [
+        // Get actual activity types from database
+        $activityTypes = $this->getActiveLogTypes();
+        
+        return view('pages.admin.history.index', compact('histories', 'users', 'activityTypes'));
+    }
+    
+    /**
+     * Get active log types based on actual data in the database
+     */
+    private function getActiveLogTypes()
+    {
+        // Default activity types that we're looking for
+        $defaultTypes = [
             'mengunggah' => 'Mengunggah Dokumen',
             'memperbarui' => 'Memperbarui Dokumen',
             'menghapus' => 'Menghapus Dokumen',
@@ -67,15 +142,54 @@ class HistoryController extends Controller
             'revisi' => 'Revisi Dokumen',
             'komentar' => 'Komentar',
             'login' => 'Login ke Sistem',
-            'template' => 'Template Dokumen',
             'profil' => 'Perubahan Profil',
             'finalisasi' => 'Finalisasi Dokumen',
-            'status' => 'Perubahan Status',
-            'tambah' => 'Penambahan Data',
-            'kriteria' => 'Akses Kriteria'
+            'template' => 'Template Dokumen'
         ];
         
-        return view('pages.admin.history.index', compact('histories', 'users', 'activityTypes'));
+        try {
+            // Get all history records to check for activity types
+            $allActivities = DB::table('histories')->select('aktivitas')->get();
+            
+            // Check which activity types exist
+            $existingTypes = [];
+            
+            foreach ($defaultTypes as $key => $label) {
+                foreach ($allActivities as $activity) {
+                    if (stripos($activity->aktivitas, $key) !== false) {
+                        $existingTypes[$key] = $label;
+                        break;
+                    }
+                }
+            }
+            
+            // Add special case checks for finalisasi and template
+            if (!isset($existingTypes['finalisasi'])) {
+                foreach ($allActivities as $activity) {
+                    if (stripos($activity->aktivitas, 'finalisasi') !== false || 
+                        stripos($activity->aktivitas, 'berhasil difinalisasi') !== false) {
+                        $existingTypes['finalisasi'] = $defaultTypes['finalisasi'];
+                        break;
+                    }
+                }
+            }
+            
+            if (!isset($existingTypes['template'])) {
+                foreach ($allActivities as $activity) {
+                    if (stripos($activity->aktivitas, 'template') !== false) {
+                        $existingTypes['template'] = $defaultTypes['template'];
+                        break;
+                    }
+                }
+            }
+            
+            // Return existing types or default if empty
+            return !empty($existingTypes) ? $existingTypes : $defaultTypes;
+        } catch (\Exception $e) {
+            // In case of database error, return default types
+            report($e);
+            return $defaultTypes;
+        }
     }
     
     /**
@@ -83,6 +197,17 @@ class HistoryController extends Controller
      */
     public function export(Request $request)
     {
+        // Parse form daterange if submitted
+        if ($request->has('daterange') && !empty($request->daterange)) {
+            $dateRange = explode(' - ', $request->daterange);
+            if (count($dateRange) == 2) {
+                $request->merge([
+                    'from_date' => trim($dateRange[0]),
+                    'to_date' => trim($dateRange[1])
+                ]);
+            }
+        }
+        
         // Build query with filters similar to index method
         $query = History::with(['user', 'dokumen', 'dokumen.kriteria'])
             ->orderBy('created_at', 'desc');
@@ -94,23 +219,76 @@ class HistoryController extends Controller
         
         // Filter by activity type
         if ($request->has('activity_type') && $request->activity_type) {
-            $query->where('aktivitas', 'like', '%' . $request->activity_type . '%');
+            // Use a more precise filter for different activity types
+            switch ($request->activity_type) {
+                case 'mengunggah':
+                    $query->where('aktivitas', 'like', '%Mengunggah dokumen:%');
+                    break;
+                case 'memperbarui':
+                    $query->where('aktivitas', 'like', '%Memperbarui dokumen:%');
+                    break;
+                case 'menghapus':
+                    $query->where('aktivitas', 'like', '%Menghapus dokumen:%');
+                    break;
+                case 'memvalidasi':
+                    $query->where('aktivitas', 'like', '%Validator memvalidasi%');
+                    break;
+                case 'revisi':
+                    $query->where(function($q) {
+                        $q->where('aktivitas', 'like', '%Validator meminta revisi%')
+                          ->orWhere('aktivitas', 'like', '%Mengajukan revisi%')
+                          ->orWhere('aktivitas', 'like', '%revisi dokumen%');
+                    });
+                    break;
+                case 'komentar':
+                    $query->where('aktivitas', 'like', '%komentar%');
+                    break;
+                case 'login':
+                    $query->where('aktivitas', 'like', '%Login ke sistem%');
+                    break;
+                case 'profil':
+                    $query->where('aktivitas', 'like', '%Memperbarui % profil%');
+                    break;
+                case 'finalisasi':
+                    $query->where(function($q) {
+                        $q->where('aktivitas', 'like', '%Memfinalisasi dokumen:%')
+                          ->orWhere('aktivitas', 'like', '%finalisasi dokumen%')
+                          ->orWhere('aktivitas', 'like', '%berhasil difinalisasi%');
+                    });
+                    break;
+                case 'template':
+                    $query->where('aktivitas', 'like', '%template dokumen%');
+                    break;
+                default:
+                    $query->where('aktivitas', 'like', '%' . $request->activity_type . '%');
+            }
         }
         
         // Filter by date range if provided
         if ($request->has('from_date') && $request->from_date) {
-            $fromDate = Carbon::parse($request->from_date)->startOfDay();
-            $query->where('created_at', '>=', $fromDate);
+            try {
+                $fromDate = Carbon::parse($request->from_date)->startOfDay();
+                $query->where('created_at', '>=', $fromDate);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+                report($e);
+            }
         }
         
         if ($request->has('to_date') && $request->to_date) {
-            $toDate = Carbon::parse($request->to_date)->endOfDay();
-            $query->where('created_at', '<=', $toDate);
+            try {
+                $toDate = Carbon::parse($request->to_date)->endOfDay();
+                $query->where('created_at', '<=', $toDate);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+                report($e);
+            }
         }
         
         $histories = $query->get();
         
         // Create new Spreadsheet object
+        /** @var \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet */
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         
@@ -156,6 +334,7 @@ class HistoryController extends Controller
         $filename = 'log_aktivitas_' . Carbon::now()->format('Ymd_His') . '.xlsx';
         
         // Create file and save to temporary location
+        /** @var \PhpOffice\PhpSpreadsheet\Writer\Xlsx $writer */
         $writer = new Xlsx($spreadsheet);
         $tempFile = tempnam(sys_get_temp_dir(), 'log_');
         $writer->save($tempFile);

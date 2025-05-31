@@ -103,6 +103,64 @@ class HistoryService
     }
 
     /**
+     * Record document finalization activity.
+     *
+     * @param Dokumen $dokumen The finalized document
+     * @return History
+     */
+    public function recordFinalization(Dokumen $dokumen): History
+    {
+        return $this->record(
+            "Memfinalisasi dokumen: {$dokumen->nama_dokumen}",
+            $dokumen
+        );
+    }
+
+    /**
+     * Record document revision submission activity.
+     *
+     * @param Dokumen $dokumen The revised document
+     * @return History
+     */
+    public function recordRevisionSubmit(Dokumen $dokumen): History
+    {
+        return $this->record(
+            "Mengajukan revisi dokumen: {$dokumen->nama_dokumen}",
+            $dokumen
+        );
+    }
+
+    /**
+     * Record comment activity.
+     *
+     * @param Dokumen $dokumen The document being commented
+     * @return History
+     */
+    public function recordComment(Dokumen $dokumen): History
+    {
+        return $this->record(
+            "Menambahkan komentar pada dokumen: {$dokumen->nama_dokumen}",
+            $dokumen
+        );
+    }
+
+    /**
+     * Record profile update activity.
+     *
+     * @param User $user The user whose profile is updated
+     * @param string $what What was updated (e.g., 'photo', 'information')
+     * @return History
+     */
+    public function recordProfileUpdate(User $user, string $what = 'informasi'): History
+    {
+        return $this->record(
+            "Memperbarui {$what} profil pengguna",
+            null,
+            $user
+        );
+    }
+
+    /**
      * Record login activity.
      *
      * @param User $user The user who logged in
@@ -114,6 +172,36 @@ class HistoryService
             "Login ke sistem",
             null,
             $user
+        );
+    }
+
+    /**
+     * Record template activity.
+     *
+     * @param string $action Action performed (create, update, delete)
+     * @param string $templateName Name of the template
+     * @return History
+     */
+    public function recordTemplateActivity(string $action, string $templateName): History
+    {
+        $actionText = '';
+        switch ($action) {
+            case 'create':
+                $actionText = 'membuat';
+                break;
+            case 'update':
+                $actionText = 'memperbarui';
+                break;
+            case 'delete':
+                $actionText = 'menghapus';
+                break;
+            default:
+                $actionText = $action;
+                break;
+        }
+
+        return $this->record(
+            "{$actionText} template dokumen: {$templateName}"
         );
     }
 
@@ -143,7 +231,24 @@ class HistoryService
         }
 
         return $this->record(
-            "Admin {$actionText} user: {$targetUser->name} ({$targetUser->role})"
+            "Admin {$actionText} user: {$targetUser->nama} ({$targetUser->role})"
+        );
+    }
+
+    /**
+     * Record kriteria access activity.
+     *
+     * @param User $user The user who accessed kriteria
+     * @param int $kriteriaId The ID of the kriteria being accessed
+     * @param string $kriteriaName The name of the kriteria
+     * @return History
+     */
+    public function recordKriteriaAccess(User $user, int $kriteriaId, string $kriteriaName): History
+    {
+        return $this->record(
+            "Mengakses kriteria: {$kriteriaName}",
+            null,
+            $user
         );
     }
 }

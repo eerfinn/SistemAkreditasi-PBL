@@ -72,7 +72,7 @@
                                         <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                                         <input type="text" class="form-control input-daterange-datepicker" name="daterange"
                                             value="{{ request('from_date') && request('to_date') ? request('from_date') . ' - ' . request('to_date') : '' }}"
-                                            placeholder="Filter berdasarkan tanggal">
+                                            placeholder="Filter berdasarkan tanggal" autocomplete="off">
                                     </div>
                                     <input type="hidden" name="from_date" id="from_date" value="{{ request('from_date') }}">
                                     <input type="hidden" name="to_date" id="to_date" value="{{ request('to_date') }}">
@@ -117,12 +117,12 @@
                         <table id="history-table" class="table table-responsive-md table-hover">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">No</th>
-                                    <th>Waktu</th>
-                                    <th>Pengguna</th>
+                                    <th style="width: 60px;">No</th>
+                                    <th style="width: 140px;">Waktu</th>
+                                    <th style="width: 150px;">Pengguna</th>
                                     <th>Aktivitas</th>
                                     <th>Dokumen</th>
-                                    <th>Kriteria</th>
+                                    <th style="width: 120px;">Kriteria</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,8 +141,16 @@
                                     <td>
                                         @if($history->user)
                                             <div class="d-flex align-items-center">
+                                                @if($history->user->photo)
+                                                    <img src="{{ asset('storage/profile/' . $history->user->photo) }}" class="rounded-circle me-2" width="30" height="30" alt="">
+                                                @else
+                                                    <div class="avatar avatar-sm me-2 bg-primary">
+                                                        <span class="avatar-content">{{ substr($history->user->nama, 0, 1) }}</span>
+                                                    </div>
+                                                @endif
                                                 <div>
-                                                    <h6 class="mb-0">{{ $history->user->nama }}</h6>
+                                                    <h6 class="mb-0 fs-14">{{ $history->user->nama }}</h6>
+                                                    <span class="text-muted fs-12">{{ ucfirst($history->user->role) }}</span>
                                                 </div>
                                             </div>
                                         @else
@@ -155,26 +163,35 @@
                                                 $iconClass = 'fa-history';
                                                 $badgeClass = 'badge-primary';
 
-                                                if (strpos($history->aktivitas, 'mengunggah') !== false) {
+                                                if (stripos($history->aktivitas, 'mengunggah') !== false) {
                                                     $iconClass = 'fa-upload';
                                                     $badgeClass = 'badge-success';
-                                                } elseif (strpos($history->aktivitas, 'menghapus') !== false) {
+                                                } elseif (stripos($history->aktivitas, 'menghapus') !== false) {
                                                     $iconClass = 'fa-trash';
                                                     $badgeClass = 'badge-danger';
-                                                } elseif (strpos($history->aktivitas, 'memperbarui') !== false) {
+                                                } elseif (stripos($history->aktivitas, 'memperbarui') !== false) {
                                                     $iconClass = 'fa-edit';
                                                     $badgeClass = 'badge-info';
-                                                } elseif (strpos($history->aktivitas, 'login') !== false) {
+                                                } elseif (stripos($history->aktivitas, 'login') !== false) {
                                                     $iconClass = 'fa-sign-in-alt';
                                                     $badgeClass = 'badge-secondary';
-                                                } elseif (strpos($history->aktivitas, 'validasi') !== false) {
+                                                } elseif (stripos($history->aktivitas, 'validasi') !== false) {
                                                     $iconClass = 'fa-check-circle';
                                                     $badgeClass = 'badge-success';
-                                                } elseif (strpos($history->aktivitas, 'revisi') !== false) {
+                                                } elseif (stripos($history->aktivitas, 'revisi') !== false) {
                                                     $iconClass = 'fa-redo';
                                                     $badgeClass = 'badge-warning';
-                                                } elseif (strpos($history->aktivitas, 'komentar') !== false) {
+                                                } elseif (stripos($history->aktivitas, 'komentar') !== false) {
                                                     $iconClass = 'fa-comment';
+                                                    $badgeClass = 'badge-info';
+                                                } elseif (stripos($history->aktivitas, 'finalisasi') !== false) {
+                                                    $iconClass = 'fa-flag-checkered';
+                                                    $badgeClass = 'badge-success';
+                                                } elseif (stripos($history->aktivitas, 'template') !== false) {
+                                                    $iconClass = 'fa-file-alt';
+                                                    $badgeClass = 'badge-primary';
+                                                } elseif (stripos($history->aktivitas, 'profil') !== false) {
+                                                    $iconClass = 'fa-user-edit';
                                                     $badgeClass = 'badge-info';
                                                 }
                                             @endphp
@@ -230,7 +247,52 @@
                             <small class="text-muted">Menampilkan {{ $histories->firstItem() ?? 0 }} - {{ $histories->lastItem() ?? 0 }} dari {{ $histories->total() }} log</small>
                         </div>
                         <div>
-                            {{ $histories->links() }}
+                            <nav>
+                                <ul class="pagination pagination-sm pagination-circle">
+                                    {{-- Previous Page Link --}}
+                                    @if ($histories->onFirstPage())
+                                        <li class="page-item disabled"><span class="page-link">«</span></li>
+                                    @else
+                                        <li class="page-item"><a class="page-link" href="{{ $histories->previousPageUrl() }}" rel="prev">«</a></li>
+                                    @endif
+
+                                    {{-- Pagination Elements --}}
+                                    @php
+                                        $start = max($histories->currentPage() - 2, 1);
+                                        $end = min($start + 4, $histories->lastPage());
+                                        $start = max(min($end - 4, $start), 1);
+                                    @endphp
+
+                                    @if($start > 1)
+                                        <li class="page-item"><a class="page-link" href="{{ $histories->url(1) }}">1</a></li>
+                                        @if($start > 2)
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        @endif
+                                    @endif
+
+                                    @for ($i = $start; $i <= $end; $i++)
+                                        @if ($i == $histories->currentPage())
+                                            <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
+                                        @else
+                                            <li class="page-item"><a class="page-link" href="{{ $histories->url($i) }}">{{ $i }}</a></li>
+                                        @endif
+                                    @endfor
+
+                                    @if($end < $histories->lastPage())
+                                        @if($end < $histories->lastPage() - 1)
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        @endif
+                                        <li class="page-item"><a class="page-link" href="{{ $histories->url($histories->lastPage()) }}">{{ $histories->lastPage() }}</a></li>
+                                    @endif
+
+                                    {{-- Next Page Link --}}
+                                    @if ($histories->hasMorePages())
+                                        <li class="page-item"><a class="page-link" href="{{ $histories->nextPageUrl() }}" rel="next">»</a></li>
+                                    @else
+                                        <li class="page-item disabled"><span class="page-link">»</span></li>
+                                    @endif
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
@@ -289,6 +351,9 @@
             $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
             $('#from_date').val(picker.startDate.format('YYYY-MM-DD'));
             $('#to_date').val(picker.endDate.format('YYYY-MM-DD'));
+
+            // Automatically submit the form when a date range is selected
+            $('#filter-form').submit();
         });
 
         $('.input-daterange-datepicker').on('cancel.daterangepicker', function(ev, picker) {
