@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\History;
 use App\Models\Dokumen;
 use App\Models\User;
+use App\Models\Kriteria;
 use Illuminate\Support\Facades\Auth;
 
 class HistoryService
@@ -15,16 +16,19 @@ class HistoryService
      * @param string $aktivitas Description of the activity
      * @param Dokumen|null $dokumen Related document (if applicable)
      * @param User|null $user User who performed the action (defaults to authenticated user)
+     * @param Kriteria|null $kriteria Related kriteria (if applicable)
      * @return History
      */
-    public function record(string $aktivitas, ?Dokumen $dokumen = null, ?User $user = null): History
+    public function record(string $aktivitas, ?Dokumen $dokumen = null, ?User $user = null, ?Kriteria $kriteria = null): History
     {
         $userId = $user ? $user->id : Auth::id();
         $dokumenId = $dokumen ? $dokumen->id : null;
+        $kriteriaId = $kriteria ? $kriteria->id : ($dokumen && $dokumen->kriteria_id ? $dokumen->kriteria_id : null);
 
         return History::create([
             'user_id' => $userId,
             'dokumen_id' => $dokumenId,
+            'kriteria_id' => $kriteriaId,
             'aktivitas' => $aktivitas
         ]);
     }
@@ -141,6 +145,22 @@ class HistoryService
         return $this->record(
             "Menambahkan komentar pada dokumen: {$dokumen->nama_dokumen}",
             $dokumen
+        );
+    }
+
+    /**
+     * Record kriteria comment activity.
+     *
+     * @param Kriteria $kriteria The kriteria being commented
+     * @return History
+     */
+    public function recordKriteriaComment(Kriteria $kriteria): History
+    {
+        return $this->record(
+            "Menambahkan komentar pada kriteria: {$kriteria->nama_kriteria}",
+            null,
+            null,
+            $kriteria
         );
     }
 

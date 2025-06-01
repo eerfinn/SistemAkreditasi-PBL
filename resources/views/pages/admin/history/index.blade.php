@@ -221,6 +221,10 @@
                                             <a href="{{ route('kriteria.show', $history->dokumen->kriteria_id) }}" class="text-primary">
                                                 <span class="badge badge-primary">{{ $history->dokumen->kriteria->nama_kriteria }}</span>
                                             </a>
+                                        @elseif($history->kriteria)
+                                            <a href="{{ route('kriteria.show', $history->kriteria_id) }}" class="text-primary">
+                                                <span class="badge badge-primary">{{ $history->kriteria->nama_kriteria }}</span>
+                                            </a>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
@@ -343,7 +347,10 @@
                '30 Hari Terakhir': [moment().subtract(29, 'days'), moment()],
                'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
                'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
+            },
+            alwaysShowCalendars: true,
+            minYear: 2020,
+            maxYear: parseInt(moment().format('YYYY'), 10) + 1
         });
 
         // Handle date range picker events

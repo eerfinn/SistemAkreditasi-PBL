@@ -15,12 +15,18 @@ class History extends Model
     protected $fillable = [
         'user_id',
         'dokumen_id',
+        'kriteria_id',
         'aktivitas',
     ];
 
     public function dokumen(): BelongsTo
     {
         return $this->belongsTo(Dokumen::class, 'dokumen_id');
+    }
+
+    public function kriteria(): BelongsTo
+    {
+        return $this->belongsTo(Kriteria::class, 'kriteria_id');
     }
 
     public function user(): BelongsTo

@@ -347,14 +347,32 @@ class DokumenController extends Controller
         }
 
         $kriteriaId = $dokumen->kriteria_id;
+        $dokumenName = $dokumen->nama_dokumen;
+        $userId = $dokumen->user_id;
+        $kriteria = Kriteria::find($kriteriaId);
 
         // Hapus file fisik
         if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {
             Storage::disk('public')->delete($dokumen->path);
         }
 
+        // Record deletion in history before deleting the document
+        $this->historyService->recordDelete($dokumen);
+
         // Hapus record dari database
         $dokumen->delete();
+
+        // Notify the document owner
+        if ($userId) {
+            $this->notificationService->create($userId, 'Dokumen Dihapus',
+                "Dokumen '{$dokumenName}' untuk kriteria {$kriteria->nama_kriteria} telah dihapus", [
+                'type' => 'dokumen',
+                'kriteria_id' => $kriteriaId,
+                'icon' => 'fa-trash',
+                'color' => 'danger',
+                'link' => "/kriteria/{$kriteriaId}"
+            ]);
+        }
 
         return redirect()->route('kriteria.show', $kriteriaId)
                         ->with('success', 'Dokumen berhasil dihapus.');

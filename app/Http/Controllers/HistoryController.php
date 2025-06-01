@@ -72,7 +72,10 @@ class HistoryController extends Controller
                     });
                     break;
                 case 'komentar':
-                    $query->where('aktivitas', 'like', '%komentar%');
+                    $query->where(function($q) {
+                        $q->where('aktivitas', 'like', '%komentar pada dokumen%')
+                          ->orWhere('aktivitas', 'like', '%komentar pada kriteria%');
+                    });
                     break;
                 case 'login':
                     $query->where('aktivitas', 'like', '%Login ke sistem%');
@@ -241,7 +244,10 @@ class HistoryController extends Controller
                     });
                     break;
                 case 'komentar':
-                    $query->where('aktivitas', 'like', '%komentar%');
+                    $query->where(function($q) {
+                        $q->where('aktivitas', 'like', '%komentar pada dokumen%')
+                          ->orWhere('aktivitas', 'like', '%komentar pada kriteria%');
+                    });
                     break;
                 case 'login':
                     $query->where('aktivitas', 'like', '%Login ke sistem%');

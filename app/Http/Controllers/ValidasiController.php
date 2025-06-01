@@ -78,6 +78,9 @@ class ValidasiController extends Controller
                 'comment' => $request->komentar
             ]);
 
+            // Record comment in history
+            $this->historyService->recordComment($dokumen);
+
             // Buat notifikasi untuk pemilik dokumen tentang komentar baru
             $this->notificationService->create($dokumen->user_id, 'Komentar Baru pada Dokumen',
                 ucfirst($user->role) . " telah menambahkan komentar pada dokumen '{$dokumen->nama_dokumen}'", [
@@ -105,9 +108,12 @@ class ValidasiController extends Controller
                     'comment' => $request->kriteria_comment
                 ]);
 
-                // Notifikasi untuk dosen yang bertanggung jawab atas kriteria ini
+                // Record kriteria comment in history
                 $kriteria = Kriteria::find($dokumen->kriteria_id);
                 if ($kriteria) {
+                    $this->historyService->recordKriteriaComment($kriteria);
+                    
+                    // Notifikasi untuk dosen yang bertanggung jawab atas kriteria ini
                     $this->notificationService->notifyKriteriaUsers($kriteria, 'Komentar Baru pada Kriteria',
                         ucfirst($user->role) . " telah menambahkan komentar pada kriteria {$kriteria->nama_kriteria}", [
                         'type' => 'kriteria',
@@ -180,6 +186,9 @@ class ValidasiController extends Controller
             $komen->user_id = $user->id;
             $komen->komentar = $request->komentar;
             $komen->save();
+
+            // Record kriteria comment in history
+            $this->historyService->recordKriteriaComment($kriteria);
 
             // Buat notifikasi untuk dosen yang bertanggung jawab atas kriteria ini
             $this->notificationService->notifyKriteriaUsers($kriteria, 'Komentar Baru pada Kriteria',

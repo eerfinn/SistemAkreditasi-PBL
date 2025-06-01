@@ -573,4 +573,42 @@ class KriteriaController extends Controller
 
         return view('pages.kriteria.upload', compact('kriteria', 'ppepp', 'dokumen'));
     }
+
+    public function destroyDokumen(Dokumen $dokumen)
+    {
+        $user = Auth::user();
+
+        if (!in_array($user->role, ['administrator', 'dosen'])) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Verify document is a draft
+        if ($dokumen->status !== Dokumen::STATUS_DRAFT) {
+            return redirect()->back()->with('error', 'Hanya dokumen draft yang dapat dihapus.');
+        }
+
+        $kriteriaId = $dokumen->kriteria_id;
+        $dokumenName = $dokumen->nama_dokumen;
+
+        // Delete physical file if exists
+        if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {
+            Storage::disk('public')->delete($dokumen->path);
+        }
+
+        // Record deletion in history before deleting the document
+        $this->historyService->recordDelete($dokumen);
+
+        // Delete database record
+        $dokumen->delete();
+
+        Log::info('User deleted draft document', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
+            'dokumen_id' => $dokumen->id,
+            'kriteria_id' => $kriteriaId
+        ]);
+
+        return redirect()->route('kriteria.show', ['kriteria' => $kriteriaId])
+                        ->with('success', 'Dokumen draft berhasil dihapus.');
+    }
 }
