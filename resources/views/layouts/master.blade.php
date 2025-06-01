@@ -50,7 +50,8 @@
 
         /* Ensure modals are always on top */
         .modal {
-            padding-top: 220px;
+            padding-top: 55px;
+            margin-left: 100px;
             background: rgba(0, 0, 0, 0.5);
             z-index: 9999 !important;
             margin-top: 0px;
