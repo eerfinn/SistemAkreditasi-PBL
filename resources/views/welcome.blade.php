@@ -27,7 +27,8 @@
     <!-- Main CSS File -->
     <link href="{{ asset('assets/css/welcome.css') }}" rel="stylesheet">
     
-    <!-- Particles.js Library -->
+    <!-- Particles.js and jQuery (needed by some plugins) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 
@@ -40,7 +41,7 @@
                 <span class="sitename">SiAkred</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" onclick="scrollToTop()">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 

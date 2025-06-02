@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to top function
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    
+    // Make scrollToTop function globally available
+    window.scrollToTop = scrollToTop;
+
     // Header scroll effect
     window.addEventListener('scroll', function() {
         const header = document.querySelector('.navbar');
@@ -20,22 +31,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add click handler for back to top button
-    document.querySelector('.back-to-top').addEventListener('click', function(e) {
-        e.preventDefault();
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+    const backToTopButton = document.querySelector('.back-to-top');
+    if (backToTopButton) {
+        backToTopButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
-    });
+    }
 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
-
             const targetId = this.getAttribute('href');
+            if (targetId === '#') return; // Skip empty hash links
+            
             const targetElement = document.querySelector(targetId);
-
             if (targetElement) {
                 window.scrollTo({
                     top: targetElement.offsetTop - 80,
