@@ -145,7 +145,7 @@
                                 <tr class="document-item">
                                     <td>{{ $index + 1 }}</td>
                                     <td class="nama-dokumen-cell">
-                                        <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank"
+                                        <a href="{{ route('dokumen.view', $doc->id) }}" target="_blank"
                                             class="text-primary">
                                             <i class="fas fa-file-alt me-1"></i> {{ $doc->nama_dokumen }}
                                         </a>
@@ -159,7 +159,7 @@
                                     <td class="date-column">{{ $doc->updated_at->format('d M Y') }}</td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('dokumen.show', $doc->id) }}" target="_blank"
+                                            <a href="{{ route('dokumen.view', $doc->id) }}" target="_blank"
                                                 class="btn btn-info btn-xs sharp me-1" title="Lihat File">
                                                 <i class="fas fa-eye"></i>
                                             </a>

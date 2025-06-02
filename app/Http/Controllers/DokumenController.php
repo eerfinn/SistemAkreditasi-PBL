@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\History;
+use Symfony\Component\Mime\MimeTypes;
 
 class DokumenController extends Controller
 {
@@ -229,22 +230,6 @@ class DokumenController extends Controller
             ->get();
 
         return view('pages.dokumen.index', compact('dokumen'));
-    }
-
-    public function show(Dokumen $dokumen)
-    {
-        $user = Auth::user();
-
-        // Check if the document should be visible to the current user
-        $isVisible = Dokumen::where('id', $dokumen->id)
-            ->visibleToUser($user)
-            ->exists();
-
-        if (!$isVisible) {
-            abort(403, 'Anda tidak memiliki akses untuk melihat dokumen ini.');
-        }
-
-        return view('pages.dokumen.show', compact('dokumen'));
     }
 
     public function edit(Dokumen $dokumen)
@@ -573,5 +558,57 @@ class DokumenController extends Controller
         }
 
         return view('pages.kriteria.form', $viewData);
+    }
+
+    /**
+     * Securely stream document content to authenticated users
+     */
+    public function viewDocument($id)
+    {
+        $dokumen = Dokumen::findOrFail($id);
+        $user = Auth::user();
+
+        // Check if user has access to this document
+        $isVisible = Dokumen::where('id', $dokumen->id)
+            ->visibleToUser($user)
+            ->exists();
+
+        if (!$isVisible) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat dokumen ini.');
+        }
+
+        // Check if file exists
+        $filePath = storage_path('app/public/' . $dokumen->path);
+        if (!file_exists($filePath)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        // Get file extension and map to MIME type
+        $extension = pathinfo($dokumen->path, PATHINFO_EXTENSION);
+        $mimeType = $this->getMimeTypeFromExtension($extension);
+
+        // Stream the file
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . $dokumen->nama_dokumen . '.' . $extension . '"'
+        ]);
+    }
+
+    /**
+     * Get MIME type from file extension
+     */
+    private function getMimeTypeFromExtension($extension)
+    {
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xls' => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        ];
+
+        return $mimeTypes[strtolower($extension)] ?? 'application/octet-stream';
     }
 }

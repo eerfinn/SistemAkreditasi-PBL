@@ -34,7 +34,9 @@
                         <tr class="table-row">
                             <td>{{ $index + 1 }}</td>
                             <td class="nama-dokumen-cell">
-                                {{ $dokumen->nama_dokumen }}
+                                <a href="{{ route('dokumen.view', $dokumen->id) }}" target="_blank" class="text-primary">
+                                    <i class="fas fa-file-alt me-1"></i> {{ $dokumen->nama_dokumen }}
+                                </a>
                             </td>
                             <td>
                                 {{ $dokumen->user->nama ?? 'Unknown' }}
@@ -57,7 +59,7 @@
                                     @endphp
 
                                     <!-- View button -->
-                                    <a href="{{ $dokumen->file_url }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
+                                    <a href="{{ route('dokumen.view', $dokumen->id) }}" target="_blank" class="btn btn-info btn-xs sharp me-1" title="Lihat">
                                         <i class="fas fa-eye"></i>
                                     </a>
 

@@ -48,6 +48,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 /*
 |--------------------------------------------------------------------------
+| Document Access Route
+|--------------------------------------------------------------------------
+*/
+Route::get('/dokumen/view/{id}', [DokumenController::class, 'viewDocument'])
+    ->name('dokumen.view')
+    ->middleware('auth');
+
+/*
+|--------------------------------------------------------------------------
 | Protected Routes (Requires Authentication)
 |--------------------------------------------------------------------------
 */
@@ -76,7 +85,9 @@ Route::middleware('auth')->group(function () {
     Route::controller(DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/{dokumen}', 'show')->name('show');
+        Route::get('/{id}', function($id) {
+            return redirect()->route('dokumen.view', $id);
+        })->name('redirect_to_view');
         Route::put('/{dokumen}', 'update')->name('update');
         Route::delete('/{dokumen}', 'destroy')->name('destroy');
         Route::delete('/{dokumen}/draft', 'destroyDraft')->name('destroy.draft');
@@ -188,5 +199,5 @@ Route::middleware('auth')->group(function () {
 
 // Fallback route for 404 errors
 Route::fallback(function () {
-    return response()->view('pages.errors.404', [], 404);
+    return response()->view('pages.errors.page-error-404', [], 404);
 });
