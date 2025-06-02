@@ -363,7 +363,7 @@
                 <rect width="24" height="24" fill="white"></rect>
                 <path d="M14.5 17L9.5 12L14.5 7" stroke="#055fc5" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
-            Kembali ke Home
+            Back to Home
         </a>
 
         <div class="logo-header">
@@ -436,7 +436,7 @@
         document.querySelectorAll('.form-input').forEach(input => {
             const formGroup = input.closest('.form-group');
             const label = formGroup.querySelector('.form-label');
-            
+
             input.addEventListener('focus', function() {
                 if (label) {
                     label.style.color = '#055FC5';
