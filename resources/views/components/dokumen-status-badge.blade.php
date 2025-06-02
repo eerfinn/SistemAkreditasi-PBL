@@ -1,21 +1,24 @@
 @props(['status'])
 
 @php
-$badgeClass = match($status) {
-    'draft' => 'light badge-info',
-    'menunggu' => 'light badge-warning',
-    'revisi' => 'light badge-danger',
-    'diverifikasi' => 'light badge-primary',
-    default => 'light badge-secondary'
-};
+    $statusClasses = [
+        'draft' => 'badge-secondary',
+        'menunggu' => 'badge-warning',
+        'menunggu_direktur' => 'badge-info',
+        'revisi' => 'badge-danger',
+        'diverifikasi' => 'badge-success'
+    ];
 
-$statusLabel = match($status) {
-    'draft' => 'Draft',
-    'menunggu' => 'Menunggu',
-    'revisi' => 'Revisi',
-    'diverifikasi' => 'Terverifikasi',
-    default => ucfirst($status)
-};
+    $statusLabels = [
+        'draft' => 'Draft',
+        'menunggu' => 'Menunggu Validasi',
+        'menunggu_direktur' => 'Menunggu Validasi Direktur',
+        'revisi' => 'Perlu Revisi',
+        'diverifikasi' => 'Terverifikasi'
+    ];
+
+    $class = $statusClasses[$status] ?? 'badge-secondary';
+    $label = $statusLabels[$status] ?? ucfirst($status);
 @endphp
 
-<span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span> 
+<span class="badge light {{ $class }}">{{ $label }}</span> 

@@ -18,6 +18,9 @@ class Dokumen extends Model
     public const STATUS_REVISI = 'revisi';
     public const STATUS_DIVERIFIKASI = 'diverifikasi';
 
+    // Status untuk validasi bertingkat
+    public const STATUS_MENUNGGU_DIREKTUR = 'menunggu_direktur';
+
     public const PPEPP_PENETAPAN = 'penetapan';
     public const PPEPP_PELAKSANAAN = 'pelaksanaan';
     public const PPEPP_EVALUASI = 'evaluasi';
@@ -30,12 +33,17 @@ class Dokumen extends Model
         'kriteria_id',
         'user_id',
         'validator_id',
+        'koordinator_id',
+        'direktur_id',
         'nama_dokumen',
         'jenis_ppepp',
         'path',
         'status',
+        'validator_level',
         'komentar',
         'validated_at',
+        'koordinator_validated_at',
+        'direktur_validated_at',
         'is_admin_upload',
         'deskripsi_dokumen',
     ];
@@ -48,6 +56,21 @@ class Dokumen extends Model
     public function kriteria(): BelongsTo
     {
         return $this->belongsTo(Kriteria::class, 'kriteria_id');
+    }
+
+    public function validator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'validator_id');
+    }
+
+    public function koordinator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'koordinator_id');
+    }
+
+    public function direktur(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'direktur_id');
     }
 
     public function komentar(): HasMany
@@ -78,6 +101,22 @@ class Dokumen extends Model
         return null;
     }
 
+    /**
+     * Menentukan apakah dokumen perlu validasi direktur
+     */
+    public function needsDirectorValidation(): bool
+    {
+        return $this->status === self::STATUS_MENUNGGU_DIREKTUR;
+    }
+
+    /**
+     * Menentukan apakah dokumen sudah divalidasi sepenuhnya
+     */
+    public function isFullyValidated(): bool
+    {
+        return $this->status === self::STATUS_DIVERIFIKASI;
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -98,6 +137,25 @@ class Dokumen extends Model
             return $query;
         }
 
+        // Direktur can see documents that need their validation, their rejected ones, and verified ones
+        if ($user->role === 'direktur') {
+            return $query->where(function($q) {
+                $q->where('status', self::STATUS_MENUNGGU_DIREKTUR)
+                  ->orWhere(function($q2) {
+                      $q2->where('status', self::STATUS_REVISI)
+                         ->where('validator_level', 'direktur');
+                  })
+                  ->orWhere('status', self::STATUS_DIVERIFIKASI);
+            });
+        }
+
+        // Koordinator can see non-draft documents
+        if ($user->role === 'koordinator') {
+            return $query->where(function($q) {
+                $q->where('status', '!=', self::STATUS_DRAFT);
+            });
+        }
+
         // Dosen can see all their own documents
         if ($user->role === 'dosen') {
             // Show own drafts and all other non-draft documents
@@ -107,7 +165,7 @@ class Dokumen extends Model
             });
         }
 
-        // Koordinator and other roles can see non-draft documents
+        // Other roles can see non-draft documents
         return $query->where('status', '!=', self::STATUS_DRAFT);
     }
 }

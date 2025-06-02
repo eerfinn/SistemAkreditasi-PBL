@@ -26,7 +26,7 @@ class ValidasiController extends Controller
     }
 
     /**
-     * Memperbarui status dokumen (validasi oleh admin)
+     * Memperbarui status dokumen (validasi oleh admin/koordinator/direktur)
      */
     public function updateStatus(Request $request, Dokumen $dokumen)
     {
@@ -38,8 +38,14 @@ class ValidasiController extends Controller
         }
 
         // Validasi request
+        $validStatusOptions = [
+            Dokumen::STATUS_REVISI,
+            Dokumen::STATUS_DIVERIFIKASI,
+            Dokumen::STATUS_MENUNGGU_DIREKTUR
+        ];
+
         $request->validate([
-            'status' => 'required|in:' . implode(',', [Dokumen::STATUS_REVISI, Dokumen::STATUS_DIVERIFIKASI]),
+            'status' => 'required|in:' . implode(',', $validStatusOptions),
             'komentar' => 'nullable|string|max:1000',
             'kriteria_comment' => 'nullable|string|max:1000',
         ]);
@@ -49,19 +55,79 @@ class ValidasiController extends Controller
             return redirect()->back()->with('error', 'Dokumen masih dalam status draft dan belum bisa divalidasi.');
         }
 
-        // Update status dokumen
+        // Tentukan alur validasi berdasarkan peran pengguna
         $oldStatus = $dokumen->status;
-        $dokumen->status = $request->status;
+        $newStatus = $request->status;
+
+        // Logika validasi bertingkat
+        if ($user->role === 'koordinator') {
+            // Koordinator hanya bisa memvalidasi dokumen yang belum divalidasi atau perlu revisi
+            if (!in_array($dokumen->status, [Dokumen::STATUS_MENUNGGU, Dokumen::STATUS_REVISI])) {
+                return redirect()->back()->with('error', 'Dokumen ini tidak dalam status yang dapat divalidasi oleh koordinator.');
+            }
+
+            if ($newStatus === Dokumen::STATUS_DIVERIFIKASI) {
+                // Jika koordinator menyetujui, ubah status ke menunggu direktur
+                $newStatus = Dokumen::STATUS_MENUNGGU_DIREKTUR;
+                $dokumen->koordinator_id = $user->id;
+                $dokumen->koordinator_validated_at = now();
+                $dokumen->validator_level = 'koordinator';
+            } else if ($newStatus === Dokumen::STATUS_REVISI) {
+                // Status tetap revisi jika koordinator meminta revisi
+                $dokumen->validator_level = 'koordinator';
+            }
+        } elseif ($user->role === 'direktur') {
+            // Direktur hanya bisa memvalidasi dokumen yang sudah divalidasi oleh koordinator
+            if ($dokumen->status !== Dokumen::STATUS_MENUNGGU_DIREKTUR) {
+                return redirect()->back()->with('error', 'Dokumen ini belum divalidasi oleh koordinator atau tidak dalam status yang dapat divalidasi oleh direktur.');
+            }
+
+            if ($newStatus === Dokumen::STATUS_DIVERIFIKASI) {
+                // Status menjadi terverifikasi jika direktur menyetujui
+                $dokumen->direktur_id = $user->id;
+                $dokumen->direktur_validated_at = now();
+                $dokumen->validator_level = 'direktur';
+            } else if ($newStatus === Dokumen::STATUS_REVISI) {
+                // Ubah ke revisi (langsung ke dosen) jika direktur meminta revisi
+                $dokumen->validator_level = 'direktur';
+                // Pastikan dokumen tidak perlu divalidasi oleh koordinator lagi
+                $dokumen->koordinator_validated_at = null;
+            }
+        } elseif ($user->role === 'administrator') {
+            // Admin bisa mengubah status ke apapun
+            $dokumen->validator_level = 'administrator';
+
+            if ($newStatus === Dokumen::STATUS_DIVERIFIKASI) {
+                $dokumen->direktur_id = $user->id;
+                $dokumen->direktur_validated_at = now();
+            } else if ($newStatus === Dokumen::STATUS_MENUNGGU_DIREKTUR) {
+                $dokumen->koordinator_id = $user->id;
+                $dokumen->koordinator_validated_at = now();
+            }
+        } else {
+            // Peran lain tidak boleh mengubah status
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengubah status dokumen ini.');
+        }
+
+        // Update status dokumen
+        $dokumen->status = $newStatus;
+        $dokumen->validator_id = $user->id;
         $dokumen->save();
-        
+
         // Catat validasi menggunakan historyService
-        $this->historyService->recordValidation($dokumen, $request->status);
+        $this->historyService->recordValidation($dokumen, $newStatus);
 
         // Simpan validasi
         $validasi = new Validasi();
         $validasi->dokumen_id = $dokumen->id;
         $validasi->user_id = $user->id;
-        $validasi->status = ($request->status === Dokumen::STATUS_REVISI) ? 'ditolak' : 'diterima';
+
+        if (in_array($newStatus, [Dokumen::STATUS_DIVERIFIKASI, Dokumen::STATUS_MENUNGGU_DIREKTUR])) {
+            $validasi->status = 'diterima';
+        } else {
+            $validasi->status = 'ditolak';
+        }
+
         $validasi->save();
 
         // Simpan komentar dokumen jika ada
@@ -132,31 +198,12 @@ class ValidasiController extends Controller
         }
 
         // Buat notifikasi untuk pemilik dokumen tentang perubahan status
-        if ($dokumen->status === Dokumen::STATUS_REVISI) {
-            $this->notificationService->create($dokumen->user_id, 'Dokumen Perlu Direvisi',
-                ucfirst($user->role) . " meminta dokumen '{$dokumen->nama_dokumen}' untuk direvisi", [
-                'type' => 'dokumen',
-                'dokumen_id' => $dokumen->id,
-                'kriteria_id' => $dokumen->kriteria_id,
-                'icon' => 'fa-exclamation-circle',
-                'color' => 'warning',
-                'link' => "/kriteria/{$dokumen->kriteria_id}"
-            ]);
-        } else if ($dokumen->status === Dokumen::STATUS_DIVERIFIKASI) {
-            $this->notificationService->create($dokumen->user_id, 'Dokumen Diverifikasi',
-                ucfirst($user->role) . " telah memverifikasi dokumen '{$dokumen->nama_dokumen}'", [
-                'type' => 'dokumen',
-                'dokumen_id' => $dokumen->id,
-                'kriteria_id' => $dokumen->kriteria_id,
-                'icon' => 'fa-check-circle',
-                'color' => 'success',
-                'link' => "/kriteria/{$dokumen->kriteria_id}"
-            ]);
-        }
+        $this->createStatusNotifications($dokumen, $user);
 
         $statusMessages = [
             Dokumen::STATUS_REVISI => 'Dokumen dikembalikan untuk revisi.',
-            Dokumen::STATUS_DIVERIFIKASI => 'Dokumen telah diverifikasi.'
+            Dokumen::STATUS_DIVERIFIKASI => 'Dokumen telah diverifikasi.',
+            Dokumen::STATUS_MENUNGGU_DIREKTUR => 'Dokumen menunggu validasi direktur.'
         ];
 
         return redirect()->back()->with('success', $statusMessages[$request->status]);
@@ -208,6 +255,68 @@ class ValidasiController extends Controller
             ]);
 
             return redirect()->back()->with('error', 'Gagal menambahkan komentar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Membuat notifikasi berdasarkan status dokumen
+     */
+    private function createStatusNotifications(Dokumen $dokumen, $user)
+    {
+        // Notifikasi untuk pemilik dokumen
+        switch ($dokumen->status) {
+            case Dokumen::STATUS_REVISI:
+                // Check if the validator is direktur
+                $message = $dokumen->validator_level === 'direktur'
+                    ? "Direktur meminta dokumen '{$dokumen->nama_dokumen}' untuk direvisi"
+                    : ucfirst($user->role) . " meminta dokumen '{$dokumen->nama_dokumen}' untuk direvisi";
+
+                $this->notificationService->create($dokumen->user_id, 'Dokumen Perlu Direvisi',
+                    $message, [
+                    'type' => 'dokumen',
+                    'dokumen_id' => $dokumen->id,
+                    'kriteria_id' => $dokumen->kriteria_id,
+                    'icon' => 'fa-exclamation-circle',
+                    'color' => 'warning',
+                    'link' => "/kriteria/{$dokumen->kriteria_id}"
+                ]);
+                break;
+
+            case Dokumen::STATUS_MENUNGGU_DIREKTUR:
+                // Notifikasi untuk direktur bahwa ada dokumen yang perlu divalidasi
+                $this->notificationService->notifyRole('direktur', 'Dokumen Menunggu Validasi',
+                    "Dokumen '{$dokumen->nama_dokumen}' telah divalidasi oleh koordinator dan menunggu validasi Anda", [
+                    'type' => 'dokumen',
+                    'dokumen_id' => $dokumen->id,
+                    'kriteria_id' => $dokumen->kriteria_id,
+                    'icon' => 'fa-clock',
+                    'color' => 'warning',
+                    'link' => "/kriteria/{$dokumen->kriteria_id}"
+                ]);
+
+                // Notifikasi untuk pemilik dokumen
+                $this->notificationService->create($dokumen->user_id, 'Dokumen Divalidasi Koordinator',
+                    "Koordinator telah memvalidasi dokumen '{$dokumen->nama_dokumen}' dan menunggu validasi direktur", [
+                    'type' => 'dokumen',
+                    'dokumen_id' => $dokumen->id,
+                    'kriteria_id' => $dokumen->kriteria_id,
+                    'icon' => 'fa-check-circle',
+                    'color' => 'success',
+                    'link' => "/kriteria/{$dokumen->kriteria_id}"
+                ]);
+                break;
+
+            case Dokumen::STATUS_DIVERIFIKASI:
+                $this->notificationService->create($dokumen->user_id, 'Dokumen Diverifikasi',
+                    ucfirst($user->role) . " telah memverifikasi dokumen '{$dokumen->nama_dokumen}'", [
+                    'type' => 'dokumen',
+                    'dokumen_id' => $dokumen->id,
+                    'kriteria_id' => $dokumen->kriteria_id,
+                    'icon' => 'fa-check-circle',
+                    'color' => 'success',
+                    'link' => "/kriteria/{$dokumen->kriteria_id}"
+                ]);
+                break;
         }
     }
 }

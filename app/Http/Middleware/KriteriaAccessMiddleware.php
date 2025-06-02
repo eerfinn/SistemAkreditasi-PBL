@@ -45,13 +45,13 @@ class KriteriaAccessMiddleware
         // For validation access
         if ($request->routeIs('validasi.*')) {
             // For document validation
-            if ($request->routeIs('validasi.update-status') && !in_array($user->role, ['administrator', 'koordinator'])) {
-                abort(403, 'Forbidden: Only administrators and coordinators can validate documents.');
+            if ($request->routeIs('validasi.update-status') && !in_array($user->role, ['administrator', 'koordinator', 'direktur'])) {
+                abort(403, 'Forbidden: Only administrators, coordinators, and directors can validate documents.');
             }
 
             // For kriteria comments
-            if ($request->routeIs('validasi.kriteria-comment') && !in_array($user->role, ['administrator', 'koordinator', 'kajur', 'kaprodi'])) {
-                abort(403, 'Forbidden: Only administrators, coordinators, kajur, and kaprodi can add comments to kriteria.');
+            if ($request->routeIs('validasi.kriteria-comment') && !in_array($user->role, ['administrator', 'koordinator', 'kajur', 'kaprodi', 'direktur'])) {
+                abort(403, 'Forbidden: Only administrators, coordinators, directors, kajur, and kaprodi can add comments to kriteria.');
             }
         }
 
