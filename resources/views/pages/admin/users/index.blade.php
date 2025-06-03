@@ -245,6 +245,36 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Modal close button styling */
+        .modal-header .close {
+            padding: 1rem;
+            margin: -1rem -1rem -1rem auto;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+            background-color: transparent;
+            border: 0;
+        }
+        
+        .modal-header .close:hover {
+            opacity: .75;
+            color: #000;
+            text-decoration: none;
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            border-top-left-radius: calc(0.3rem - 1px);
+            border-top-right-radius: calc(0.3rem - 1px);
+        }
     </style>
 @endsection
 
@@ -325,7 +355,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <form id="addUserForm">
                 @csrf
@@ -387,7 +419,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         <i class="fas fa-times me-1"></i> Close
                     </button>
                     <button type="submit" class="btn btn-primary">
@@ -405,7 +437,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <form id="editUserForm">
                 @csrf
@@ -454,7 +488,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         <i class="fas fa-times me-1"></i> Close
                     </button>
                     <button type="submit" class="btn btn-primary">
@@ -472,7 +506,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="manageCriteriaModalLabel">Manage Dosen Criteria Access</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div id="criteria-alert-container"></div>
@@ -558,7 +594,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -568,12 +604,44 @@
 @push('scripts')
 <script src="{{ asset('assets/vendor/select2/js/select2.full.min.js') }}"></script>
 <script>
+// Add Bootstrap modal compatibility layer
+(function($) {
+    // Check if we're using Bootstrap 4 or 5
+    var isBootstrap5 = typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined';
+    
+    // Create a compatibility layer for modals
+    if (isBootstrap5) {
+        // We're using Bootstrap 5, but the code expects Bootstrap 4 behavior
+        // Add jQuery plugin method to handle both
+        $.fn.modal = function(action) {
+            if (action === 'show') {
+                var modalEl = this[0];
+                if (modalEl) {
+                    var bsModal = new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                }
+            } else if (action === 'hide') {
+                var modalEl = this[0];
+                if (modalEl) {
+                    var bsModal = bootstrap.Modal.getInstance(modalEl);
+                    if (bsModal) {
+                        bsModal.hide();
+                    } else {
+                        $(this).removeClass('show');
+                        $(this).attr('aria-hidden', 'true');
+                        $(this).css('display', 'none');
+                    }
+                }
+            }
+            return this;
+        };
+    }
+})(jQuery);
+
 $(document).ready(function() {
     // Sembunyikan loading overlay setelah halaman dimuat
-    setTimeout(function() {
-        $('#usersTableLoading').fadeOut(300);
-        initializeDataTable();
-    }, 800);
+    $('#usersTableLoading').fadeOut(300);
+    initializeDataTable();
     
     // Initialize DataTable
     function initializeDataTable() {
@@ -734,10 +802,7 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 showSuccess('Success', 'User created successfully', function() {
-                    var addModal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
-                    if (addModal) {
-                        addModal.hide();
-                    }
+                    $('#addUserModal').modal('hide');
                     window.location.reload();
                 });
             },
@@ -769,10 +834,7 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 showSuccess('Success', 'User updated successfully', function() {
-                    var editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
-                    if (editModal) {
-                        editModal.hide();
-                    }
+                    $('#editUserModal').modal('hide');
                     window.location.reload();
                 });
             },
@@ -793,13 +855,13 @@ $(document).ready(function() {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
-            icon: 'warning',
+            type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.value) {
                 // Show loader
                 showLoader('Processing...', 'Deleting user');
                 
@@ -927,9 +989,6 @@ $(document).ready(function() {
                             $('#edit-dosen-id').val(dosenId);
                             $('#editing-dosen-name span').text(dosenNama);
                             
-                            // Show loading indicator
-                            $('#kriteria-select-loading').css('display', 'flex !important').show();
-                            
                             // Reset and set kriteria selection
                             if ($('#edit-dosen-kriteria').hasClass('select2-hidden-accessible')) {
                                 $('#edit-dosen-kriteria').select2('destroy');
@@ -946,21 +1005,20 @@ $(document).ready(function() {
                                 
                                 $('#edit-dosen-kriteria').val(dosenKriteria).trigger('change');
                                 
-                                // Hide loading indicator
-                                $('#kriteria-select-loading').hide();
-                                
                                 // Show editor section
                                 showDosenEditor();
                             }, 300);
                         });
                     },
                     error: function(xhr, status, error) {
+                        hideLoader();
                         console.error('Error getting kriteria data:', error);
                         showError('Error', 'Failed to get kriteria data: ' + (xhr.responseJSON?.message || error));
                     }
                 });
             },
             error: function(xhr, status, error) {
+                hideLoader();
                 console.error('Error getting dosen data:', error);
                 showError('Error', 'Failed to get dosen data: ' + (xhr.responseJSON?.message || error));
             }
@@ -987,8 +1045,14 @@ $(document).ready(function() {
     
     // Function to hide dosen editor
     function hideDosenEditor() {
-        // Hide the editor
-        $('#dosenCriteriaEditor').slideUp(300);
+        // Hide the editor with animation
+        $('#dosenCriteriaEditor').slideUp(300, function() {
+            // Reset the form after animation completes
+            $('#editDosenCriteriaForm')[0].reset();
+            if ($('#edit-dosen-kriteria').hasClass('select2-hidden-accessible')) {
+                $('#edit-dosen-kriteria').val(null).trigger('change');
+            }
+        });
         
         // Hide the overlay
         $('.edit-mode-overlay').fadeOut(300);
@@ -1042,8 +1106,9 @@ $(document).ready(function() {
         Swal.fire({
             title: title,
             text: text,
+            showConfirmButton: false,
             allowOutsideClick: false,
-            didOpen: () => {
+            onOpen: function() {
                 Swal.showLoading();
             }
         });
@@ -1056,23 +1121,58 @@ $(document).ready(function() {
     
     // Helper function to show success message
     function showSuccess(title, text, callback) {
-        Swal.fire({
-            icon: 'success',
-            title: title,
-            text: text
-        }).then(() => {
-            if (typeof callback === 'function') {
-                callback();
+        // Close all modals first
+        $('.modal').each(function() {
+            try {
+                // Try Bootstrap 5 method first
+                if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+                    const bsModal = bootstrap.Modal.getInstance(this);
+                    if (bsModal) {
+                        bsModal.hide();
+                    } else {
+                        $(this).modal('hide');
+                    }
+                } else {
+                    // Bootstrap 4 method
+                    $(this).modal('hide');
+                }
+            } catch (err) {
+                // Fallback
+                $(this).modal('hide');
+                $(this).removeClass('show');
+                $(this).attr('aria-hidden', 'true');
+                $(this).css('display', 'none');
+                $('.modal-backdrop').remove();
             }
         });
+        
+        // Remove any modal backdrop that might be left
+        setTimeout(function() {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('padding-right', '');
+            
+            // Then show the success message
+            Swal.fire({
+                title: title,
+                text: text,
+                type: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.value && typeof callback === 'function') {
+                    callback();
+                }
+            });
+        }, 300);
     }
     
     // Helper function to show error message
     function showError(title, text) {
         Swal.fire({
-            icon: 'error',
             title: title,
-            text: text
+            text: text,
+            type: 'error',
+            confirmButtonText: 'OK'
         });
     }
     
@@ -1088,6 +1188,82 @@ $(document).ready(function() {
             $(`#${prefix}${field}-error`).text(errors[field][0]);
         }
     }
+
+    // Handle all types of close buttons (Bootstrap 4 and 5)
+    $(document).on('click', '.btn-close, .close, [data-dismiss="modal"], [data-bs-dismiss="modal"]', function(e) {
+        e.preventDefault();
+        const $modal = $(this).closest('.modal');
+        
+        // Try both Bootstrap 4 and 5 methods
+        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+            // Bootstrap 5
+            try {
+                const bsModal = bootstrap.Modal.getInstance($modal[0]);
+                if (bsModal) {
+                    bsModal.hide();
+                } else {
+                    $modal.modal('hide');
+                }
+            } catch (err) {
+                // Fallback
+                $modal.modal('hide');
+            }
+        } else {
+            // Bootstrap 4
+            $modal.modal('hide');
+        }
+        
+        // Reset forms when modal is closed
+        if ($modal.attr('id') === 'addUserModal') {
+            $('#addUserForm')[0].reset();
+            $('#kriteria-access-container').hide();
+        } else if ($modal.attr('id') === 'editUserModal') {
+            $('#editUserForm')[0].reset();
+            $('#edit-dosen-info').hide();
+        } else if ($modal.attr('id') === 'manageCriteriaModal') {
+            hideDosenEditor();
+        }
+    });
+
+    // Handle modal closing through backdrop click
+    $(document).on('click', '.modal', function(e) {
+        if ($(e.target).hasClass('modal')) {
+            $(this).modal('hide');
+        }
+    });
+
+    // Add event listener for ESC key to close modals
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            $('.modal.show').modal('hide');
+        }
+    });
+    
+    // Handle closing manageCriteriaModal
+    $('#manageCriteriaModal').on('hidden.bs.modal', function () {
+        hideDosenEditor();
+        $('#dosenCriteriaTableBody').empty();
+    });
+    
+    // Handle close button in dosen criteria editor
+    $('#closeDosenEditor, #cancelDosenEdit').off('click').on('click', function() {
+        hideDosenEditor();
+    });
+    
+    // Reset forms when modals are hidden
+    $('#addUserModal').on('hidden.bs.modal', function () {
+        $('#addUserForm')[0].reset();
+        $('#kriteria-access-container').hide();
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').text('');
+    });
+    
+    $('#editUserModal').on('hidden.bs.modal', function () {
+        $('#editUserForm')[0].reset();
+        $('#edit-dosen-info').hide();
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').text('');
+    });
 });
 </script>
 @endpush 

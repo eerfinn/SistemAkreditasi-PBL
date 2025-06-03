@@ -19,7 +19,7 @@
     <title>@yield('title')</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
     <!-- FAVICONS ICON -->
-    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon.ico') }}">
     <link href="{{ asset('assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css') }}" rel="stylesheet">
 
     <!-- DataTables CSS -->
@@ -50,7 +50,7 @@
 
         /* Ensure modals are always on top */
         .modal {
-            padding-top: 55px;
+            padding-top: 70px;
             margin-left: 100px;
             background: rgba(0, 0, 0, 0.5);
             z-index: 9999 !important;
