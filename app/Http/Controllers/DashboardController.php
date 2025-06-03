@@ -298,7 +298,7 @@ class DashboardController extends Controller
             $pendingDocs = Dokumen::where('kriteria_id', $k->id)
                             ->where('status', Dokumen::STATUS_MENUNGGU)
                             ->count();
-
+            
             $kriteriaStats[] = [
                 'id' => $k->id,
                 'nama' => $k->nama_kriteria,
@@ -359,10 +359,10 @@ class DashboardController extends Controller
         $revisionDocuments = Dokumen::where('status', Dokumen::STATUS_REVISI)
                             ->where('validator_level', 'direktur')
                             ->count();
-
+        
         // Dokumen yang menunggu validasi direktur
         $waitingDirectorValidation = Dokumen::where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)->count();
-
+        
         // Get PPEPP statistics
         $ppepp_stages = [
             Dokumen::PPEPP_PENETAPAN,
@@ -405,7 +405,7 @@ class DashboardController extends Controller
             $pendingDocs = Dokumen::where('kriteria_id', $k->id)
                             ->where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
                             ->count();
-
+            
             $kriteriaStats[] = [
                 'id' => $k->id,
                 'nama' => $k->nama_kriteria,

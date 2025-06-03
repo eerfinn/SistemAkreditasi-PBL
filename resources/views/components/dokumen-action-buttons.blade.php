@@ -6,7 +6,7 @@
     $isAdmin = $user && $user->role === 'administrator';
     $isKoordinator = $user && $user->role === 'koordinator';
     $isDirektur = $user && $user->role === 'direktur';
-
+    
     // Tentukan apakah dokumen bisa divalidasi berdasarkan status dan peran
     $canKoordinatorValidate = $isKoordinator && 
                              in_array($dokumen->status, ['menunggu', 'revisi']) && 
@@ -20,7 +20,7 @@
                           $dokumen->status !== 'diverifikasi';
                           
     $canValidate = $isAdmin || $canKoordinatorValidate || $canDirektorValidate;
-
+    
     // Tentukan apakah dokumen bisa direvisi
     $canRevise = $isOwner && $dokumen->status === 'revisi';
 @endphp

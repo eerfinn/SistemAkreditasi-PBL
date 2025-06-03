@@ -271,7 +271,7 @@
                                                 @endif
                                             </div>
                                             <div class="progress mb-2" style="height: 10px;">
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $kriteria['percentage'] }}%;"
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $kriteria['percentage'] }}%;" 
                                                     aria-valuenow="{{ $kriteria['percentage'] }}" aria-valuemin="0" aria-valuemax="100">
                                                 </div>
                                             </div>
@@ -313,7 +313,7 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- Tasks -->
         <div class="col-xl-4 mb-4">
             <div class="card">
@@ -430,12 +430,12 @@
             for (let i = 0; i < particlesArray.length; i++) {
                 particlesArray[i].update();
                 particlesArray[i].draw();
-
+                
                 for (let j = i; j < particlesArray.length; j++) {
                     const dx = particlesArray[i].x - particlesArray[j].x;
                     const dy = particlesArray[i].y - particlesArray[j].y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-
+                    
                     if (distance < maxDistance) {
                         ctx.beginPath();
                         ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance/maxDistance})`;
@@ -455,8 +455,8 @@
         // Document Status Chart
         const documentStatusOptions = {
             series: [
-                {{ $verifiedDocuments }},
-                {{ $pendingDocuments }},
+                {{ $verifiedDocuments }}, 
+                {{ $pendingDocuments }}, 
                 {{ $revisionDocuments }}
             ],
             chart: {

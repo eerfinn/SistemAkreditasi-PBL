@@ -17,7 +17,7 @@ class Dokumen extends Model
     public const STATUS_MENUNGGU = 'menunggu';
     public const STATUS_REVISI = 'revisi';
     public const STATUS_DIVERIFIKASI = 'diverifikasi';
-
+    
     // Status untuk validasi bertingkat
     public const STATUS_MENUNGGU_DIREKTUR = 'menunggu_direktur';
 

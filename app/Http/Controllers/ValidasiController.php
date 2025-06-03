@@ -39,11 +39,11 @@ class ValidasiController extends Controller
 
         // Validasi request
         $validStatusOptions = [
-            Dokumen::STATUS_REVISI,
+            Dokumen::STATUS_REVISI, 
             Dokumen::STATUS_DIVERIFIKASI,
             Dokumen::STATUS_MENUNGGU_DIREKTUR
         ];
-
+        
         $request->validate([
             'status' => 'required|in:' . implode(',', $validStatusOptions),
             'komentar' => 'nullable|string|max:1000',
@@ -58,14 +58,14 @@ class ValidasiController extends Controller
         // Tentukan alur validasi berdasarkan peran pengguna
         $oldStatus = $dokumen->status;
         $newStatus = $request->status;
-
+        
         // Logika validasi bertingkat
         if ($user->role === 'koordinator') {
             // Koordinator hanya bisa memvalidasi dokumen yang belum divalidasi atau perlu revisi
             if (!in_array($dokumen->status, [Dokumen::STATUS_MENUNGGU, Dokumen::STATUS_REVISI])) {
                 return redirect()->back()->with('error', 'Dokumen ini tidak dalam status yang dapat divalidasi oleh koordinator.');
             }
-
+            
             if ($newStatus === Dokumen::STATUS_DIVERIFIKASI) {
                 // Jika koordinator menyetujui, ubah status ke menunggu direktur
                 $newStatus = Dokumen::STATUS_MENUNGGU_DIREKTUR;
@@ -81,7 +81,7 @@ class ValidasiController extends Controller
             if ($dokumen->status !== Dokumen::STATUS_MENUNGGU_DIREKTUR) {
                 return redirect()->back()->with('error', 'Dokumen ini belum divalidasi oleh koordinator atau tidak dalam status yang dapat divalidasi oleh direktur.');
             }
-
+            
             if ($newStatus === Dokumen::STATUS_DIVERIFIKASI) {
                 // Status menjadi terverifikasi jika direktur menyetujui
                 $dokumen->direktur_id = $user->id;
@@ -96,7 +96,7 @@ class ValidasiController extends Controller
         } elseif ($user->role === 'administrator') {
             // Admin bisa mengubah status ke apapun
             $dokumen->validator_level = 'administrator';
-
+            
             if ($newStatus === Dokumen::STATUS_DIVERIFIKASI) {
                 $dokumen->direktur_id = $user->id;
                 $dokumen->direktur_validated_at = now();
@@ -113,7 +113,7 @@ class ValidasiController extends Controller
         $dokumen->status = $newStatus;
         $dokumen->validator_id = $user->id;
         $dokumen->save();
-
+        
         // Catat validasi menggunakan historyService
         $this->historyService->recordValidation($dokumen, $newStatus);
 
@@ -121,13 +121,13 @@ class ValidasiController extends Controller
         $validasi = new Validasi();
         $validasi->dokumen_id = $dokumen->id;
         $validasi->user_id = $user->id;
-
+        
         if (in_array($newStatus, [Dokumen::STATUS_DIVERIFIKASI, Dokumen::STATUS_MENUNGGU_DIREKTUR])) {
             $validasi->status = 'diterima';
         } else {
             $validasi->status = 'ditolak';
         }
-
+        
         $validasi->save();
 
         // Simpan komentar dokumen jika ada

@@ -31,16 +31,16 @@
                                     if(confirm('Yakin ingin menghapus dokumen revisi ini?')) {
                                         document.getElementById('delete-form-{{ $dokumen->id }}').submit();
                                     }">
-                            <i class="fas fa-trash me-1"></i> Hapus Dokumen
+                                <i class="fas fa-trash me-1"></i> Hapus Dokumen
                         </a>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i> Batal
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload me-1"></i> Upload Revisi
-                        </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-1"></i> Upload Revisi
+                    </button>
                     </div>
                 </div>
             </form>

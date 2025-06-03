@@ -84,24 +84,30 @@ class HistoryService
      */
     public function recordValidation(Dokumen $dokumen, string $status): History
     {
-        $statusText = '';
+        $statusText = 'mengubah status';
+        $statusChangeText = $status;
+        
         switch ($status) {
-            case 'divalidasi':
-                $statusText = 'memvalidasi';
+            case Dokumen::STATUS_DIVERIFIKASI:
+                $statusText = 'memverifikasi';
+                $statusChangeText = 'diverifikasi';
                 break;
-            case 'revisi':
+            case Dokumen::STATUS_REVISI:
                 $statusText = 'meminta revisi pada';
+                $statusChangeText = 'perlu revisi';
+                break;
+            case Dokumen::STATUS_MENUNGGU_DIREKTUR:
+                $statusText = 'menyetujui';
+                $statusChangeText = 'menunggu validasi direktur';
                 break;
             case 'ditolak':
                 $statusText = 'menolak';
-                break;
-            default:
-                $statusText = 'mengubah status';
+                $statusChangeText = 'ditolak';
                 break;
         }
 
         return $this->record(
-            "Validator {$statusText} dokumen: {$dokumen->nama_dokumen}",
+            "Validator {$statusText} dokumen: {$dokumen->nama_dokumen} (Status: {$statusChangeText})",
             $dokumen
         );
     }

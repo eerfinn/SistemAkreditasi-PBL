@@ -10,7 +10,7 @@
     ];
 
     $statusLabels = [
-        'draft' => 'Draft',
+    'draft' => 'Draft',
         'menunggu' => 'Menunggu Validasi',
         'menunggu_direktur' => 'Menunggu Validasi Direktur',
         'revisi' => 'Perlu Revisi',
