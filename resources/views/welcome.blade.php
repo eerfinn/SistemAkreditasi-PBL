@@ -25,6 +25,7 @@
 
     <!-- Main CSS File -->
     <link href="{{ asset('assets/css/welcome.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/hamburger.css') }}" rel="stylesheet">
     
     <!-- Particles.js and jQuery (needed by some plugins) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -63,6 +64,22 @@
                         <a class="btn btn-primary" href="/login">Login</a>
                     </li>
                     @else
+                    <!-- Mobile-only dashboard link -->
+                    <li class="nav-item mobile-dashboard-link">
+                        <a class="nav-link" href="/dashboard">
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Mobile-only logout link -->
+                    <li class="nav-item mobile-dashboard-link">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="nav-link">
+                                <span>Logout</span>
+                            </a>
+                        </form>
+                    </li>
+                    <!-- Desktop-only profile dropdown -->
                     <li class="nav-item ps-3">
                         <div class="dropdown nav-profile">
                             <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">

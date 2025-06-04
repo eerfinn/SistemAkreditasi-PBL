@@ -1,0 +1,202 @@
+/* Custom hamburger menu styles */
+.navbar-toggler {
+    border: none;
+    background: transparent;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.navbar-toggler-icon {
+    background-image: none !important;
+    position: relative;
+    width: 24px;
+    height: 2px;
+    background: var(--primary);
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggler-icon::before,
+.navbar-toggler-icon::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: var(--primary);
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggler-icon::before {
+    top: -8px;
+}
+
+.navbar-toggler-icon::after {
+    bottom: -8px;
+}
+
+.navbar-toggler[aria-expanded="true"] {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+    background: transparent;
+}
+
+.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::before {
+    top: 0;
+    transform: rotate(45deg);
+}
+
+.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::after {
+    bottom: 0;
+    transform: rotate(-45deg);
+}
+
+/* Default styles for mobile links (outside media query) */
+.navbar-nav .mobile-dashboard-link {
+    display: none !important; /* Hidden by default on all screens */
+}
+
+/* Adjust mobile menu positioning */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 280px;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+        padding: 80px 20px 20px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        z-index: 1045;
+    }
+    
+    .navbar-collapse.show {
+        transform: translateX(0);
+    }
+    
+    .navbar-nav {
+        width: 100%;
+        text-align: right;
+    }
+    
+    .navbar-nav .nav-item {
+        margin-bottom: 10px;
+        text-align: right;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 10px 15px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-align: right;
+        justify-content: flex-end;
+        display: flex;
+    }
+    
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.active {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary);
+    }
+    
+    .navbar-nav .nav-link:before {
+        display: none;
+    }
+    
+    /* Right align the login button */
+    .navbar-nav .btn-primary {
+        margin-left: auto;
+    }
+    
+    /* Right align dropdown menus */
+    .navbar-nav .dropdown-menu {
+        text-align: right;
+        right: 0;
+        left: auto;
+        margin-top: 0.5rem;
+    }
+    
+    .navbar-nav .dropdown-item {
+        text-align: right;
+        padding-right: 1rem;
+    }
+    
+    /* Convert profile dropdown to simple dashboard link on mobile */
+    .navbar-nav .nav-profile {
+        display: none !important; /* Hide the regular profile dropdown */
+    }
+    
+    /* Show dashboard link for mobile only */
+    .navbar-nav .mobile-dashboard-link {
+        display: block !important; /* Override the d-none class */
+    }
+    
+    .navbar-nav .mobile-dashboard-link .nav-link {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 10px 15px;
+    }
+    
+    /* Adjust dropdown items with icons */
+    .navbar-nav .dropdown-item.ai-icon {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+        text-align: right;
+    }
+    
+    .navbar-nav .dropdown-item.ai-icon svg {
+        margin-left: 10px;
+        margin-right: 0;
+    }
+    
+    .navbar-nav .dropdown-item.ai-icon .ms-2 {
+        margin-left: 0 !important;
+        margin-right: auto !important;
+    }
+}
+
+/* Body overlay when mobile menu is open */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+body.menu-open::after {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+} 
