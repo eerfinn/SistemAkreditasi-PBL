@@ -10,8 +10,7 @@
     <meta name="keywords" content="akreditasi, sistem informasi, politeknik negeri malang, D4 SIB">
 
     <!-- Favicon and apple touch icon -->
-    <link href="{{ asset('assets\images\Jti_polinema.png') }}" rel="icon">
-    <link href="{{ asset('Selecao/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset('assets\images\favicon.ico') }}" rel="icon">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

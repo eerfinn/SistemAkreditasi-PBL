@@ -553,9 +553,27 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     background: var(--gradient-1);
     box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    text-decoration: none;
+}
+
+.features-tabs .nav-link.active:hover {
+    text-decoration: none;
 }
 
 .features-tabs .nav-link.active:after {
+    display: none;
+}
+
+/* Override general nav-link styles for features-tabs */
+.features-tabs .nav-link:before {
+    display: none; /* Remove the underline element completely */
+}
+
+.features-tabs .nav-link.active:before {
+    display: none;
+}
+
+.features-tabs .nav-link:hover:before {
     display: none;
 }
 
