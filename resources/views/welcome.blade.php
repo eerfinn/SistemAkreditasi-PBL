@@ -10,8 +10,7 @@
     <meta name="keywords" content="akreditasi, sistem informasi, politeknik negeri malang, D4 SIB">
 
     <!-- Favicon and apple touch icon -->
-    <link href="{{ asset('assets\images\Jti_polinema.png') }}" rel="icon">
-    <link href="{{ asset('Selecao/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset('assets\images\favicon.ico') }}" rel="icon">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,8 +25,10 @@
 
     <!-- Main CSS File -->
     <link href="{{ asset('assets/css/welcome.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/hamburger.css') }}" rel="stylesheet">
     
-    <!-- Particles.js Library -->
+    <!-- Particles.js and jQuery (needed by some plugins) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 
@@ -40,7 +41,7 @@
                 <span class="sitename">SiAkred</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" onclick="scrollToTop()">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -63,6 +64,22 @@
                         <a class="btn btn-primary" href="/login">Login</a>
                     </li>
                     @else
+                    <!-- Mobile-only dashboard link -->
+                    <li class="nav-item mobile-dashboard-link">
+                        <a class="nav-link" href="/dashboard">
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Mobile-only logout link -->
+                    <li class="nav-item mobile-dashboard-link">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="nav-link">
+                                <span>Logout</span>
+                            </a>
+                        </form>
+                    </li>
+                    <!-- Desktop-only profile dropdown -->
                     <li class="nav-item ps-3">
                         <div class="dropdown nav-profile">
                             <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">

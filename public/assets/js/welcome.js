@@ -1,4 +1,43 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to top function
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    
+    // Make scrollToTop function globally available
+    window.scrollToTop = scrollToTop;
+
+    // Mobile menu toggle functionality
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    
+    if (navbarToggler) {
+        navbarToggler.addEventListener('click', function() {
+            document.body.classList.toggle('menu-open');
+        });
+    }
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+            if (!navbarCollapse.contains(e.target) && !navbarToggler.contains(e.target)) {
+                navbarToggler.click();
+            }
+        }
+    });
+    
+    // Close mobile menu when clicking on a nav link
+    document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                navbarToggler.click();
+            }
+        });
+    });
+
     // Header scroll effect
     window.addEventListener('scroll', function() {
         const header = document.querySelector('.navbar');
@@ -20,22 +59,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add click handler for back to top button
-    document.querySelector('.back-to-top').addEventListener('click', function(e) {
-        e.preventDefault();
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+    const backToTopButton = document.querySelector('.back-to-top');
+    if (backToTopButton) {
+        backToTopButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
-    });
+    }
 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
-
             const targetId = this.getAttribute('href');
+            if (targetId === '#') return; // Skip empty hash links
+            
             const targetElement = document.querySelector(targetId);
-
             if (targetElement) {
                 window.scrollTo({
                     top: targetElement.offsetTop - 80,

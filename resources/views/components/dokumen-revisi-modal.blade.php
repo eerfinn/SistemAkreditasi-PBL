@@ -25,13 +25,14 @@
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div>
-                        <form action="{{ route('dokumen.destroy', $dokumen->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus dokumen revisi ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
+                        <a href="{{ route('dokumen.destroy', $dokumen->id) }}" 
+                           class="btn btn-danger"
+                           onclick="event.preventDefault();
+                                    if(confirm('Yakin ingin menghapus dokumen revisi ini?')) {
+                                        document.getElementById('delete-form-{{ $dokumen->id }}').submit();
+                                    }">
                                 <i class="fas fa-trash me-1"></i> Hapus Dokumen
-                            </button>
-                        </form>
+                        </a>
                     </div>
                     <div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -42,6 +43,12 @@
                     </button>
                     </div>
                 </div>
+            </form>
+            
+            <!-- Separate form for delete action -->
+            <form id="delete-form-{{ $dokumen->id }}" action="{{ route('dokumen.destroy', $dokumen->id) }}" method="POST" style="display: none;">
+                @csrf
+                @method('DELETE')
             </form>
         </div>
     </div>

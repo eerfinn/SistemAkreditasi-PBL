@@ -467,7 +467,30 @@ class DokumenController extends Controller
             // Update the document
             $dokumen->nama_dokumen = pathinfo($originalNameForDisplay, PATHINFO_FILENAME);
             $dokumen->path = $path;
-            $dokumen->status = Dokumen::STATUS_MENUNGGU;
+
+            // Set appropriate status based on who requested the revision
+            if ($dokumen->validator_level === 'direktur') {
+                // If revision was requested by direktur, set status to menunggu_direktur
+                $dokumen->status = Dokumen::STATUS_MENUNGGU_DIREKTUR;
+
+                // Notify direktur about the revised document
+                $this->notificationService->notifyRole('direktur', 'Revisi Dokumen Disubmit',
+                    "Revisi untuk dokumen '{$dokumen->nama_dokumen}' telah disubmit dan menunggu validasi Anda", [
+                    'type' => 'dokumen',
+                    'dokumen_id' => $dokumen->id,
+                    'kriteria_id' => $dokumen->kriteria_id,
+                    'icon' => 'fa-sync-alt',
+                    'color' => 'warning',
+                    'link' => "/kriteria/{$dokumen->kriteria_id}"
+                ]);
+            } else {
+                // If revision was requested by koordinator, set status to menunggu
+                $dokumen->status = Dokumen::STATUS_MENUNGGU;
+
+                // Notify koordinator about the revised document
+                $this->notificationService->notifyKoordinatorAboutDocument($dokumen, 'revised');
+            }
+
             $dokumen->updated_at = now();
             $dokumen->save();
 
@@ -476,11 +499,9 @@ class DokumenController extends Controller
 
             Log::info('Document revision submitted successfully', [
                 'dokumen_id' => $dokumen->id,
-                'new_path' => $path
+                'new_path' => $path,
+                'new_status' => $dokumen->status
             ]);
-
-            // Notify koordinator about the revised document
-            $this->notificationService->notifyKoordinatorAboutDocument($dokumen, 'revised');
 
             return redirect()->route('kriteria.show', $dokumen->kriteria_id)
                             ->with('success', 'Revisi dokumen berhasil diunggah dan menunggu validasi.');

@@ -56,6 +56,24 @@
                                             ->orderBy('created_at', 'desc')
                                             ->get();
                                         $commentCount = $dokumenComments->count();
+                                        
+                                        // Determine if user can validate based on role and document status
+                                        $user = auth()->user();
+                                        $isAdmin = $user && $user->role === 'administrator';
+                                        $isKoordinator = $user && $user->role === 'koordinator';
+                                        $isDirektur = $user && $user->role === 'direktur';
+                                        
+                                        // Specific validation rules
+                                        $canKoordinatorValidate = $isKoordinator && in_array($dokumen->status, ['menunggu', 'revisi']) && 
+                                                                 $dokumen->validator_level !== 'direktur' && 
+                                                                 $dokumen->status !== 'diverifikasi';
+                                                                 
+                                        $canDirektorValidate = $isDirektur && 
+                                                              ($dokumen->status === 'menunggu_direktur' || 
+                                                              ($dokumen->status === 'revisi' && $dokumen->validator_level === 'direktur')) &&
+                                                              $dokumen->status !== 'diverifikasi';
+                                                              
+                                        $canValidate = $isAdmin || $canKoordinatorValidate || $canDirektorValidate;
                                     @endphp
 
                                     <!-- View button -->
@@ -86,7 +104,7 @@
                                     @endif
 
                                     <!-- Validation button -->
-                                    @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
+                                    @if($canValidate)
                                         <button type="button" class="btn btn-primary btn-xs sharp me-1" title="Validasi" data-bs-toggle="modal" data-bs-target="#validasiModal{{ $dokumen->id }}">
                                             <i class="fas fa-check-double"></i>
                                         </button>
@@ -100,7 +118,7 @@
                                         <x-dokumen-revisi-modal :dokumen="$dokumen" />
                                     @endif
 
-                                    @if(auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator']))
+                                    @if($canValidate)
                                         <x-dokumen-validasi-modal :dokumen="$dokumen" />
                                     @endif
                                 @endif

@@ -96,7 +96,7 @@
                     @endif
 
                     {{-- Kaprodi, Kajur, KJM, Koordinator see all criteria --}}
-                    @if(in_array(auth()->user()->role, ['kaprodi', 'kajur', 'kjm', 'koordinator']))
+                    @if(in_array(auth()->user()->role, ['kaprodi', 'kajur', 'kjm', 'koordinator', 'direktur']))
                     @php
                         $currentKriteriaId = null;
                         if (request()->routeIs('kriteria.show')) {

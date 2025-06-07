@@ -18,7 +18,8 @@ class DashboardController extends Controller
         'koordinator' => 'koordinator',
         'kjm' => 'kjm',
         'kaprodi' => 'kaprodi',
-        'kajur' => 'kajur'
+        'kajur' => 'kajur',
+        'direktur' => 'direktur'
     ];
 
     public function __construct()
@@ -342,5 +343,95 @@ class DashboardController extends Controller
     {
         return $this->administratorData();
         // return ['user' => auth()->user()];
+    }
+
+    /**
+     * Get data for direktur dashboard
+     */
+    protected function direkturData()
+    {
+        $user = auth()->user();
+
+        // Get document statistics
+        $totalDocuments = Dokumen::count();
+        $verifiedDocuments = Dokumen::where('status', Dokumen::STATUS_DIVERIFIKASI)->count();
+        $pendingDocuments = Dokumen::where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)->count();
+        $revisionDocuments = Dokumen::where('status', Dokumen::STATUS_REVISI)
+                            ->where('validator_level', 'direktur')
+                            ->count();
+        
+        // Dokumen yang menunggu validasi direktur
+        $waitingDirectorValidation = Dokumen::where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)->count();
+        
+        // Get PPEPP statistics
+        $ppepp_stages = [
+            Dokumen::PPEPP_PENETAPAN,
+            Dokumen::PPEPP_PELAKSANAAN,
+            Dokumen::PPEPP_EVALUASI,
+            Dokumen::PPEPP_PENGENDALIAN,
+            Dokumen::PPEPP_PENINGKATAN
+        ];
+
+        $ppepp_verified = [];
+        $ppepp_total = [];
+
+        foreach ($ppepp_stages as $stage) {
+            $verified = Dokumen::where('jenis_ppepp', $stage)
+                        ->where('status', Dokumen::STATUS_DIVERIFIKASI)
+                        ->count();
+
+            $total = Dokumen::where('jenis_ppepp', $stage)->count();
+
+            $ppepp_verified[] = $verified;
+            $ppepp_total[] = $total;
+        }
+
+        // Dokumen yang memerlukan perhatian direktur
+        $documentsNeedingAttention = Dokumen::where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
+            ->with(['user', 'kriteria'])
+            ->orderBy('updated_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Get all kriteria with document counts
+        $kriteria = \App\Models\Kriteria::all();
+        $kriteriaStats = [];
+
+        foreach ($kriteria as $k) {
+            $totalDocs = Dokumen::where('kriteria_id', $k->id)->count();
+            $verifiedDocs = Dokumen::where('kriteria_id', $k->id)
+                            ->where('status', Dokumen::STATUS_DIVERIFIKASI)
+                            ->count();
+            $pendingDocs = Dokumen::where('kriteria_id', $k->id)
+                            ->where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
+                            ->count();
+            
+            $kriteriaStats[] = [
+                'id' => $k->id,
+                'nama' => $k->nama_kriteria,
+                'total' => $totalDocs,
+                'verified' => $verifiedDocs,
+                'pending' => $pendingDocs,
+                'percentage' => $totalDocs > 0 ? round(($verifiedDocs / $totalDocs) * 100) : 0
+            ];
+        }
+
+        // Get calendar events and tasks
+        $calendarData = $this->getCalendarData($user);
+
+        return [
+            'user' => $user,
+            'totalDocuments' => $totalDocuments,
+            'verifiedDocuments' => $verifiedDocuments,
+            'pendingDocuments' => $pendingDocuments,
+            'revisionDocuments' => $revisionDocuments,
+            'waitingDirectorValidation' => $waitingDirectorValidation,
+            'ppepp_verified' => $ppepp_verified ?: [0, 0, 0, 0, 0],
+            'ppepp_total' => $ppepp_total ?: [0, 0, 0, 0, 0],
+            'documentsNeedingAttention' => $documentsNeedingAttention,
+            'kriteriaStats' => $kriteriaStats,
+            'calendarEvents' => $calendarData['calendarEvents'] ?? [],
+            'tasks' => $calendarData['tasks'] ?? []
+        ];
     }
 }
