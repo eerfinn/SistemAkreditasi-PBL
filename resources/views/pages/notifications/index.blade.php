@@ -39,16 +39,16 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">Daftar Notifikasi</h4>
-                    <div>
+                    <div class="d-flex gap-2">
                         <form action="{{ route('notifications.markAllRead') }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn btn-sm btn-primary">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-check-double me-1"></i> Tandai Semua Dibaca
                             </button>
                         </form>
-                        <form action="{{ route('notifications.clearAll') }}" method="POST" class="d-inline ms-2">
+                        <form action="{{ route('notifications.clearAll') }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus semua notifikasi yang sudah dibaca?')">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus semua notifikasi yang sudah dibaca?')">
                                 <i class="fas fa-trash me-1"></i> Hapus Yang Sudah Dibaca
                             </button>
                         </form>
@@ -79,14 +79,14 @@
                                         <span class="badge bg-warning me-1">Kriteria {{ $notification->kriteria->nama_kriteria }}</span>
                                         @endif
                                     </div>
-                                    <div>
-                                        <a href="{{ route('notifications.read', $notification->id) }}" class="btn btn-sm btn-outline-primary">
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('notifications.read', $notification->id) }}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-eye me-1"></i> Lihat
                                         </a>
-                                        <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST" class="d-inline ms-1">
+                                        <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus notifikasi ini?')">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus notifikasi ini?')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -96,8 +96,10 @@
                         </div>
                         @endforeach
                     </div>
-                    <div class="mt-4">
-                        {{ $notifications->links() }}
+                    <div class="mt-4 d-flex justify-content-center">
+                        <nav>
+                            {{ $notifications->links('pagination::bootstrap-5') }}
+                        </nav>
                     </div>
                     @else
                     <div class="text-center py-5">
@@ -124,6 +126,22 @@
     }
     .notification-item:hover {
         background-color: rgba(0,0,0,0.02);
+    }
+    .pagination {
+        margin-bottom: 0;
+    }
+    .page-item.active .page-link {
+        background-color: #6366f1;
+        border-color: #6366f1;
+    }
+    .page-link {
+        color: #6366f1;
+    }
+    .page-link:hover {
+        color: #4f46e5;
+    }
+    .gap-2 {
+        gap: 0.5rem !important;
     }
 </style>
 @endpush
