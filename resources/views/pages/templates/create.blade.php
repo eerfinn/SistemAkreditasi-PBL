@@ -4,6 +4,77 @@
 
 @section('vendor-style')
     <!-- TinyMCE CSS tidak diperlukan lagi karena menggunakan CDN -->
+    <style>
+        /* Custom styling for form elements */
+        .form-select, .form-control {
+            border: 1px solid #ced4da;
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .form-select {
+            border-left: 3px solid #3b82f6;
+            cursor: pointer;
+        }
+
+        .form-select:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+        }
+
+        .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+
+        /* Style for the dropdown arrow */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%233b82f6' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            padding-right: 2.5rem;
+        }
+
+        /* Style for required fields */
+        .required-field {
+            color: #dc3545;
+            margin-left: 4px;
+        }
+
+        /* Card styling */
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        /* Remove validation styling */
+        .form-select.is-valid {
+            border-color: #ced4da;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%233b82f6' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            padding-right: 2.5rem;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -39,20 +110,20 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Form Template Dokumen</h4>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0"><i class="fas fa-file-alt me-2"></i>Form Template Dokumen</h4>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('templates.store') }}" method="POST">
                         @csrf
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="name" class="form-label">Nama Template <span class="text-danger">*</span></label>
+                                <label for="name" class="form-label">Nama Template <span class="required-field">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="kriteria_id" class="form-label">Kriteria <span class="text-danger">*</span></label>
-                                <select class="form-select" id="kriteria_id" name="kriteria_id" required>
+                                <label for="kriteria_id" class="form-label">Kriteria <span class="required-field">*</span></label>
+                                <select class="form-select custom-select" id="kriteria_id" name="kriteria_id" required>
                                     <option value="">Pilih Kriteria</option>
                                     @foreach($kriteria as $k)
                                     <option value="{{ $k->id }}" {{ old('kriteria_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_kriteria }}</option>
@@ -68,8 +139,8 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="ppepp_type" class="form-label">Tahap PPEPP <span class="text-danger">*</span></label>
-                                <select class="form-select" id="ppepp_type" name="ppepp_type" required>
+                                <label for="ppepp_type" class="form-label">Tahap PPEPP <span class="required-field">*</span></label>
+                                <select class="form-select custom-select" id="ppepp_type" name="ppepp_type" required>
                                     <option value="">Pilih Tahap PPEPP</option>
                                     @foreach($ppepp_types as $value => $label)
                                     <option value="{{ $value }}" {{ old('ppepp_type') == $value ? 'selected' : '' }}>{{ $label }}</option>
@@ -79,14 +150,19 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <label for="content" class="form-label">Konten Template <span class="text-danger">*</span></label>
+                                <label for="content" class="form-label">Konten Template <span class="required-field">*</span></label>
                                 <textarea class="form-control" id="content" name="content">{{ old('content') }}</textarea>
+                                <small class="text-muted mt-1 d-block">Gunakan editor untuk memformat konten template sesuai kebutuhan.</small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12 d-flex justify-content-end">
-                                <a href="{{ route('templates.index') }}" class="btn btn-secondary me-2">Batal</a>
-                                <button type="submit" class="btn btn-primary">Simpan Template</button>
+                                <a href="{{ route('templates.index') }}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-1"></i> Batal
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Simpan Template
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -100,4 +176,13 @@
 @section('vendor-script')
     <!-- TinyMCE -->
     <x-head.tinymce-config selector="#content" height="500" />
+
+    <script>
+        $(document).ready(function() {
+            // Add visual feedback on form submission
+            $('form').on('submit', function() {
+                $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
+            });
+        });
+    </script>
 @endsection
