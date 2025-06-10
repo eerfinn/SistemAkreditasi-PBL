@@ -151,7 +151,7 @@
         .document-item.revision {
             border-left-color: #ef4444;
         }
-        
+
         /* Event styles */
         .event-scroll {
             max-height: 350px;
@@ -268,7 +268,7 @@
             font-weight: 600;
             color: #555;
         }
-        
+
         .my-calendar .card-header {
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
@@ -377,7 +377,6 @@
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Dokumen Menunggu Validasi</h4>
-                    <a href="{{ route('kriteria.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
                 </div>
                 <div class="card-body">
                     <div class="documents-list">
@@ -399,7 +398,7 @@
                                         </div>
                                     </div>
                                     <div class="mt-2">
-                                        <small class="text-muted">Kriteria: {{ $doc->kriteria->nama_kriteria }} | 
+                                        <small class="text-muted">Kriteria: {{ $doc->kriteria->nama_kriteria }} |
                                         Tanggal: {{ $doc->updated_at->format('d M Y H:i') }}</small>
                                     </div>
                                 </div>
@@ -967,7 +966,7 @@
                         // Reset form dan tutup modal
                         $('#addTaskForm')[0].reset();
                         $('#addTaskModal').modal('hide');
-                        
+
                         // Reload halaman untuk menampilkan tugas baru
                         location.reload();
                     },
@@ -985,4 +984,4 @@
             }
         });
     </script>
-@endsection 
+@endsection
