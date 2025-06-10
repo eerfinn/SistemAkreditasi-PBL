@@ -10,6 +10,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make scrollToTop function globally available
     window.scrollToTop = scrollToTop;
 
+    // Profile dropdown enhancements
+    const profileDropdown = document.querySelector('.nav-profile .dropdown-menu');
+    const profileLink = document.querySelector('.nav-profile .nav-link');
+    
+    if (profileDropdown && profileLink) {
+        // Add click outside handler to close dropdown
+        document.addEventListener('click', function(e) {
+            if (!profileDropdown.contains(e.target) && !profileLink.contains(e.target)) {
+                $(profileDropdown).dropdown('hide');
+            }
+        });
+    }
+
     // Mobile menu toggle functionality
     const navbarToggler = document.querySelector('.navbar-toggler');
     const navbarCollapse = document.querySelector('.navbar-collapse');

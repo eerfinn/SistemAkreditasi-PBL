@@ -85,37 +85,29 @@
                             <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="profile-info d-flex align-items-center">
                                     <div class="profile-image">
-                                        {{-- <img src="{{ Auth::user()->profile_photo_url ?? asset('assets/images/user.jpg') }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"> --}}
-                                       <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/avatar/1.png') }}" alt="" class= "profile-image img">
+                                       <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/avatar/1.png') }}" alt="Profile" class="profile-image img">
                                     </div>
+                                    <span class="ms-2 d-none d-lg-inline-block profile-name">{{ Auth::user()->name }}</span>
                                 </div>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <div class="card border-0 mb-0">
-                                    <div class="card-body px-0 py-2">
-                                        <a href="/dashboard" class="dropdown-item ai-icon">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path d="M16.28 13.61C15.15 14.74 13.53 15.09 12.1 14.64L9.51001 17.22C9.33001 17.41 8.96001 17.53 8.69001 17.49L7.49001 17.33C7.09001 17.28 6.73001 16.9 6.67001 16.51L6.51001 15.31C6.47001 15.05 6.60001 14.68 6.78001 14.49L9.36001 11.91C8.92001 10.48 9.26001 8.86001 10.39 7.73001C12.01 6.11001 14.65 6.11001 16.28 7.73001C17.9 9.34001 17.9 11.98 16.28 13.61Z" stroke="var(--primary)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path d="M10.45 16.28L9.59998 15.42" stroke="var(--primary)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path d="M13.3945 10.7H13.4035" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                            <span class="ms-2">Dashboard</span>
+                            <div class="dropdown-menu dropdown-menu-end profile-dropdown" data-bs-popper="none">
+                                <div class="profile-header px-3 py-2 border-bottom text-center">
+                                    <h6 class="mb-0">{{ Auth::user()->nama }}</h6>
+                                    <small class="text-muted">{{ Auth::user()->email }}</small>
+                                </div>
+                                <div class="px-2 py-2">
+                                    <a href="/dashboard" class="dropdown-item py-2">
+                                        <i class="bi bi-grid me-2"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" 
+                                           class="dropdown-item py-2 text-danger">
+                                            <i class="bi bi-box-arrow-right me-2"></i>
+                                            <span>Logout</span>
                                         </a>
-                                    </div>
-                                    <div class="card-footer px-0 py-2">
-                                        <form method="POST" action="{{ route('logout') }}">
-                                            @csrf
-                                            <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="dropdown-item ai-icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                                    <polyline points="16 17 21 12 16 7"></polyline>
-                                                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                                                </svg>
-                                                <span class="ms-2">Logout</span>
-                                            </a>
-                                        </form>
-                                    </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
