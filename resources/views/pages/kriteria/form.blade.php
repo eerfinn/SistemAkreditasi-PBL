@@ -5,6 +5,84 @@
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/kriteria.css') }}" rel="stylesheet">
+    <style>
+        /* PPEPP Navigation Styling */
+        .nav-ppepp .nav-link {
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            margin: 0 3px;
+            color: #495057;
+            background-color: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        
+        .nav-ppepp .nav-link:not(.active):hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-ppepp .nav-link.active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* PPEPP Stage Colors */
+        .nav-ppepp .nav-link.bg-light.text-primary {
+            background-color: #e6f0ff !important;
+            border-bottom: 3px solid #3b82f6;
+        }
+        
+        .nav-ppepp .nav-link.bg-light.text-success {
+            background-color: #e6fff0 !important;
+            border-bottom: 3px solid #10b981;
+        }
+        
+        .nav-ppepp .nav-link.bg-light.text-info {
+            background-color: #e6faff !important;
+            border-bottom: 3px solid #0dcaf0;
+        }
+        
+        .nav-ppepp .nav-link.bg-light.text-warning {
+            background-color: #fff8e6 !important;
+            border-bottom: 3px solid #f59e0b;
+        }
+        
+        .nav-ppepp .nav-link.bg-light.text-danger {
+            background-color: #ffe6e6 !important;
+            border-bottom: 3px solid #ef4444;
+        }
+        
+        /* Document title styling */
+        .card-title {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .text-muted {
+            color: #555 !important;
+        }
+        
+        /* Table headers */
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        /* Document item hover effect */
+        .document-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* File links */
+        .nama-dokumen-cell a {
+            font-weight: 500;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -57,7 +135,7 @@
                                     };
                                 @endphp
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link{{ $stage['key'] === $stageKey ? ' active' : '' }} bg-{{ $stage['key'] === $stageKey ? $colorClass : 'light' }} text-{{ $stage['key'] === $stageKey ? 'white' : $colorClass }}"
+                                    <a class="nav-link{{ $stage['key'] === $stageKey ? ' active' : '' }} {{ $stage['key'] === $stageKey ? 'bg-'.$colorClass : 'bg-light' }} text-{{ $stage['key'] === $stageKey ? 'white' : $colorClass }}"
                                         href="{{ $stage['route_kelola_tahap_ini'] }}">
                                         <i class="fas fa-{{ $iconClass }} me-1"></i> {{ $stage['label'] }}
                                     </a>
@@ -92,7 +170,7 @@
         <div class="card mb-4">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i> Dokumen {{ $stageLabel }}</h5>
-                <span class="badge bg-light text-primary fs-6">{{ count($existingDocsForStage) }} Dokumen</span>
+                <span class="badge bg-white text-primary fs-6 fw-bold">{{ count($existingDocsForStage) }} Dokumen</span>
             </div>
             <div class="card-body">
                 @php
@@ -105,7 +183,7 @@
                             <div>
                                 <h6 class="alert-heading fw-bold mb-2"><i class="fas fa-info-circle me-2"></i>Deskripsi Umum
                                     {{ $stageLabel }}</h6>
-                                <p class="mb-0">{{ $ppepp_descriptions[$stageKey] ?? '' }}</p>
+                                <p class="mb-0 text-dark">{{ $ppepp_descriptions[$stageKey] ?? '' }}</p>
                             </div>
                             <div class="btn-group">
                                 <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
@@ -128,7 +206,7 @@
 
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered align-middle">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th class="col-no">No</th>
                                 <th class="col-nama-dokumen nama-dokumen-cell text-center">Nama Dokumen</th>
@@ -291,7 +369,7 @@
                             <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="4"
                                 placeholder="Deskripsi umum untuk tahap ini..."></textarea>
                             @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $errors->first('description') }}</div>
                             @enderror
                             <small class="text-muted">Deskripsi ini akan ditampilkan sebagai informasi umum untuk tahap
                                 {{ $stageLabel }}.</small>
@@ -379,7 +457,7 @@
                         <input type="file" class="form-control @error('files') is-invalid @enderror" name="files[]"
                             id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
                         @error('files')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback">{{ $errors->first('files') }}</div>
                         @enderror
                         <small class="text-muted">
                             <i class="fas fa-info-circle me-1"></i> Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT,
