@@ -17,7 +17,7 @@ class Dokumen extends Model
     public const STATUS_MENUNGGU = 'menunggu';
     public const STATUS_REVISI = 'revisi';
     public const STATUS_DIVERIFIKASI = 'diverifikasi';
-    
+
     // Status untuk validasi bertingkat
     public const STATUS_MENUNGGU_DIREKTUR = 'menunggu_direktur';
 
@@ -137,7 +137,8 @@ class Dokumen extends Model
             return $query;
         }
 
-        // Direktur can see documents that need their validation, their rejected ones, and verified ones
+        // Direktur can see ONLY documents that need their validation (after koordinator validation),
+        // their rejected ones, and verified ones
         if ($user->role === 'direktur') {
             return $query->where(function($q) {
                 $q->where('status', self::STATUS_MENUNGGU_DIREKTUR)

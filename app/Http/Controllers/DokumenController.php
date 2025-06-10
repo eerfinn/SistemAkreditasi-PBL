@@ -511,7 +511,7 @@ class DokumenController extends Controller
                 'message' => $e->getMessage(),
                 'dokumen_id' => $dokumen->id
             ]);
-            
+
             return back()->with('error', 'Gagal mengajukan revisi: ' . $e->getMessage());
         }
     }
@@ -586,32 +586,27 @@ class DokumenController extends Controller
      */
     public function viewDocument($id)
     {
-        $dokumen = Dokumen::findOrFail($id);
-        $user = Auth::user();
+        $dokumen = Dokumen::with(['user', 'kriteria'])->findOrFail($id);
+        $user = auth()->user();
 
-        // Check if user has access to this document
-        $isVisible = Dokumen::where('id', $dokumen->id)
-            ->visibleToUser($user)
-            ->exists();
+        // Access control is now handled by DocumentAccessMiddleware
+        // We don't need to check access here anymore
 
-        if (!$isVisible) {
-            abort(403, 'Anda tidak memiliki akses untuk melihat dokumen ini.');
+        // Check if the file exists in storage
+        if (!Storage::disk('public')->exists($dokumen->path)) {
+            abort(404, 'File not found.');
         }
 
-        // Check if file exists
-        $filePath = storage_path('app/public/' . $dokumen->path);
-        if (!file_exists($filePath)) {
-            abort(404, 'File tidak ditemukan.');
-        }
-
-        // Get file extension and map to MIME type
+        // Get the file extension to determine content type
         $extension = pathinfo($dokumen->path, PATHINFO_EXTENSION);
-        $mimeType = $this->getMimeTypeFromExtension($extension);
+        $contentType = $this->getMimeTypeFromExtension($extension);
 
-        // Stream the file
-        return response()->file($filePath, [
-            'Content-Type' => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . $dokumen->nama_dokumen . '.' . $extension . '"'
+        // Return the file with the original filename
+        $originalFilename = $dokumen->nama_dokumen . '.' . $extension;
+        
+        return response()->file(storage_path('app/public/' . $dokumen->path), [
+            'Content-Type' => $contentType,
+            'Content-Disposition' => 'inline; filename="' . $originalFilename . '"'
         ]);
     }
 

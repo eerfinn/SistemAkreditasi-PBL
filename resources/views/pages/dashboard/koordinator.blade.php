@@ -151,6 +151,145 @@
         .document-item.revision {
             border-left-color: #ef4444;
         }
+        
+        /* Event styles */
+        .event-scroll {
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .event-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .event-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .event-scroll::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 10px;
+        }
+
+        .event-scroll::-webkit-scrollbar-thumb:hover {
+            background: #ccc;
+        }
+
+        .event-box {
+            width: 45px;
+            height: 45px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-right: 15px;
+        }
+
+        .event-box h5 {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            color: #333;
+        }
+
+        .event-box span {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .event-media {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .event-media:last-child {
+            border-bottom: none;
+        }
+
+        .event-media:hover {
+            transform: translateY(0);
+            box-shadow: none;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .event-data {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .event-data h5 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #333;
+        }
+
+        .event-data span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .event-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .event-time {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .card-body.schedules-cal {
+            padding: 0 !important;
+        }
+
+        .events h6 {
+            padding: 15px 15px 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .my-calendar .card-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+        }
+
+        .my-calendar .card-header .card-title {
+            font-weight: 600;
+            color: white;
+        }
+
+        .my-calendar .card-header .btn-primary {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: transparent;
+        }
+
+        .my-calendar .card-header .btn-primary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: transparent;
+        }
     </style>
 @endsection
 
@@ -234,7 +373,7 @@
         </div>
 
         <!-- Documents Needing Attention -->
-        <div class="col-xl-8 mb-4">
+        <div class="col-xl-4 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Dokumen Menunggu Validasi</h4>
@@ -275,47 +414,68 @@
                 </div>
             </div>
         </div>
+
+        <!-- Events Card -->
+        <div class="col-xl-4 mb-4">
+            <div class="card my-calendar h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Events</h4>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#addTaskModal">+ Tambah</a>
+                </div>
+                <div class="card-body schedules-cal">
+                    <input type="text" class="form-control d-none" id="datetimepicker1">
+                    <div class="events">
+                        <h6 class="mb-3">Daftar Events</h6>
+                        <div class="dz-scroll event-scroll">
+                            <div id="eventsList">
+                                @if(count($tasks ?? []) > 0)
+                                    @foreach($tasks as $task)
+                                        <div class="event-media" data-id="{{ $task['id'] }}" data-raw-date="{{ $task['rawDate'] }}" data-raw-time="{{ $task['rawTime'] }}">
+                                            <div class="d-flex align-items-center">
+                                                <div class="event-box">
+                                                    <h5 class="mb-0">{{ \Carbon\Carbon::parse($task['rawDate'])->format('d') }}</h5>
+                                                    <span>{{ \Carbon\Carbon::parse($task['rawDate'])->format('D') }}</span>
+                                                </div>
+                                                <div class="event-data">
+                                                    <h5 class="mb-0">
+                                                        <a href="javascript:void(0);" class="{{ $task['status'] == 'completed' ? 'text-decoration-line-through' : '' }}">{{ $task['title'] }}</a>
+                                                    </h5>
+                                                    <span>{{ $task['date'] }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="event-actions">
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input task-checkbox" type="checkbox" role="switch" data-id="{{ $task['id'] }}" {{ $task['status'] == 'completed' ? 'checked' : '' }}>
+                                                </div>
+                                                <span class="event-time text-white bg-{{ $task['status'] == 'completed' ? 'success' : 'warning' }}">{{ $task['rawTime'] == '00:00' ? 'Sepanjang hari' : $task['rawTime'] }}</span>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+
+                            <!-- Pesan jika tidak ada tugas -->
+                            <div id="noTasksMessage" class="text-center p-3 {{ count($tasks ?? []) > 0 ? 'd-none' : '' }}">
+                                <p class="text-muted mb-0">Belum ada events. Klik tombol + Tambah untuk menambahkan event baru.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Main Content Row 2 -->
     <div class="row">
         <!-- Document Progress Chart -->
-        <div class="col-xl-8 mb-4">
+        <div class="col-xl-12 mb-4">
             <div class="card h-100">
                 <div class="card-header">
                     <h4 class="card-title">Progress Dokumen PPEPP</h4>
                 </div>
                 <div class="card-body">
                     <div id="documentProgressChart" style="width: 100%; height: 350px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Calendar and Events -->
-        <div class="col-xl-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title mb-0">Jadwal Kegiatan</h4>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#addTaskModal">+ Tambah</a>
-                </div>
-                <div class="card-body">
-                    <div id="mini-calendar"></div>
-                    <div class="mt-3">
-                        <h5 class="mb-3">Kegiatan Mendatang</h5>
-                        @if(count($tasks ?? []) > 0)
-                            <div class="task-list">
-                                @foreach($tasks as $task)
-                                    <div class="task-item mb-2 p-2 border-start border-4 {{ $task['status'] == 'completed' ? 'border-success' : 'border-warning' }} bg-light rounded">
-                                        <h6 class="mb-1">{{ $task['title'] }}</h6>
-                                        <small class="text-muted">{{ $task['date'] }} - {{ $task['rawTime'] }}</small>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-muted">Tidak ada kegiatan mendatang.</p>
-                        @endif
-                    </div>
                 </div>
             </div>
         </div>
@@ -716,6 +876,65 @@
             // Initialize charts
             setTimeout(ensureChartsRendered, 500);
 
+            // Initialize datetimepicker
+            if ($("#datetimepicker1").length > 0) {
+                $('#datetimepicker1').datetimepicker({
+                    inline: true,
+                    format: 'YYYY-MM-DD',
+                    defaultDate: moment(),
+                    icons: {
+                        time: "fa fa-clock-o",
+                        date: "fa fa-calendar",
+                        up: "fa fa-arrow-up",
+                        down: "fa fa-arrow-down",
+                        previous: 'fa fa-chevron-left',
+                        next: 'fa fa-chevron-right',
+                        today: 'fa fa-screenshot',
+                        clear: 'fa fa-trash',
+                        close: 'fa fa-remove'
+                    }
+                });
+            }
+
+            // Handle task checkboxes
+            $(document).on('change', '.task-checkbox', function() {
+                const taskId = $(this).data('id');
+                const isCompleted = $(this).is(':checked');
+                const status = isCompleted ? 'completed' : 'pending';
+
+                // Update task status via AJAX
+                $.ajax({
+                    url: `/tugas/${taskId}/status`,
+                    type: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    data: JSON.stringify({ status: status }),
+                    processData: false,
+                    success: function(response) {
+                        // Update UI
+                        const $eventMedia = $(`.event-media[data-id="${taskId}"]`);
+                        const $taskTitle = $eventMedia.find('.event-data h5 a');
+                        const $statusBadge = $eventMedia.find('.bg-warning, .bg-success');
+
+                        if (isCompleted) {
+                            $taskTitle.addClass('text-decoration-line-through');
+                            $statusBadge.removeClass('bg-warning').addClass('bg-success');
+                        } else {
+                            $taskTitle.removeClass('text-decoration-line-through');
+                            $statusBadge.removeClass('bg-success').addClass('bg-warning');
+                        }
+                    },
+                    error: function() {
+                        // Revert checkbox if error
+                        $(this).prop('checked', !isCompleted);
+                        alert('Terjadi kesalahan saat memperbarui status tugas.');
+                    }
+                });
+            });
+
             // Event handling for task creation
             $('#saveTaskBtn').click(function() {
                 const title = $('#taskTitle').val().trim();
@@ -758,6 +977,12 @@
                     }
                 });
             });
+
+            // Helper function to format date
+            function formatDate(dateString) {
+                const options = { day: 'numeric', month: 'short', year: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            }
         });
     </script>
 @endsection 

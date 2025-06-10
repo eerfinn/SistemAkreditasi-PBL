@@ -82,5 +82,6 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'kriteria.access' => \App\Http\Middleware\KriteriaAccessMiddleware::class,
         'role' => \App\Http\Middleware\CheckRole::class,
+        'document.access' => \App\Http\Middleware\DocumentAccessMiddleware::class,
     ];
 }

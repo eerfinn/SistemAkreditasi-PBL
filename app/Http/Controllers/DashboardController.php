@@ -298,7 +298,7 @@ class DashboardController extends Controller
             $pendingDocs = Dokumen::where('kriteria_id', $k->id)
                             ->where('status', Dokumen::STATUS_MENUNGGU)
                             ->count();
-            
+
             $kriteriaStats[] = [
                 'id' => $k->id,
                 'nama' => $k->nama_kriteria,
@@ -352,18 +352,27 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // Get document statistics
-        $totalDocuments = Dokumen::count();
+        // Get document statistics - only count documents that have been validated by koordinator
+        // and are now waiting for direktur validation, or have been processed by direktur
+        $totalDocuments = Dokumen::where(function($q) {
+            $q->where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
+              ->orWhere(function($q2) {
+                  $q2->where('status', Dokumen::STATUS_REVISI)
+                     ->where('validator_level', 'direktur');
+              })
+              ->orWhere('status', Dokumen::STATUS_DIVERIFIKASI);
+        })->count();
+
         $verifiedDocuments = Dokumen::where('status', Dokumen::STATUS_DIVERIFIKASI)->count();
         $pendingDocuments = Dokumen::where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)->count();
         $revisionDocuments = Dokumen::where('status', Dokumen::STATUS_REVISI)
                             ->where('validator_level', 'direktur')
                             ->count();
-        
-        // Dokumen yang menunggu validasi direktur
-        $waitingDirectorValidation = Dokumen::where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)->count();
-        
-        // Get PPEPP statistics
+
+        // Dokumen yang menunggu validasi direktur - only count documents visible to the director
+        $waitingDirectorValidation = Dokumen::visibleToUser($user)->where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)->count();
+
+        // Get PPEPP statistics - only count documents visible to the director
         $ppepp_stages = [
             Dokumen::PPEPP_PENETAPAN,
             Dokumen::PPEPP_PELAKSANAAN,
@@ -376,36 +385,59 @@ class DashboardController extends Controller
         $ppepp_total = [];
 
         foreach ($ppepp_stages as $stage) {
+            // Only count verified documents
             $verified = Dokumen::where('jenis_ppepp', $stage)
                         ->where('status', Dokumen::STATUS_DIVERIFIKASI)
                         ->count();
 
-            $total = Dokumen::where('jenis_ppepp', $stage)->count();
+            // Only count documents that have been validated by koordinator or processed by direktur
+            $total = Dokumen::where('jenis_ppepp', $stage)
+                    ->where(function($q) {
+                        $q->where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
+                          ->orWhere(function($q2) {
+                              $q2->where('status', Dokumen::STATUS_REVISI)
+                                 ->where('validator_level', 'direktur');
+                          })
+                          ->orWhere('status', Dokumen::STATUS_DIVERIFIKASI);
+                    })
+                    ->count();
 
             $ppepp_verified[] = $verified;
             $ppepp_total[] = $total;
         }
 
-        // Dokumen yang memerlukan perhatian direktur
+        // Dokumen yang memerlukan perhatian direktur - only show documents that have been validated by koordinator
         $documentsNeedingAttention = Dokumen::where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
             ->with(['user', 'kriteria'])
             ->orderBy('updated_at', 'desc')
             ->take(5)
             ->get();
 
-        // Get all kriteria with document counts
+        // Get all kriteria with document counts - only count documents visible to the director
         $kriteria = \App\Models\Kriteria::all();
         $kriteriaStats = [];
 
         foreach ($kriteria as $k) {
-            $totalDocs = Dokumen::where('kriteria_id', $k->id)->count();
+            // Only count documents that have been validated by koordinator or processed by direktur
+            $totalDocs = Dokumen::where('kriteria_id', $k->id)
+                        ->where(function($q) {
+                            $q->where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
+                              ->orWhere(function($q2) {
+                                  $q2->where('status', Dokumen::STATUS_REVISI)
+                                     ->where('validator_level', 'direktur');
+                              })
+                              ->orWhere('status', Dokumen::STATUS_DIVERIFIKASI);
+                        })
+                        ->count();
+
             $verifiedDocs = Dokumen::where('kriteria_id', $k->id)
                             ->where('status', Dokumen::STATUS_DIVERIFIKASI)
                             ->count();
+
             $pendingDocs = Dokumen::where('kriteria_id', $k->id)
                             ->where('status', Dokumen::STATUS_MENUNGGU_DIREKTUR)
                             ->count();
-            
+
             $kriteriaStats[] = [
                 'id' => $k->id,
                 'nama' => $k->nama_kriteria,

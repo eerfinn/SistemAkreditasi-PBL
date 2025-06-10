@@ -53,7 +53,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 */
 Route::get('/dokumen/view/{id}', [DokumenController::class, 'viewDocument'])
     ->name('dokumen.view')
-    ->middleware('auth');
+    ->middleware(['auth', 'document.access']);
 
 /*
 |--------------------------------------------------------------------------
