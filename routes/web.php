@@ -201,3 +201,14 @@ Route::middleware('auth')->group(function () {
 Route::fallback(function () {
     return response()->view('pages.errors.page-error-404', [], 404);
 });
+
+// Template routes
+Route::get('templates', [TemplateController::class, 'index'])->name('templates.index');
+Route::get('templates/create', [TemplateController::class, 'create'])->name('templates.create');
+Route::post('templates', [TemplateController::class, 'store'])->name('templates.store');
+Route::get('templates/{template}', [TemplateController::class, 'show'])->name('templates.show');
+Route::get('templates/{template}/edit', [TemplateController::class, 'edit'])->name('templates.edit');
+Route::put('templates/{template}', [TemplateController::class, 'update'])->name('templates.update');
+Route::delete('templates/{template}', [TemplateController::class, 'destroy'])->name('templates.destroy');
+Route::get('templates/{template}/download', [TemplateController::class, 'download'])->name('templates.download');
+Route::get('templates-download-multiple', [TemplateController::class, 'downloadMultiple'])->name('templates.download.multiple');

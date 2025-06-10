@@ -43,11 +43,61 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">Daftar Template</h4>
-                    @if(in_array(auth()->user()->role, ['administrator', 'dosen']))
-                    <a href="{{ route('templates.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Tambah Template Baru
-                    </a>
-                    @endif
+                    <div class="d-flex">
+                        <div class="dropdown me-2">
+                            <button class="btn btn-success dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-download me-1"></i> Unduh Template
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 300px;" aria-labelledby="downloadDropdown">
+                                <form action="{{ route('templates.download.multiple') }}" method="GET" id="downloadForm">
+                                    <div class="mb-3">
+                                        <label for="kriteria_id" class="form-label">Filter Kriteria</label>
+                                        <select class="form-select" id="kriteria_id" name="kriteria_id">
+                                            <option value="">Semua Kriteria</option>
+                                            @php
+                                                $user = auth()->user();
+                                                $allowedKriteriaIds = [];
+
+                                                if ($user->role === 'administrator') {
+                                                    // Admin dapat mengakses semua kriteria
+                                                    $kriteria_list = App\Models\Kriteria::all();
+                                                } else if ($user->role === 'dosen') {
+                                                    // Dosen hanya dapat mengakses kriteria yang ditugaskan
+                                                    $allowedKriteriaIds = $user->kriteria_access ?? [];
+                                                    $kriteria_list = App\Models\Kriteria::whereIn('id', $allowedKriteriaIds)->get();
+                                                } else {
+                                                    $kriteria_list = collect();
+                                                }
+                                            @endphp
+
+                                            @foreach($kriteria_list as $kriteria)
+                                                <option value="{{ $kriteria->id }}">{{ $kriteria->nama_kriteria }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="ppepp_type" class="form-label">Filter Tahap PPEPP</label>
+                                        <select class="form-select" id="ppepp_type" name="ppepp_type">
+                                            <option value="">Semua Tahap</option>
+                                            <option value="penetapan">Penetapan</option>
+                                            <option value="pelaksanaan">Pelaksanaan</option>
+                                            <option value="evaluasi">Evaluasi</option>
+                                            <option value="pengendalian">Pengendalian</option>
+                                            <option value="peningkatan">Peningkatan</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-file-archive me-1"></i> Unduh sebagai ZIP
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        @if(in_array(auth()->user()->role, ['administrator', 'dosen']))
+                        <a href="{{ route('templates.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Tambah Template Baru
+                        </a>
+                        @endif
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -171,6 +221,56 @@
                 $('.paginate_button.page-item:not(.previous):not(.next)').addClass('btn btn-sm btn-outline-primary');
                 $('.paginate_button.page-item.active').removeClass('btn-outline-primary').addClass('btn-primary');
             }
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        $('.dropdown-menu').on('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Improved download handling with loading overlay
+        var loadingOverlay;
+
+        $('#downloadForm').on('submit', function() {
+            // Create a loading overlay
+            loadingOverlay = $('<div id="downloadOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.5); z-index: 9999;"><div class="spinner-border text-light" role="status"></div><div class="text-light ms-3"></div></div>');
+            $('body').append(loadingOverlay);
+
+            // Set a timeout to remove the overlay after download starts
+            setTimeout(function() {
+                removeLoadingOverlay();
+            }, 10000); // 10 seconds timeout
+
+            // Create an iframe to handle the download
+            var downloadFrame = $('<iframe>', {
+                name: 'download_frame',
+                id: 'download_frame',
+                style: 'display:none;'
+            }).appendTo('body');
+
+            // Update form to use the iframe
+            $(this).attr('target', 'download_frame');
+
+            // Listen for the iframe load event
+            $('#download_frame').on('load', function() {
+                removeLoadingOverlay();
+            });
+
+            return true;
+        });
+
+        // Function to remove the loading overlay
+        function removeLoadingOverlay() {
+            if (loadingOverlay) {
+                loadingOverlay.fadeOut('fast', function() {
+                    $(this).remove();
+                });
+            }
+        }
+
+        // Also remove overlay if user navigates away or refreshes
+        $(window).on('beforeunload', function() {
+            removeLoadingOverlay();
         });
     });
 </script>

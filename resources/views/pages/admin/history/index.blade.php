@@ -359,8 +359,9 @@
             $('#from_date').val(picker.startDate.format('YYYY-MM-DD'));
             $('#to_date').val(picker.endDate.format('YYYY-MM-DD'));
 
-            // Automatically submit the form when a date range is selected
-            $('#filter-form').submit();
+            // Don't automatically submit the form when a date range is selected
+            // Let the user click the filter button instead
+            // $('#filter-form').submit();
         });
 
         $('.input-daterange-datepicker').on('cancel.daterangepicker', function(ev, picker) {

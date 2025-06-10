@@ -125,7 +125,7 @@ class TemplateController extends Controller
         $template = new Template($validated);
         $template->created_by = Auth::id();
         $template->save();
-        
+
         // Catat aktivitas pembuatan template
         $this->historyService->recordTemplateActivity('create', $template->name);
 
@@ -250,7 +250,7 @@ class TemplateController extends Controller
         }
 
         $template->update($validated);
-        
+
         // Catat aktivitas update template
         $this->historyService->recordTemplateActivity('update', $template->name);
 
@@ -280,10 +280,10 @@ class TemplateController extends Controller
 
         // Simpan nama template sebelum dihapus untuk log
         $templateName = $template->name;
-        
+
         // Hapus template
         $template->delete();
-        
+
         // Catat aktivitas penghapusan template
         $this->historyService->recordTemplateActivity('delete', $templateName);
 
@@ -314,32 +314,154 @@ class TemplateController extends Controller
         try {
             // Buat nama file yang aman
             $filename = Str::slug($template->name) . '-' . date('YmdHis') . '.docx';
-            
+
             // Buat temporary file untuk menyimpan dokumen
             $tempFile = tempnam(sys_get_temp_dir(), 'word_');
-            
+
             // Konversi HTML ke Word menggunakan PhpWord
             $phpWord = new \PhpOffice\PhpWord\PhpWord();
             $section = $phpWord->addSection();
-            
+
             // Import HTML
             \PhpOffice\PhpWord\Shared\Html::addHtml($section, $template->content);
-            
+
             // Simpan ke file temporary
             $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
             $objWriter->save($tempFile);
-            
+
             // Return file sebagai download
             return response()->download($tempFile, $filename, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
                 'Cache-Control' => 'max-age=0',
             ])->deleteFileAfterSend(true);
-            
+
         } catch (\Exception $e) {
             Log::error('Template download error: ' . $e->getMessage());
             return redirect()->route('templates.index')
                 ->with('error', 'Terjadi kesalahan saat mengunduh template: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download multiple templates as a zip file
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadMultiple(Request $request)
+    {
+        $user = Auth::user();
+        $kriteria_id = $request->input('kriteria_id');
+        $ppepp_type = $request->input('ppepp_type');
+
+        $query = Template::with('kriteria');
+
+        // Apply role-based restrictions
+        if ($user->role !== 'administrator') {
+            $allowedKriteriaIds = [];
+
+            if ($user->role === 'dosen') {
+                $allowedKriteriaIds = $user->kriteria_access ?? [];
+            }
+
+            // Restrict to only allowed kriteria
+            $query->whereIn('kriteria_id', $allowedKriteriaIds);
+        }
+
+        // Apply filters if provided
+        if ($kriteria_id) {
+            $query->where('kriteria_id', $kriteria_id);
+        }
+
+        if ($ppepp_type) {
+            $query->where('ppepp_type', $ppepp_type);
+        }
+
+        $templates = $query->get();
+
+        if ($templates->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada template yang ditemukan untuk diunduh.');
+        }
+
+        try {
+            // Generate file names
+            $zipFileName = 'templates_' . date('Y-m-d_H-i-s') . '.zip';
+            $tempFileName = 'temp_' . time() . '.zip';
+
+            // Use system temp directory
+            $tempFilePath = sys_get_temp_dir() . '/' . $tempFileName;
+
+            // Create a new zip archive
+            $zip = new \ZipArchive();
+
+            if ($zip->open($tempFilePath, \ZipArchive::CREATE) !== TRUE) {
+                return redirect()->back()->with('error', 'Tidak dapat membuat file zip.');
+            }
+
+            $fileCount = 0;
+            $tempFiles = [];
+
+            foreach ($templates as $template) {
+                try {
+                    // Convert HTML to Word document
+                    $phpWord = new \PhpOffice\PhpWord\PhpWord();
+                    $section = $phpWord->addSection();
+
+                    // Import HTML
+                    \PhpOffice\PhpWord\Shared\Html::addHtml($section, $template->content);
+
+                    // Create a temporary file for this document
+                    $docTempFile = tempnam(sys_get_temp_dir(), 'doc_');
+                    $tempFiles[] = $docTempFile;
+
+                    // Save as Word document
+                    $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+                    $objWriter->save($docTempFile);
+
+                    // Create folder structure inside zip
+                    $folderPath = ($template->kriteria ? Str::slug($template->kriteria->nama_kriteria) : 'uncategorized') .
+                                '/' . ucfirst($template->ppepp_type);
+
+                    // Create filename for the document
+                    $docFileName = Str::slug($template->name) . '.docx';
+
+                    // Add file to zip
+                    $zip->addFile($docTempFile, $folderPath . '/' . $docFileName);
+                    $fileCount++;
+
+                } catch (\Exception $e) {
+                    Log::error('Error processing template ' . $template->id . ': ' . $e->getMessage());
+                    continue;
+                }
+            }
+
+            // Close the zip file
+            $zip->close();
+
+            // Clean up temporary files
+            foreach ($tempFiles as $file) {
+                if (file_exists($file)) {
+                    @unlink($file);
+                }
+            }
+
+            if ($fileCount === 0) {
+                if (file_exists($tempFilePath)) {
+                    @unlink($tempFilePath);
+                }
+                return redirect()->back()->with('error', 'Tidak ada template yang dapat diproses untuk diunduh.');
+            }
+
+            // Return the zip file as a download
+            return response()->download($tempFilePath, $zipFileName, [
+                'Content-Type' => 'application/zip',
+                'Content-Disposition' => 'attachment; filename="' . $zipFileName . '"',
+            ])->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            Log::error('Template bulk download error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunduh template: ' . $e->getMessage());
         }
     }
 }
