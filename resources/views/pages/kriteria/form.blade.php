@@ -202,7 +202,7 @@
                                                         <div class="modal-content">
                                                             <form
                                                                 action="{{ route('dokumen.submit.revision', $doc->id) }}"
-                                                                method="POST" enctype="multipart/form-data">
+                                                                method="POST" enctype="multipart/form-data" class="revisi-form">
                                                                 @csrf
                                                                 <div class="modal-header bg-warning">
                                                                     <h5 class="modal-title text-white"
@@ -224,11 +224,14 @@
                                                                     <div class="mb-3">
                                                                         <label class="form-label fw-bold">Unggah File
                                                                             Revisi</label>
-                                                                        <input type="file" class="form-control"
-                                                                            name="file" required>
+                                                                        <input type="file" class="form-control revisi-file"
+                                                                            name="file" required accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
                                                                         <small class="text-muted">Format yang diizinkan:
                                                                             PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX. Maksimal
                                                                             5MB.</small>
+                                                                        <div class="revisi-file-error text-danger mt-2" style="display: none;">
+                                                                            <i class="fas fa-exclamation-circle me-1"></i> File melebihi batas ukuran maksimal 5MB.
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
@@ -374,7 +377,7 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold">Pilih File</label>
                         <input type="file" class="form-control @error('files') is-invalid @enderror" name="files[]"
-                            id="fileInput" multiple>
+                            id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
                         @error('files')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -382,6 +385,9 @@
                             <i class="fas fa-info-circle me-1"></i> Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT,
                             PPTX. Maksimal 5MB per file.
                         </small>
+                        <div id="fileError" class="text-danger mt-2" style="display: none;">
+                            <i class="fas fa-exclamation-circle me-1"></i> File melebihi batas ukuran maksimal 5MB.
+                        </div>
                     </div>
 
                     <div class="text-end">
@@ -417,6 +423,68 @@
                     }
                 });
             }, 300);
+
+            // File size validation for main upload
+            $('#fileInput').on('change', function() {
+                const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+                const files = this.files;
+                let hasOversizedFile = false;
+                let invalidFiles = [];
+                
+                for (let i = 0; i < files.length; i++) {
+                    if (files[i].size > maxFileSize) {
+                        hasOversizedFile = true;
+                        invalidFiles.push(files[i].name);
+                    }
+                }
+                
+                if (hasOversizedFile) {
+                    $('#fileError').html('<i class="fas fa-exclamation-circle me-1"></i> File berikut melebihi batas ukuran 5MB: <br>' + invalidFiles.join('<br>'));
+                    $('#fileError').show();
+                    $(this).val(''); // Clear the file input
+                } else {
+                    $('#fileError').hide();
+                }
+            });
+
+            // File size validation for revision uploads
+            $('.revisi-file').on('change', function() {
+                const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+                const file = this.files[0];
+                const errorElement = $(this).siblings('.revisi-file-error');
+                
+                if (file && file.size > maxFileSize) {
+                    errorElement.html('<i class="fas fa-exclamation-circle me-1"></i> File ' + file.name + ' melebihi batas ukuran 5MB.');
+                    errorElement.show();
+                    $(this).val(''); // Clear the file input
+                } else {
+                    errorElement.hide();
+                }
+            });
+
+            // Form submission validation
+            $('#dokumenForm').on('submit', function(e) {
+                const files = $('#fileInput')[0].files;
+                if (files.length === 0) {
+                    e.preventDefault();
+                    alert('Silakan pilih file untuk diunggah.');
+                    return false;
+                }
+                
+                return true;
+            });
+
+            // Revision form validation
+            $('form.revisi-form').on('submit', function(e) {
+                const fileInput = $(this).find('.revisi-file')[0];
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Silakan pilih file revisi untuk diunggah.');
+                    return false;
+                }
+                
+                return true;
+            });
         });
     </script>
 @endpush
