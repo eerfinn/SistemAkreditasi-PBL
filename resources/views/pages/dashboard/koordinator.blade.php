@@ -360,124 +360,137 @@
 
     <!-- Main Content Row 1 -->
     <div class="row">
-        <!-- Document Stats -->
-        <div class="col-xl-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h4 class="card-title">Status Dokumen</h4>
-                </div>
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <div id="documentStatusChart" style="width: 100%; height: 300px;"></div>
+
+        <div class="col-xl-8">
+            <div class="row">
+
+                <!-- Document Stats -->
+                <div class="col-xl-6 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h4 class="card-title">Status Dokumen</h4>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <div id="documentStatusChart" style="width: 100%; height: 300px;"></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Documents Needing Attention -->
-        <div class="col-xl-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title mb-0">Dokumen Menunggu Validasi</h4>
-                </div>
-                <div class="card-body">
-                    <div class="documents-list">
-                        @if(count($latestDocuments) > 0)
-                            @foreach($latestDocuments as $doc)
-                                <div class="document-item pending">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h5 class="mb-1">{{ $doc->nama_dokumen }}</h5>
-                                            <p class="mb-0 text-muted">
-                                                <span class="badge bg-light text-dark">{{ ucfirst($doc->jenis_ppepp) }}</span>
-                                                <span class="ms-2">Diunggah oleh: {{ $doc->user->nama }}</span>
-                                            </p>
+            <!-- Documents Needing Attention -->
+            <div class="col-xl-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Dokumen Menunggu Validasi</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="documents-list">
+                            @if (count($latestDocuments) > 0)
+                                @foreach ($latestDocuments as $doc)
+                                    <div class="document-item pending">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="mb-1">{{ $doc->nama_dokumen }}</h5>
+                                                <p class="mb-0 text-muted">
+                                                    <span
+                                                        class="badge bg-light text-dark">{{ ucfirst($doc->jenis_ppepp) }}</span>
+                                                    <span class="ms-2">Diunggah oleh: {{ $doc->user->nama }}</span>
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('kriteria.show', $doc->kriteria_id) }}"
+                                                    class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i> Lihat
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <a href="{{ route('kriteria.show', $doc->kriteria_id) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye me-1"></i> Lihat
-                                            </a>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Kriteria: {{ $doc->kriteria->nama_kriteria }} |
+                                                Tanggal: {{ $doc->updated_at->format('d M Y H:i') }}</small>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <small class="text-muted">Kriteria: {{ $doc->kriteria->nama_kriteria }} |
-                                        Tanggal: {{ $doc->updated_at->format('d M Y H:i') }}</small>
+                                        @endforeach
+                                        @else
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                            <p>Tidak ada dokumen yang menunggu validasi saat ini.</p>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
-                            @endforeach
-                        @else
-                            <div class="text-center py-4">
-                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                <p>Tidak ada dokumen yang menunggu validasi saat ini.</p>
                             </div>
-                        @endif
+                        </div>
+                    </div>
+
+            <div class="col-xl-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h4 class="card-title">Progress Dokumen PPEPP</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="documentProgressChart" style="width: 100%; height: 350px;"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Events Card -->
-        <div class="col-xl-4 mb-4">
-            <div class="card my-calendar h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title mb-0">Events</h4>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#addTaskModal">+ Tambah</a>
-                </div>
-                <div class="card-body schedules-cal">
-                    <input type="text" class="form-control d-none" id="datetimepicker1">
-                    <div class="events">
-                        <h6 class="mb-3">Daftar Events</h6>
-                        <div class="dz-scroll event-scroll">
-                            <div id="eventsList">
-                                @if(count($tasks ?? []) > 0)
-                                    @foreach($tasks as $task)
-                                        <div class="event-media" data-id="{{ $task['id'] }}" data-raw-date="{{ $task['rawDate'] }}" data-raw-time="{{ $task['rawTime'] }}">
-                                            <div class="d-flex align-items-center">
-                                                <div class="event-box">
-                                                    <h5 class="mb-0">{{ \Carbon\Carbon::parse($task['rawDate'])->format('d') }}</h5>
-                                                    <span>{{ \Carbon\Carbon::parse($task['rawDate'])->format('D') }}</span>
+            <div class="col-xl-4 mb-4">
+                <div class="card my-calendar h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Events</h4>
+                        <a href="javascript:void(0);" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#addTaskModal">+ Tambah</a>
+                    </div>
+                    <div class="card-body schedules-cal">
+                        <input type="text" class="form-control d-none" id="datetimepicker1">
+                        <div class="events">
+                            <h6 class="mb-3">Daftar Events</h6>
+                            <div class="dz-scroll event-scroll">
+                                <div id="eventsList">
+                                    @if (count($tasks ?? []) > 0)
+                                        @foreach ($tasks as $task)
+                                            <div class="event-media" data-id="{{ $task['id'] }}"
+                                                data-raw-date="{{ $task['rawDate'] }}"
+                                                data-raw-time="{{ $task['rawTime'] }}">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="event-box">
+                                                        <h5 class="mb-0">
+                                                            {{ \Carbon\Carbon::parse($task['rawDate'])->format('d') }}</h5>
+                                                        <span>{{ \Carbon\Carbon::parse($task['rawDate'])->format('D') }}</span>
+                                                    </div>
+                                                    <div class="event-data">
+                                                        <h5 class="mb-0">
+                                                            <a href="javascript:void(0);"
+                                                                class="{{ $task['status'] == 'completed' ? 'text-decoration-line-through' : '' }}">{{ $task['title'] }}</a>
+                                                        </h5>
+                                                        <span>{{ $task['date'] }}</span>
+                                                    </div>
                                                 </div>
-                                                <div class="event-data">
-                                                    <h5 class="mb-0">
-                                                        <a href="javascript:void(0);" class="{{ $task['status'] == 'completed' ? 'text-decoration-line-through' : '' }}">{{ $task['title'] }}</a>
-                                                    </h5>
-                                                    <span>{{ $task['date'] }}</span>
+                                                <div class="event-actions">
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input class="form-check-input task-checkbox" type="checkbox"
+                                                            role="switch" data-id="{{ $task['id'] }}"
+                                                            {{ $task['status'] == 'completed' ? 'checked' : '' }}>
+                                                    </div>
+                                                    <span
+                                                        class="event-time text-white bg-{{ $task['status'] == 'completed' ? 'success' : 'warning' }}">{{ $task['rawTime'] == '00:00' ? 'Sepanjang hari' : $task['rawTime'] }}</span>
                                                 </div>
                                             </div>
-                                            <div class="event-actions">
-                                                <div class="form-check form-switch mb-0">
-                                                    <input class="form-check-input task-checkbox" type="checkbox" role="switch" data-id="{{ $task['id'] }}" {{ $task['status'] == 'completed' ? 'checked' : '' }}>
-                                                </div>
-                                                <span class="event-time text-white bg-{{ $task['status'] == 'completed' ? 'success' : 'warning' }}">{{ $task['rawTime'] == '00:00' ? 'Sepanjang hari' : $task['rawTime'] }}</span>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
 
-                            <!-- Pesan jika tidak ada tugas -->
-                            <div id="noTasksMessage" class="text-center p-3 {{ count($tasks ?? []) > 0 ? 'd-none' : '' }}">
-                                <p class="text-muted mb-0">Belum ada events. Klik tombol + Tambah untuk menambahkan event baru.</p>
+                                <!-- Pesan jika tidak ada tugas -->
+                                <div id="noTasksMessage"
+                                    class="text-center p-3 {{ count($tasks ?? []) > 0 ? 'd-none' : '' }}">
+                                    <p class="text-muted mb-0">Belum ada events. Klik tombol + Tambah untuk menambahkan
+                                        event baru.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Main Content Row 2 -->
-    <div class="row">
-        <!-- Document Progress Chart -->
-        <div class="col-xl-12 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h4 class="card-title">Progress Dokumen PPEPP</h4>
-                </div>
-                <div class="card-body">
-                    <div id="documentProgressChart" style="width: 100%; height: 350px;"></div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Kriteria Progress -->
@@ -501,30 +514,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($kriteriaStats as $stat)
-                                <tr>
-                                    <td>{{ $stat['nama'] }}</td>
-                                    <td>{{ $stat['total'] }}</td>
-                                    <td>{{ $stat['verified'] }}</td>
-                                    <td>
-                                        @if($stat['pending'] > 0)
-                                            <span class="badge bg-warning">{{ $stat['pending'] }}</span>
-                                        @else
-                                            {{ $stat['pending'] }}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="progress" style="height: 6px; width: 80%">
-                                            <div class="progress-bar bg-success" style="width: {{ $stat['percentage'] }}%"></div>
-                                        </div>
-                                        <span class="ms-1">{{ $stat['percentage'] }}%</span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('kriteria.show', $stat['id']) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i> Lihat
-                                        </a>
-                                    </td>
-                                </tr>
+                                @foreach ($kriteriaStats as $stat)
+                                    <tr>
+                                        <td>{{ $stat['nama'] }}</td>
+                                        <td>{{ $stat['total'] }}</td>
+                                        <td>{{ $stat['verified'] }}</td>
+                                        <td>
+                                            @if ($stat['pending'] > 0)
+                                                <span class="badge bg-warning">{{ $stat['pending'] }}</span>
+                                            @else
+                                                {{ $stat['pending'] }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 6px; width: 80%">
+                                                <div class="progress-bar bg-success"
+                                                    style="width: {{ $stat['percentage'] }}%"></div>
+                                            </div>
+                                            <span class="ms-1">{{ $stat['percentage'] }}%</span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('kriteria.show', $stat['id']) }}"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Lihat
+                                            </a>
+                                        </td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
@@ -607,7 +622,7 @@
             if (totalDocs === 0) {
                 $('#documentStatusChart').html(
                     '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>'
-                    );
+                );
                 return;
             }
 
@@ -702,7 +717,7 @@
             if (!hasData) {
                 $('#documentProgressChart').html(
                     '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen yang tersedia</div>'
-                    );
+                );
                 return;
             }
 
@@ -763,7 +778,7 @@
                     shared: true,
                     intersect: false,
                     y: {
-                        formatter: function (y) {
+                        formatter: function(y) {
                             if (typeof y !== "undefined") {
                                 return y.toFixed(0) + " dokumen";
                             }
@@ -910,7 +925,9 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    data: JSON.stringify({ status: status }),
+                    data: JSON.stringify({
+                        status: status
+                    }),
                     processData: false,
                     success: function(response) {
                         // Update UI
@@ -979,7 +996,11 @@
 
             // Helper function to format date
             function formatDate(dateString) {
-                const options = { day: 'numeric', month: 'short', year: 'numeric' };
+                const options = {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                };
                 return new Date(dateString).toLocaleDateString('id-ID', options);
             }
         });
