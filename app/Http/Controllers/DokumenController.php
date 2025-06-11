@@ -250,11 +250,7 @@ class DokumenController extends Controller
 
         $request->validate([
             'dokumen' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
-            'deskripsi' => 'required|string|max:2000',
         ]);
-
-        // Update deskripsi
-        $dokumen->deskripsi_dokumen = $request->deskripsi;
 
         // Jika ada file baru
         if ($request->hasFile('dokumen') && $request->file('dokumen')->isValid()) {
@@ -603,7 +599,7 @@ class DokumenController extends Controller
 
         // Return the file with the original filename
         $originalFilename = $dokumen->nama_dokumen . '.' . $extension;
-        
+
         return response()->file(storage_path('app/public/' . $dokumen->path), [
             'Content-Type' => $contentType,
             'Content-Disposition' => 'inline; filename="' . $originalFilename . '"'
