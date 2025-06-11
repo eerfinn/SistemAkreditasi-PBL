@@ -4,7 +4,6 @@
 
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/bootstrap-daterangepicker/daterangepicker.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
 @endsection
@@ -63,19 +62,6 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="form-group">
-                                    <label class="form-label text-primary">Rentang Tanggal</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                        <input type="text" class="form-control input-daterange-datepicker" name="daterange"
-                                            value="{{ request('from_date') && request('to_date') ? request('from_date') . ' - ' . request('to_date') : '' }}"
-                                            placeholder="Filter berdasarkan tanggal" autocomplete="off">
-                                    </div>
-                                    <input type="hidden" name="from_date" id="from_date" value="{{ request('from_date') }}">
-                                    <input type="hidden" name="to_date" id="to_date" value="{{ request('to_date') }}">
                                 </div>
                             </div>
                         </div>
@@ -142,7 +128,7 @@
                                         @if($history->user)
                                             <div class="d-flex align-items-center">
                                                 @if($history->user->photo)
-                                                    <img src="{{ asset('storage/profile/' . $history->user->photo) }}" class="rounded-circle me-2" width="30" height="30" alt="">
+                                                    <img src="{{ asset('storage/profile/' . $history->user->photo) }}" class="rounded-circle me-2" width="30" height="30" alt="" style="object-fit: cover;">
                                                 @else
                                                     <div class="avatar avatar-sm me-2 bg-primary">
                                                         <span class="avatar-content">{{ substr($history->user->nama, 0, 1) }}</span>
@@ -308,7 +294,6 @@
 
 @section('vendor-script')
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
     <script src="{{ asset('assets/vendor/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.js') }}"></script>
 @endsection
@@ -322,52 +307,22 @@
             noneResultsText: 'Tidak ada hasil yang cocok {0}'
         });
 
-        // Initialize date range picker with better configuration
-        $('.input-daterange-datepicker').daterangepicker({
-            buttonClasses: ['btn', 'btn-sm'],
-            applyClass: 'btn-primary',
-            cancelClass: 'btn-light',
-            opens: 'left',
-            drops: 'auto',
-            showDropdowns: true,
-            autoUpdateInput: false,
-            locale: {
-                format: 'YYYY-MM-DD',
-                applyLabel: 'Terapkan',
-                cancelLabel: 'Batal',
-                daysOfWeek: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
-                monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-                firstDay: 1,
-                customRangeLabel: 'Pilih Rentang'
-            },
-            ranges: {
-               'Hari Ini': [moment(), moment()],
-               'Kemarin': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-               '7 Hari Terakhir': [moment().subtract(6, 'days'), moment()],
-               '30 Hari Terakhir': [moment().subtract(29, 'days'), moment()],
-               'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
-               'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            },
-            alwaysShowCalendars: true,
-            minYear: 2020,
-            maxYear: parseInt(moment().format('YYYY'), 10) + 1
-        });
-
-        // Handle date range picker events
-        $('.input-daterange-datepicker').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-            $('#from_date').val(picker.startDate.format('YYYY-MM-DD'));
-            $('#to_date').val(picker.endDate.format('YYYY-MM-DD'));
-
-            // Don't automatically submit the form when a date range is selected
-            // Let the user click the filter button instead
-            // $('#filter-form').submit();
-        });
-
-        $('.input-daterange-datepicker').on('cancel.daterangepicker', function(ev, picker) {
-            $(this).val('');
-            $('#from_date').val('');
-            $('#to_date').val('');
+        // Simple date validation
+        $('#filter-form').on('submit', function(e) {
+            const fromDate = $('#from_date').val();
+            const toDate = $('#to_date').val();
+            
+            // If both dates are provided, check that from_date is not after to_date
+            if (fromDate && toDate && fromDate > toDate) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Rentang Tanggal',
+                    text: 'Tanggal awal tidak boleh lebih besar dari tanggal akhir!',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
         });
 
         // Export Excel button click
