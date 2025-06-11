@@ -4,6 +4,7 @@
 
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -193,6 +194,7 @@
 
 @section('vendor-script')
     <script src="{{ asset('assets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.js') }}"></script>
 @endsection
 
 @push('scripts')
@@ -228,10 +230,42 @@
             e.stopPropagation();
         });
 
+        // Check if templates exist when dropdown is clicked
+        $('#downloadDropdown').on('click', function(e) {
+            if ($('#templateTable tbody tr').length === 0 || 
+                $('#templateTable tbody tr:first td:first').hasClass('dataTables_empty')) {
+                e.preventDefault();
+                e.stopPropagation();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak ada template',
+                    text: 'Belum ada dokumen template yang tersedia untuk diunduh.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6'
+                });
+                return false;
+            }
+        });
+
         // Improved download handling with loading overlay
         var loadingOverlay;
 
-        $('#downloadForm').on('submit', function() {
+        $('#downloadForm').on('submit', function(e) {
+            // Check if there are any templates first
+            if ($('#templateTable tbody tr').length === 0 || 
+                $('#templateTable tbody tr:first td:first').hasClass('dataTables_empty')) {
+                // Show alert if no templates exist
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak ada template',
+                    text: 'Belum ada dokumen template yang tersedia untuk diunduh.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6'
+                });
+                return false;
+            }
+
             // Create a loading overlay
             loadingOverlay = $('<div id="downloadOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.5); z-index: 9999;"><div class="spinner-border text-light" role="status"></div><div class="text-light ms-3"></div></div>');
             $('body').append(loadingOverlay);
