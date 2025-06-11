@@ -40,12 +40,9 @@ class Dokumen extends Model
         'path',
         'status',
         'validator_level',
-        'komentar',
-        'validated_at',
         'koordinator_validated_at',
         'direktur_validated_at',
         'is_admin_upload',
-        'deskripsi_dokumen',
     ];
 
     public function user(): BelongsTo

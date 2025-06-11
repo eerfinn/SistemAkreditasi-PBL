@@ -271,7 +271,7 @@
                                                 @endif
                                             </div>
                                             <div class="progress mb-2" style="height: 10px;">
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $kriteria['percentage'] }}%;" 
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $kriteria['percentage'] }}%;"
                                                     aria-valuenow="{{ $kriteria['percentage'] }}" aria-valuemin="0" aria-valuemax="100">
                                                 </div>
                                             </div>
@@ -299,67 +299,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Calendar and Tasks Row -->
-    <div class="row">
-        <!-- Calendar -->
-        <div class="col-xl-8 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Kalender Kegiatan</h4>
-                </div>
-                <div class="card-body">
-                    <div id="calendar"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Tasks -->
-        <div class="col-xl-4 mb-4">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title">Tugas Saya</h4>
-                    <a href="{{ route('tugas.index') }}" class="btn btn-sm btn-primary">Kelola</a>
-                </div>
-                <div class="card-body">
-                    @if(isset($tasks) && count($tasks) > 0)
-                        <div class="task-list">
-                            @foreach($tasks as $task)
-                                <div class="task-item d-flex align-items-center justify-content-between p-3 border-bottom">
-                                    <div>
-                                        <h6 class="mb-1">{{ $task['title'] }}</h6>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-calendar-day text-primary me-2"></i>
-                                            <small>{{ $task['date'] }}</small>
-                                            @if($task['rawTime'])
-                                                <i class="fas fa-clock text-info ms-3 me-2"></i>
-                                                <small>{{ $task['rawTime'] }}</small>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div>
-                                        @if($task['status'] === 'selesai')
-                                            <span class="badge light badge-success">Selesai</span>
-                                        @elseif($task['status'] === 'berlangsung')
-                                            <span class="badge light badge-warning">Berlangsung</span>
-                                        @else
-                                            <span class="badge light badge-danger">Belum Dimulai</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-tasks text-muted fa-3x mb-3"></i>
-                            <h5>Belum ada tugas</h5>
-                            <p class="text-muted">Tambahkan tugas baru untuk mengatur jadwal Anda</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @section('vendor-script')
@@ -367,7 +306,6 @@
     <script src="{{ asset('assets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins-init/datatables.init.js') }}"></script>
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/fullcalendar/js/main.min.js') }}"></script>
 @endsection
 
 @section('page-script')
@@ -430,12 +368,12 @@
             for (let i = 0; i < particlesArray.length; i++) {
                 particlesArray[i].update();
                 particlesArray[i].draw();
-                
+
                 for (let j = i; j < particlesArray.length; j++) {
                     const dx = particlesArray[i].x - particlesArray[j].x;
                     const dy = particlesArray[i].y - particlesArray[j].y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    
+
                     if (distance < maxDistance) {
                         ctx.beginPath();
                         ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance/maxDistance})`;
@@ -455,8 +393,8 @@
         // Document Status Chart
         const documentStatusOptions = {
             series: [
-                {{ $verifiedDocuments }}, 
-                {{ $pendingDocuments }}, 
+                {{ $verifiedDocuments }},
+                {{ $pendingDocuments }},
                 {{ $revisionDocuments }}
             ],
             chart: {
@@ -483,30 +421,6 @@
 
         const documentStatusChart = new ApexCharts(document.querySelector("#documentStatusChart"), documentStatusOptions);
         documentStatusChart.render();
-
-        // Calendar
-        if (document.getElementById('calendar')) {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                initialView: 'dayGridMonth',
-                events: @json($calendarEvents ?? []),
-                editable: false,
-                selectable: true,
-                dayMaxEvents: true,
-                themeSystem: 'bootstrap',
-                eventClick: function(info) {
-                    if (info.event.extendedProps.type === 'task') {
-                        // Handle task click if needed
-                    }
-                }
-            });
-            calendar.render();
-        }
     });
 </script>
-@endsection 
+@endsection
