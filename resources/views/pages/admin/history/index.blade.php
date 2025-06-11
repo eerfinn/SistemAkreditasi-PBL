@@ -307,24 +307,6 @@
             noneResultsText: 'Tidak ada hasil yang cocok {0}'
         });
 
-        // Simple date validation
-        $('#filter-form').on('submit', function(e) {
-            const fromDate = $('#from_date').val();
-            const toDate = $('#to_date').val();
-            
-            // If both dates are provided, check that from_date is not after to_date
-            if (fromDate && toDate && fromDate > toDate) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error Rentang Tanggal',
-                    text: 'Tanggal awal tidak boleh lebih besar dari tanggal akhir!',
-                    confirmButtonText: 'OK'
-                });
-                return false;
-            }
-        });
-
         // Export Excel button click
         $('a[href*="admin.history.export"]').on('click', function(e) {
             Swal.fire({
