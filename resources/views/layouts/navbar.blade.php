@@ -2,7 +2,7 @@
     Nav header start
 ***********************************-->
 <div class="nav-header">
-    <a href="{{ url('/') }}" class="brand-logo">
+    <a href="{{ url('/dashboard') }}" class="brand-logo">
         <img src="{{ asset('assets/images/Jti_polinema.png') }}" class="logo-abbr" alt="Polinema Logo" style="height: 40px;">
         <span class="brand-title" style="font-weight: bold; font-size: 1.4rem; color: white;">SiAkred</span>
     </a>
