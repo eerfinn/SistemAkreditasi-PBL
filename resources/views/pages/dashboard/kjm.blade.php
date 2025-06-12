@@ -848,7 +848,7 @@
                 yaxis: { title: { text: 'Jumlah Dokumen' } },
                 colors: ['#6366f1', '#10b981'],
                 fill: { opacity: 1 },
-                legend: { position: 'top', horizontalAlign: 'center' },
+                legend: { position: 'top', horizontalAlign: 'center' },e
                 tooltip: { y: { formatter: function (val) { return val + " dokumen" } } }
             };
             new ApexCharts(document.querySelector("#documentProgressChart"), options).render();
