@@ -588,9 +588,8 @@
 @endsection
 
 @section('page-script')
-    {{-- Copied and adapted from dosen.blade.php --}}
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Initialize datetimepicker
             if ($("#datetimepicker1").length > 0) {
                 $('#datetimepicker1').datetimepicker({
@@ -611,247 +610,225 @@
                 });
             }
 
-            const tasksData = {!! isset($tasks) ? json_encode($tasks) : '[]' !!};
-            if (tasksData && tasksData.length > 0) {
-                tasksData.forEach(task => {
-                    if (typeof task.id === 'number' && task.id > 0) {
-                        addTaskToUI(task);
-                    }
-                });
-                $('#noTasksMessage').addClass('d-none');
-            } else {
-                $('#noTasksMessage').removeClass('d-none');
+            // Network animation on welcome banner
+            const canvas = document.getElementById('networkCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+
+            const particles = [];
+            const particleCount = 80;
+            const maxDistance = 100;
+            const sizeVariation = 2;
+
+            function Particle(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * sizeVariation + 0.1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
             }
 
-            $(document).on('eventsUpdated', function(e, updatedEvents) {
-                $('#eventsList').empty();
-                if (updatedEvents && updatedEvents.length > 0) {
-                    updatedEvents.forEach(event => {
-                        if (typeof event.id === 'number' && event.id > 0) {
-                            const formattedTask = {
-                                id: event.id,
-                                title: event.judul,
-                                rawDate: event.tanggal,
-                                rawTime: event.waktu || '00:00',
-                                status: event.status || 'pending'
-                            };
-                            addTaskToUI(formattedTask);
-                        }
-                    });
-                    $('#noTasksMessage').addClass('d-none');
-                } else {
-                    $('#noTasksMessage').removeClass('d-none');
+            Particle.prototype.update = function() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+            };
+
+            Particle.prototype.draw = function() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            function createParticles() {
+                for (let i = 0; i < particleCount; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    particles.push(new Particle(x, y));
                 }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw connections
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < maxDistance) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Update and draw particles
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+
+                requestAnimationFrame(animateParticles);
+            }
+
+            createParticles();
+            animateParticles();
+
+            // Responsive canvas
+            window.addEventListener('resize', function() {
+                canvas.width = canvas.parentElement.offsetWidth;
+                canvas.height = canvas.parentElement.offsetHeight;
             });
 
-            const canvas = document.getElementById('networkCanvas');
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                let width = canvas.width = canvas.offsetWidth;
-                let height = canvas.height = canvas.offsetHeight;
+            // Initialize charts
+            setTimeout(ensureChartsRendered, 500);
 
-                window.addEventListener('resize', function() {
-                    width = canvas.width = canvas.offsetWidth;
-                    height = canvas.height = canvas.offsetHeight;
-                });
-
-                const particleCount = 30;
-                const particles = [];
-                const connectionDistance = 100;
-                let mouse = { x: width / 2, y: height / 2, active: false };
-
-                canvas.addEventListener('mousemove', function(e) {
-                    const rect = canvas.getBoundingClientRect();
-                    mouse.x = e.clientX - rect.left;
-                    mouse.y = e.clientY - rect.top;
-                    mouse.active = true;
-                });
-                canvas.addEventListener('mouseleave', function() { mouse.active = false; });
-
-                class Particle {
-                    constructor() {
-                        this.x = Math.random() * width;
-                        this.y = Math.random() * height;
-                        this.vx = (Math.random() - 0.5) * 0.8;
-                        this.vy = (Math.random() - 0.5) * 0.8;
-                        this.radius = Math.random() * 2 + 1;
-                        this.color = 'rgba(255, 255, 255, 0.6)';
-                    }
-                    update() {
-                        this.x += this.vx; this.y += this.vy;
-                        if (this.x < 0 || this.x > width) this.vx = -this.vx;
-                        if (this.y < 0 || this.y > height) this.vy = -this.vy;
-                        if (mouse.active) {
-                            const dx = mouse.x - this.x; const dy = mouse.y - this.y;
-                            const dist = Math.sqrt(dx * dx + dy * dy);
-                            if (dist < 120) {
-                                const angle = Math.atan2(dy, dx);
-                                const force = (120 - dist) / 120;
-                                this.vx -= Math.cos(angle) * force * 0.2;
-                                this.vy -= Math.sin(angle) * force * 0.2;
-                            }
-                        }
-                        this.vx = Math.max(Math.min(this.vx, 2), -2);
-                        this.vy = Math.max(Math.min(this.vy, 2), -2);
-                    }
-                    draw() {
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                        ctx.fillStyle = this.color;
-                        ctx.fill();
-                    }
+            // Function to render document status chart
+            function renderDocumentStatusChart() {
+                if (typeof ApexCharts === 'undefined') {
+                    console.error("ApexCharts is not defined");
+                    return;
                 }
-                for (let i = 0; i < particleCount; i++) particles.push(new Particle());
-
-                function animate() {
-                    ctx.clearRect(0, 0, width, height);
-                    particles.forEach(particle => { particle.update(); particle.draw(); });
-                    ctx.beginPath();
-                    for (let i = 0; i < particles.length; i++) {
-                        for (let j = i + 1; j < particles.length; j++) {
-                            const dx = particles[i].x - particles[j].x;
-                            const dy = particles[i].y - particles[j].y;
-                            const dist = Math.sqrt(dx * dx + dy * dy);
-                            if (dist < connectionDistance) {
-                                const opacity = 1 - (dist / connectionDistance);
-                                ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.5})`;
-                                ctx.lineWidth = 1;
-                                ctx.moveTo(particles[i].x, particles[i].y);
-                                ctx.lineTo(particles[j].x, particles[j].y);
-                            }
-                        }
-                    }
-                    ctx.stroke();
-                    requestAnimationFrame(animate);
+                const totalDocs = {{ $totalDocuments ?? 0 }};
+                if (totalDocs === 0) {
+                    $('#documentStatusChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen tersedia</div>');
+                    return;
                 }
-                animate();
+                const options = {
+                    series: [ {{ $verifiedDocuments ?? 0 }}, {{ $pendingDocuments ?? 0 }}, {{ $revisionDocuments ?? 0 }}, {{ $draftDocuments ?? 0 }} ],
+                    chart: { type: 'donut', height: 250, fontFamily: 'inherit' },
+                    labels: ['Terverifikasi', 'Menunggu', 'Revisi', 'Draft'],
+                    colors: ['#10b981', '#f59e0b', '#ef4444', '#6366f1'],
+                    plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'Total' } } } } },
+                    dataLabels: { enabled: false },
+                    legend: { position: 'bottom' },
+                    tooltip: { enabled: true, fillSeriesColor: false }
+                };
+                new ApexCharts(document.querySelector("#documentStatusChart"), options).render();
             }
 
-            // Chart rendering functions (ensure variables are passed from controller)
-            renderDocumentStatusChart();
-            renderDocumentProgressChart();
+            // Function to render document progress chart
+            function renderDocumentProgressChart() {
+                if (typeof ApexCharts === 'undefined') {
+                    console.error("ApexCharts is not defined");
+                    return;
+                }
+                const ppeppTotal = {!! isset($ppepp_total) ? json_encode($ppepp_total) : '[0,0,0,0,0]' !!};
+                const ppeppVerified = {!! isset($ppepp_verified) ? json_encode($ppepp_verified) : '[0,0,0,0,0]' !!};
+                const hasData = ppeppTotal.some(value => value > 0);
 
-            // Event/Task handling (copied from dosen.blade.php, ensure routes are correct for Kaprodi if different)
-            // addTaskToUI, saveTaskBtn, edit-task, updateTaskBtn, delete-task, task-checkbox logic
-            // ... (Full event handling script from dosen.blade.php) ...
-            // NOTE: For brevity, the full AJAX event handling script is not repeated here but should be copied
-            // from dosen.blade.php's page-script section and adapted if necessary.
-            // Ensure {{ route('tugas.store') }}, /tugas/${taskId}, etc. are appropriate for Kaprodi.
-
-            // Placeholder for the full event/task handling script from dosen.blade.php
-            // This includes addTaskToUI, saveTaskBtn, edit-task, updateTaskBtn, delete-task, task-checkbox logic
-            // Ensure all AJAX URLs and CSRF tokens are correctly handled.
-            function addTaskToUI(task) {
-                const date = new Date(task.rawDate);
-                const day = date.getDate().toString().padStart(2, '0');
-                const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-                const dayName = dayNames[date.getDay()];
-                const time = task.rawTime || '00:00';
-                const timeDisplay = time === '00:00' ? 'Sepanjang hari' : time;
-                let statusClass = task.status === 'completed' ? 'success' : 'warning';
-
-                const eventHtml = `
-                <div class="event-media" data-id="${task.id}" data-raw-date="${task.rawDate}" data-raw-time="${task.rawTime}">
-                    <div class="d-flex align-items-center">
-                        <div class="event-box">
-                            <h5 class="mb-0">${day}</h5>
-                            <span>${dayName}</span>
-                        </div>
-                        <div class="event-data">
-                            <h5 class="mb-0">
-                                <a href="javascript:void(0);" class="${task.status === 'completed' ? 'text-decoration-line-through' : ''}">${task.title}</a>
-                            </h5>
-                            <span>${formatDate(task.rawDate)}</span>
-                        </div>
-                    </div>
-                    <div class="event-actions">
-                        <div class="form-check form-switch mb-0">
-                            <input class="form-check-input task-checkbox" type="checkbox" role="switch" data-id="${task.id}" ${task.status === 'completed' ? 'checked' : ''}>
-                        </div>
-                        <span class="event-time text-white bg-${statusClass}">${timeDisplay}</span>
-                    </div>
-                </div>`;
-                $('#eventsList').append(eventHtml);
-                $('#noTasksMessage').addClass('d-none');
+                if (!hasData) {
+                    $('#documentProgressChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada data progress dokumen</div>');
+                    return;
+                }
+                const options = {
+                    series: [{ name: 'Total Dokumen', data: ppeppTotal }, { name: 'Dokumen Terverifikasi', data: ppeppVerified }],
+                    chart: { type: 'bar', height: 300, fontFamily: 'inherit', toolbar: { show: false } },
+                    plotOptions: { bar: { horizontal: false, columnWidth: '60%', borderRadius: 5 } },
+                    dataLabels: { enabled: true, offsetY: -20, style: { fontSize: '12px', colors: ["#304758"] } },
+                    stroke: { show: true, width: 2, colors: ['transparent'] },
+                    xaxis: { categories: ['Penetapan', 'Pelaksanaan', 'Evaluasi', 'Pengendalian', 'Peningkatan'] },
+                    yaxis: { title: { text: 'Jumlah Dokumen' } },
+                    colors: ['#6366f1', '#10b981'],
+                    fill: { opacity: 1 },
+                    legend: { position: 'top', horizontalAlign: 'center' },
+                    tooltip: { y: { formatter: function (val) { return val + " dokumen" } } }
+                };
+                new ApexCharts(document.querySelector("#documentProgressChart"), options).render();
             }
 
-             $('#saveTaskBtn').click(function() {
+            // Event handling for task creation
+            $('#saveTaskBtn').click(function() {
                 const title = $('#taskTitle').val().trim();
                 const date = $('#taskDate').val();
                 const time = $('#taskTime').val() || '00:00';
                 const addToCalendar = $('#addToCalendar').is(':checked');
-                if (!title || !date) { alert('Judul dan tanggal harus diisi!'); return; }
 
+                if (!title || !date) {
+                    alert('Judul dan tanggal harus diisi!');
+                    return;
+                }
+
+                // Kirim data ke server menggunakan AJAX
                 $.ajax({
-                    url: '{{ route('tugas.store') }}', // Make sure this route is appropriate for Kaprodi
+                    url: '{{ route('tugas.store') }}',
                     type: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    data: JSON.stringify({ judul: title, tanggal: date, waktu: time, show_in_calendar: addToCalendar }),
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    data: JSON.stringify({
+                        judul: title,
+                        tanggal: date,
+                        waktu: time,
+                        show_in_calendar: addToCalendar
+                    }),
                     processData: false,
                     success: function(response) {
-                        const newTask = { id: response.id, title: title, rawDate: date, rawTime: time, status: 'pending', show_in_calendar: addToCalendar };
-                        addTaskToUI(newTask);
-                        // Add to FullCalendar if integrated
+                        console.log('Success response:', response);
+
+                        // Format tanggal untuk tampilan
+                        const displayDate = moment(date).format('D MMM YYYY');
+                        const formattedDay = moment(date).format('D');
+                        const formattedMonth = moment(date).format('MMM');
+
+                        // Buat HTML untuk event baru
+                        const eventHtml = `
+                            <div class="event-media" data-id="${response.id}" data-raw-date="${date}" data-raw-time="${time}">
+                                <div class="event-box">
+                                    <h5>${formattedDay}</h5>
+                                    <span>${formattedMonth}</span>
+                                </div>
+                                <div class="event-data">
+                                    <h5><a href="javascript:void(0);">${title}</a></h5>
+                                    <span>Oleh: {{ auth()->user()->nama }}</span>
+                                </div>
+                                <div class="event-actions">
+                                    <span class="event-time bg-light">${time}</span>
+                                </div>
+                            </div>
+                        `;
+
+                        // Tambahkan ke UI
+                        $('#eventsList').prepend(eventHtml);
+
+                        // Sembunyikan pesan "tidak ada events"
+                        $('.text-center.p-3').addClass('d-none');
+
+                        // Reset form dan tutup modal
                         $('#addTaskForm')[0].reset();
                         $('#addTaskModal').modal('hide');
                     },
-                    error: function(xhr) { console.error('Error:', xhr); alert('Gagal menyimpan event.'); }
+                    error: function(xhr) {
+                        console.error('Error response:', xhr);
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            let errorMessage = 'Terjadi kesalahan:';
+                            for (const key in errors) {
+                                errorMessage += '\n- ' + errors[key][0];
+                            }
+                            alert(errorMessage);
+                        } else {
+                            alert('Terjadi kesalahan saat menyimpan event.');
+                        }
+                    }
                 });
             });
-
-            // Edit, Update, Delete, Toggle Status logic should be copied and adapted from dosen.blade.php
-
-            function formatDate(dateString) {
-                const options = { day: 'numeric', month: 'short', year: 'numeric' };
-                return new Date(dateString).toLocaleDateString('id-ID', options);
-            }
         });
-
-        // Chart rendering functions (ensure variables are passed from controller)
-        function renderDocumentStatusChart() {
-            if (typeof ApexCharts === 'undefined') { console.error("ApexCharts is not defined"); return; }
-            const totalDocs = {{ $totalDocuments ?? 0 }};
-            if (totalDocs === 0) {
-                $('#documentStatusChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada dokumen tersedia</div>');
-                return;
-            }
-            const options = {
-                series: [ {{ $verifiedDocuments ?? 0 }}, {{ $pendingDocuments ?? 0 }}, {{ $revisionDocuments ?? 0 }}, {{ $draftDocuments ?? 0 }} ],
-                chart: { type: 'donut', height: 250, fontFamily: 'inherit' },
-                labels: ['Terverifikasi', 'Menunggu', 'Revisi', 'Draft'],
-                colors: ['#10b981', '#f59e0b', '#ef4444', '#6366f1'],
-                plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'Total' } } } } },
-                dataLabels: { enabled: false },
-                legend: { position: 'bottom' },
-                tooltip: { enabled: true, fillSeriesColor: false }
-            };
-            new ApexCharts(document.querySelector("#documentStatusChart"), options).render();
-        }
-
-        function renderDocumentProgressChart() {
-            if (typeof ApexCharts === 'undefined') { console.error("ApexCharts is not defined"); return; }
-            const ppeppTotal = {!! isset($ppepp_total) ? json_encode($ppepp_total) : '[0,0,0,0,0]' !!};
-            const ppeppVerified = {!! isset($ppepp_verified) ? json_encode($ppepp_verified) : '[0,0,0,0,0]' !!};
-            const hasData = ppeppTotal.some(value => value > 0);
-
-            if (!hasData) {
-                $('#documentProgressChart').html('<div class="d-flex align-items-center justify-content-center h-100 text-muted">Tidak ada data progress dokumen</div>');
-                return;
-            }
-            const options = {
-                series: [{ name: 'Total Dokumen', data: ppeppTotal }, { name: 'Dokumen Terverifikasi', data: ppeppVerified }],
-                chart: { type: 'bar', height: 300, fontFamily: 'inherit', toolbar: { show: false } },
-                plotOptions: { bar: { horizontal: false, columnWidth: '60%', borderRadius: 5 } },
-                dataLabels: { enabled: true, offsetY: -20, style: { fontSize: '12px', colors: ["#304758"] } },
-                stroke: { show: true, width: 2, colors: ['transparent'] },
-                xaxis: { categories: ['Penetapan', 'Pelaksanaan', 'Evaluasi', 'Pengendalian', 'Peningkatan'] },
-                yaxis: { title: { text: 'Jumlah Dokumen' } },
-                colors: ['#6366f1', '#10b981'],
-                fill: { opacity: 1 },
-                legend: { position: 'top', horizontalAlign: 'center' },e
-                tooltip: { y: { formatter: function (val) { return val + " dokumen" } } }
-            };
-            new ApexCharts(document.querySelector("#documentProgressChart"), options).render();
-        }
     </script>
 @endsection
