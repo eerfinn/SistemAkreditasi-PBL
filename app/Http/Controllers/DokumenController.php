@@ -191,16 +191,23 @@ class DokumenController extends Controller
             return back()->with('error', 'Hanya dokumen draft yang dapat dihapus.');
         }
 
+        // Store document info before deletion
         $kriteriaId = $dokumen->kriteria_id;
         $dokumenName = $dokumen->nama_dokumen;
         $userId = $dokumen->user_id;
         $kriteria = Kriteria::find($kriteriaId);
+        $ppepp = $dokumen->jenis_ppepp;
 
         // File fisik akan otomatis terhapus oleh event 'deleting' di model Dokumen
         $dokumen->delete();
 
-        // Catat aktivitas penghapusan dokumen draft
-        $this->historyService->recordDelete($dokumen);
+        // Catat aktivitas penghapusan dokumen draft setelah dokumen dihapus
+        $this->historyService->record(
+            "Menghapus dokumen: {$dokumenName}",
+            null, // No document reference since it's deleted
+            null, // Use current user
+            $kriteria
+        );
 
         Log::info('Dokumen draft dihapus', ['dokumen_id' => $dokumen->id]);
 
@@ -214,7 +221,8 @@ class DokumenController extends Controller
             'link' => "/kriteria/{$kriteriaId}"
         ]);
 
-        return redirect()->route('kriteria.show', $kriteriaId)
+        // Redirect back to the document management page
+        return redirect()->route('kriteria.upload.form', ['kriteria' => $kriteriaId, 'ppepp' => $ppepp])
                          ->with('success', 'Dokumen draft berhasil dihapus.');
     }
 

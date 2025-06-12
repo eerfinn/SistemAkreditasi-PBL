@@ -49,24 +49,19 @@ class UserController extends Controller
             'username' => 'required|string|unique:users',
             'email' => 'nullable|email|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur',
-            'kriteria_access' => 'nullable|array',
-            'kriteria_access.*' => 'integer|exists:kriteria,id',
+            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur,direktur',
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
 
-        // Administrators don't need explicit kriteria access
+        // Set kriteria access based on role
         if ($validated['role'] === 'administrator') {
             $validated['kriteria_access'] = null;
-        }
-        // Only dosen need specific kriteria access
-        else if ($validated['role'] === 'dosen') {
-            // For dosen, set the kriteria access as provided
-            $validated['kriteria_access'] = $request->kriteria_access ?? null;
-        }
-        // For all other roles, give access to all kriteria
-        else {
+        } else if ($validated['role'] === 'dosen') {
+            // For new dosen, start with no kriteria access
+            $validated['kriteria_access'] = [];
+        } else {
+            // For all other roles, give access to all kriteria
             $allKriteriaIds = Kriteria::pluck('id')->toArray();
             $validated['kriteria_access'] = $allKriteriaIds;
         }
@@ -74,12 +69,10 @@ class UserController extends Controller
         $user = User::create($validated);
 
         if ($request->ajax()) {
-            $allKriteria = Kriteria::all(['id', 'nama_kriteria']);
             return response()->json([
                 'success' => true,
                 'message' => 'User created successfully.',
-                'user' => $user,
-                'allKriteria' => $allKriteria
+                'user' => $user
             ]);
         }
 
@@ -93,7 +86,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur','direktur'];
+        $roles = ['administrator', 'dosen', 'koordinator', 'kjm', 'kaprodi', 'kajur', 'direktur'];
         $kriteria = Kriteria::all();
         return view('pages.admin.users.edit', compact('user', 'roles', 'kriteria'));
     }
@@ -104,7 +97,7 @@ class UserController extends Controller
             'nama' => 'required|string|max:255',
             'username' => 'required|string|unique:users,username,' . $user->id,
             'email' => 'nullable|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur', 'direktur',
+            'role' => 'required|in:administrator,dosen,koordinator,kjm,kaprodi,kajur,direktur',
             'kriteria_access' => 'nullable|array',
             'kriteria_access.*' => 'integer|exists:kriteria,id',
         ]);

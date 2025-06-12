@@ -72,6 +72,7 @@
                             <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
                                 <option value="">Select Role</option>
                                 <option value="administrator" {{ old('role') == 'administrator' ? 'selected' : '' }}>Administrator</option>
+                                <option value="direktur" {{ old('role') == 'direktur' ? 'selected' : '' }}>Direktur</option>
                                 <option value="dosen" {{ old('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
                                 <option value="koordinator" {{ old('role') == 'koordinator' ? 'selected' : '' }}>Koordinator</option>
                                 <option value="kjm" {{ old('role') == 'kjm' ? 'selected' : '' }}>KJM</option>
@@ -86,23 +87,11 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3" id="kriteria-access-container" style="display: {{ old('role') === 'dosen' ? 'block' : 'none' }};">
-                            <label for="kriteria_access">Kriteria Access</label>
+                        <div class="mb-3" id="dosen-info" style="display: none;">
+                            <label>Kriteria Access</label>
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i> Kriteria access hanya berlaku untuk dosen. Role lain secara otomatis memiliki akses ke semua kriteria.
+                                <i class="fas fa-info-circle"></i> Kriteria access untuk dosen dikelola melalui fitur "Manage Dosen Criteria Access" pada halaman utama pengguna.
                             </div>
-                            <select class="form-control select2" id="kriteria-access" name="kriteria_access[]" multiple>
-                                @foreach($kriteria as $k)
-                                    <option value="{{ $k->id }}" {{ is_array(old('kriteria_access')) && in_array($k->id, old('kriteria_access')) ? 'selected' : '' }}>
-                                        {{ $k->nama_kriteria }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('kriteria_access')
-                                <span class="text-danger">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
                         </div>
 
                         <div class="d-flex justify-content-between">
@@ -123,14 +112,19 @@
         // Initialize Select2
         $('.select2').select2();
         
-        // Show/hide kriteria access based on role
+        // Show/hide dosen info based on role
         $('#role').change(function() {
             if ($(this).val() === 'dosen') {
-                $('#kriteria-access-container').show();
+                $('#dosen-info').show();
             } else {
-                $('#kriteria-access-container').hide();
+                $('#dosen-info').hide();
             }
         });
+
+        // Check initial value on page load
+        if ($('#role').val() === 'dosen') {
+            $('#dosen-info').show();
+        }
     });
 </script>
 @endpush

@@ -199,6 +199,10 @@
             background-color: #e9f5fe;
             color: #2196f3;
         }
+        .role-direktur {
+            background-color: #e9f5fe;
+            color: #2196f3;
+        }
         .role-koordinator, .role-kjm, .role-kaprodi, .role-kajur, .role-kps {
             background-color: #e3f9f7;
             color: #17a2b8;
@@ -391,6 +395,7 @@
                         <select class="form-control" id="role" name="role" required>
                             <option value="">Select Role</option>
                             <option value="administrator">Administrator</option>
+                            <option value="direktur">Direktur</option>
                             <option value="dosen">Dosen</option>
                             <option value="koordinator">Koordinator</option>
                             <option value="kjm">KJM</option>
@@ -401,20 +406,9 @@
                         <span class="invalid-feedback" role="alert" id="role-error"></span>
                     </div>
 
-                    <div id="kriteria-access-container" style="display: none;">
-                        <div class="form-group">
-                            <label class="form-label">Kriteria Access</label>
-                            <div class="alert alert-info mb-3">
-                                <i class="fas fa-info-circle"></i> Kriteria access hanya berlaku untuk dosen. Role lain secara otomatis memiliki akses ke semua kriteria.
-                            </div>
-                            <select class="form-control select2" id="kriteria-access" name="kriteria_access[]" multiple>
-                                @foreach(App\Models\Kriteria::all() as $kriteria)
-                                <option value="{{ $kriteria->id }}">
-                                    {{ $kriteria->nama_kriteria }}
-                                </option>
-                                @endforeach
-                            </select>
-                            <span class="invalid-feedback" role="alert" id="kriteria_access-error"></span>
+                    <div id="dosen-info" style="display: none;">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i> Kriteria access untuk dosen dapat dikelola setelah user dibuat melalui fitur "Manage Dosen Criteria Access".
                         </div>
                     </div>
                 </div>
@@ -471,6 +465,7 @@
                         <select class="form-control" id="edit-role" name="role" required>
                             <option value="">Select Role</option>
                             <option value="administrator">Administrator</option>
+                            <option value="direktur">Direktur</option>
                             <option value="dosen">Dosen</option>
                             <option value="koordinator">Koordinator</option>
                             <option value="kjm">KJM</option>
@@ -666,9 +661,9 @@ $(document).ready(function() {
     // Show/hide kriteria access based on role in Add form
     $('#role').change(function() {
         if ($(this).val() === 'dosen') {
-            $('#kriteria-access-container').show();
+            $('#dosen-info').show();
         } else {
-            $('#kriteria-access-container').hide();
+            $('#dosen-info').hide();
         }
     });
     
@@ -1216,7 +1211,7 @@ $(document).ready(function() {
         // Reset forms when modal is closed
         if ($modal.attr('id') === 'addUserModal') {
             $('#addUserForm')[0].reset();
-            $('#kriteria-access-container').hide();
+            $('#dosen-info').hide();
         } else if ($modal.attr('id') === 'editUserModal') {
             $('#editUserForm')[0].reset();
             $('#edit-dosen-info').hide();
@@ -1253,7 +1248,7 @@ $(document).ready(function() {
     // Reset forms when modals are hidden
     $('#addUserModal').on('hidden.bs.modal', function () {
         $('#addUserForm')[0].reset();
-        $('#kriteria-access-container').hide();
+        $('#dosen-info').hide();
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').text('');
     });

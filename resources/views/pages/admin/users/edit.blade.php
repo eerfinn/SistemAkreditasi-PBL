@@ -73,6 +73,7 @@
                             <select class="form-control @error('role') is-invalid @enderror" id="edit-role" name="role" required>
                                 <option value="">Select Role</option>
                                 <option value="administrator" {{ old('role', $user->role) == 'administrator' ? 'selected' : '' }}>Administrator</option>
+                                <option value="direktur" {{ old('role', $user->role) == 'direktur' ? 'selected' : '' }}>Direktur</option>
                                 <option value="dosen" {{ old('role', $user->role) == 'dosen' ? 'selected' : '' }}>Dosen</option>
                                 <option value="koordinator" {{ old('role', $user->role) == 'koordinator' ? 'selected' : '' }}>Koordinator</option>
                                 <option value="kjm" {{ old('role', $user->role) == 'kjm' ? 'selected' : '' }}>KJM</option>
