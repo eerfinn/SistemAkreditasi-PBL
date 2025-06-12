@@ -5,6 +5,44 @@
 @section('vendor-style')
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/kriteria.css') }}" rel="stylesheet">
+    <style>
+        .comment-item {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            margin-bottom: 15px;
+            border-left: 4px solid #6c757d;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .comment-item:hover {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            border-left-color: #5a5a5a;
+        }
+        .comment-content {
+            margin-top: 10px;
+            padding-left: 45px;
+            color: #333;
+            line-height: 1.5;
+        }
+        .comment-avatar img {
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .comment-delete-btn {
+            opacity: 0.6;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+        .comment-delete-btn:hover {
+            opacity: 1;
+            transform: scale(1.15);
+            box-shadow: none !important;
+        }
+        .comment-delete-btn:focus {
+            box-shadow: none !important;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -313,6 +351,18 @@
                                                 class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
                                             <small
                                                 class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                                            
+                                            {{-- Delete button - only visible to comment owner --}}
+                                            @if(auth()->check() && auth()->user()->id === $comment->user_id)
+                                                <form action="{{ route('validasi.delete-comment', ['komen' => $comment->id]) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus komentar ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-2 comment-delete-btn" title="Hapus komentar">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                         <p class="mb-0 comment-content">{{ $comment->komentar }}</p>
                                     </div>
@@ -324,8 +374,8 @@
                             </div>
                         @endif
 
-                        <!-- Comment Form - Visible to admins, coordinators, kajur, and kaprodi -->
-                        @if (auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'kajur', 'kaprodi']))
+                        <!-- Comment Form - Visible to admins, coordinators, direktur, kajur, and kaprodi -->
+                        @if (auth()->user() && in_array(auth()->user()->role, ['administrator', 'koordinator', 'kajur', 'kaprodi', 'direktur']))
                             <form action="{{ route('validasi.kriteria-comment', $kriteria->id) }}" method="POST">
                                 @csrf
                                 <div class="mb-3">

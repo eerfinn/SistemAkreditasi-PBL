@@ -134,6 +134,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(ValidasiController::class)->prefix('validasi')->name('validasi.')->middleware('kriteria.access')->group(function () {
         Route::post('/{dokumen}/update-status', 'updateStatus')->name('update-status');
         Route::post('/kriteria/{kriteria}/comment', 'addKriteriaComment')->name('kriteria-comment');
+        Route::delete('/comment/{komen}', 'deleteComment')->name('delete-comment');
     });
 
     // Task Management Routes

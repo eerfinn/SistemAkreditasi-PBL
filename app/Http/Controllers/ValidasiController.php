@@ -259,6 +259,41 @@ class ValidasiController extends Controller
     }
 
     /**
+     * Menghapus komentar (hanya bisa dilakukan oleh pengirim komentar)
+     */
+    public function deleteComment(Komen $komen)
+    {
+        $user = Auth::user();
+
+        // Validasi bahwa user adalah pemilik komentar
+        if ($komen->user_id !== $user->id) {
+            return redirect()->back()->with('error', 'Anda hanya dapat menghapus komentar yang Anda buat.');
+        }
+
+        try {
+            // Catat aktivitas penghapusan komentar
+            Log::info('Comment deleted', [
+                'komen_id' => $komen->id,
+                'user_id' => $user->id,
+                'kriteria_id' => $komen->kriteria_id,
+                'dokumen_id' => $komen->dokumen_id
+            ]);
+
+            // Hapus komentar
+            $komen->delete();
+
+            return redirect()->back()->with('success', 'Komentar berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Failed to delete comment', [
+                'error' => $e->getMessage(),
+                'komen_id' => $komen->id
+            ]);
+
+            return redirect()->back()->with('error', 'Gagal menghapus komentar: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Membuat notifikasi berdasarkan status dokumen
      */
     private function createStatusNotifications(Dokumen $dokumen, $user)

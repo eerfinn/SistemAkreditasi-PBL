@@ -6,6 +6,24 @@
     <link href="{{ asset('assets/vendor/datatables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
+    <style>
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+        .history-row:hover {
+            background-color: rgba(108, 117, 125, 0.05);
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -113,7 +131,7 @@
                             </thead>
                             <tbody>
                                 @forelse($histories as $index => $history)
-                                <tr class="{{ $index % 2 == 0 ? 'table-hover' : '' }}">
+                                <tr class="history-row">
                                     <td class="text-center">{{ ($histories->currentPage() - 1) * $histories->perPage() + $loop->iteration }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
@@ -128,11 +146,9 @@
                                         @if($history->user)
                                             <div class="d-flex align-items-center">
                                                 @if($history->user->photo)
-                                                    <img src="{{ asset('storage/profile/' . $history->user->photo) }}" class="rounded-circle me-2" width="30" height="30" alt="" style="object-fit: cover;">
+                                                    <img src="{{ asset('storage/profile/' . $history->user->photo) }}" class="user-avatar me-2" alt="{{ $history->user->nama }}">
                                                 @else
-                                                    <div class="avatar avatar-sm me-2 bg-primary">
-                                                        <span class="avatar-content">{{ substr($history->user->nama, 0, 1) }}</span>
-                                                    </div>
+                                                    <img src="{{ asset('assets/images/avatar/1.png') }}" class="user-avatar me-2" alt="{{ $history->user->nama }}">
                                                 @endif
                                                 <div>
                                                     <h6 class="mb-0 fs-14">{{ $history->user->nama }}</h6>
@@ -140,7 +156,13 @@
                                                 </div>
                                             </div>
                                         @else
-                                            <span class="text-muted">User tidak ditemukan</span>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ asset('assets/images/avatar/user-default.png') }}" class="user-avatar me-2" alt="User tidak ditemukan">
+                                                <div>
+                                                    <h6 class="mb-0 fs-14 text-muted">User tidak ditemukan</h6>
+                                                    <span class="text-muted fs-12">-</span>
+                                                </div>
+                                            </div>
                                         @endif
                                     </td>
                                     <td>
