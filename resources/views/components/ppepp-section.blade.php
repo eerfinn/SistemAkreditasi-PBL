@@ -45,7 +45,8 @@
                                 <x-dokumen-status-badge :status="$dokumen->status" />
                             </td>
                             <td class="date-column">
-                                {{ \Carbon\Carbon::parse($dokumen->created_at)->format('d M Y') }}
+                                <div>{{ \Carbon\Carbon::parse($dokumen->created_at)->format('d M Y') }}</div>
+                                <small class="text-muted">{{ \Carbon\Carbon::parse($dokumen->created_at)->format('H:i') }}</small>
                             </td>
                             <td class="text-center">
                                 @if($dokumen->path)

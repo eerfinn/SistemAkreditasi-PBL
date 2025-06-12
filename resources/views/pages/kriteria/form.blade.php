@@ -78,6 +78,14 @@
             background-color: #f8f9fa;
         }
         
+        /* Date column styling */
+        .date-column {
+            line-height: 1.2;
+        }
+        .date-column small {
+            font-size: 0.8rem;
+        }
+        
         /* File links */
         .nama-dokumen-cell a {
             font-weight: 500;
@@ -234,7 +242,10 @@
                                     <td>
                                         <x-dokumen-status-badge :status="$doc->status" />
                                     </td>
-                                    <td class="date-column">{{ $doc->updated_at->format('d M Y') }}</td>
+                                    <td class="date-column">
+                                        <div>{{ $doc->updated_at->format('d M Y') }}</div>
+                                        <small class="text-muted">{{ $doc->updated_at->format('H:i') }}</small>
+                                    </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
                                             <a href="{{ route('dokumen.view', $doc->id) }}" target="_blank"

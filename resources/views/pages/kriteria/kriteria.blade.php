@@ -42,6 +42,14 @@
         .comment-delete-btn:focus {
             box-shadow: none !important;
         }
+        
+        /* Date column styling */
+        .date-column {
+            line-height: 1.2;
+        }
+        .date-column small {
+            font-size: 0.8rem;
+        }
     </style>
 @endsection
 
@@ -349,8 +357,10 @@
                                             <h6 class="mb-0 ms-2">{{ $comment->user->nama ?? 'User' }}</h6>
                                             <span
                                                 class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
-                                            <small
-                                                class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                                            <div class="date-column ms-auto text-end">
+                                                <div>{{ $comment->created_at->format('d M Y') }}</div>
+                                                <small class="text-muted">{{ $comment->created_at->format('H:i') }}</small>
+                                            </div>
                                             
                                             {{-- Delete button - only visible to comment owner --}}
                                             @if(auth()->check() && auth()->user()->id === $comment->user_id)

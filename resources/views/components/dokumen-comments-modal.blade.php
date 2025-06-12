@@ -20,7 +20,10 @@
                             </div>
                             <h6 class="mb-0">{{ $comment->user->nama ?? 'User' }}</h6>
                             <span class="badge bg-secondary ms-2">{{ $comment->user->role ?? 'unknown' }}</span>
-                            <small class="text-muted ms-auto">{{ $comment->created_at->format('d M Y H:i') }}</small>
+                            <div class="date-column ms-auto text-end">
+                                <div>{{ $comment->created_at->format('d M Y') }}</div>
+                                <small class="text-muted">{{ $comment->created_at->format('H:i') }}</small>
+                            </div>
                         </div>
                         <p class="mb-0 ps-4">{{ $comment->komentar }}</p>
                     </div>
