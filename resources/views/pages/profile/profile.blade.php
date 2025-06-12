@@ -68,7 +68,7 @@
 @section('content')
 
 <nav class="nav flex-column sidebar-nav">
-    <a class="nav-link" href="{{ route('dashboard') }}">
+    <a class="nav-link back-link" href="{{ route('dashboard') }}">
         <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
     </a>
 </nav>
@@ -96,7 +96,6 @@
                                 </label>
                                 <input type="file" id="profile_photo" name="profile_photo" class="d-none">
                             </form>
-                            <div class="status-indicator bg-success"></div>
                         </div>
                         {{-- <h5 class="mb-1">{{ $user->nama }}</h5> --}}
                         {{-- <p class="text-muted small mb-3">{{ ucfirst($user->role) }}</p> --}}
@@ -239,17 +238,15 @@
         border-left: 3px solid transparent;
         transition: all 0.3s ease;
     }
-
-    .sidebar-nav .nav-link:hover {
-        background-color: rgba(0, 123, 255, 0.05);
-        color: #0d6efd;
-    }
-
-    .sidebar-nav .nav-link.active {
-        background-color: rgba(0, 123, 255, 0.1);
-        color: #0d6efd;
-        border-left: 3px solid #0d6efd;
+    
+    .sidebar-nav .back-link {
+        color: #495057;
         font-weight: 500;
+    }
+    
+    .sidebar-nav .back-link:hover {
+        color: #0d6efd;
+        text-decoration: none;
     }
 
     .sidebar-nav .nav-link i {
