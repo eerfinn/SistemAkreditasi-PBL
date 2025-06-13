@@ -1,5 +1,16 @@
 <div class="deznav">
     <div class="deznav-scroll">
+        <div class="user-profile-sidebar">
+            <a href="{{ url('/profile') }}" class="profile-link w-100">
+                <div class="profile-image">
+                    <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('assets/images/avatar/1.png') }}" alt="Profile" class="sidebar-profile-img">
+                </div>
+                <div class="profile-name">
+                    <span class="nav-text">{{ Auth::user()->nama ?? Auth::user()->name ?? 'Profile' }}</span>
+                    <small class="role-text">{{ Auth::user()->role ?? 'User' }}</small>
+                </div>
+            </a>
+        </div>
         <ul class="metismenu" id="menu">
             {{-- Common Dashboard Menu Item for All Users --}}
             <li>
@@ -166,3 +177,127 @@
         </ul>
     </div>
 </div>
+
+<style>
+    /* Profile styles for sidebar */
+    .user-profile-sidebar {
+        padding: 15px 10px;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .profile-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none !important;
+    }
+    
+    .profile-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-profile-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .profile-name {
+        transition: all 0.3s ease;
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+        margin-top: 10px;
+        max-height: 50px;
+    }
+    
+    .profile-name .nav-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #fff;
+        display: block;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.3s ease;
+    }
+    
+    .profile-name .role-text {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.3s ease;
+    }
+    
+    .profile-link:hover .nav-text {
+        color: #fff;
+    }
+    
+    .profile-link:hover .role-text {
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* When sidebar is collapsed - hide text and resize image */
+    [data-sidebar-style="icon-hover"] .deznav.collapsed .profile-name,
+    [data-sidebar-style="overlay"] .deznav.collapsed .profile-name,
+    [data-sidebar-style="full"] .deznav.collapsed .profile-name,
+    [data-sidebar-style="mini"] .deznav .profile-name {
+        opacity: 0;
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+        max-height: 0;
+        padding: 0;
+        transform: translateY(-10px);
+    }
+    
+    /* When sidebar is collapsed, make profile image smaller */
+    [data-sidebar-style="icon-hover"] .deznav.collapsed .sidebar-profile-img,
+    [data-sidebar-style="overlay"] .deznav.collapsed .sidebar-profile-img,
+    [data-sidebar-style="full"] .deznav.collapsed .sidebar-profile-img,
+    [data-sidebar-style="mini"] .deznav .sidebar-profile-img {
+        width: 30px;
+        height: 30px;
+        border-width: 1px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Adjust padding when collapsed */
+    [data-sidebar-style="icon-hover"] .deznav.collapsed .user-profile-sidebar,
+    [data-sidebar-style="overlay"] .deznav.collapsed .user-profile-sidebar,
+    [data-sidebar-style="full"] .deznav.collapsed .user-profile-sidebar,
+    [data-sidebar-style="mini"] .deznav .user-profile-sidebar {
+        padding: 10px 5px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Ensure smooth transition */
+    .deznav {
+        transition: all 0.3s ease;
+    }
+    
+    .deznav-scroll {
+        transition: all 0.3s ease;
+    }
+    
+    /* Fix for mini sidebar specific behavior */
+    [data-sidebar-style="mini"] .deznav .user-profile-sidebar {
+        padding-bottom: 5px;
+    }
+</style>
