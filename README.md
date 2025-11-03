@@ -43,13 +43,19 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-### 6. Jalankan Server Laravel
+### 6. Migrasi Database
+
+```bash
+php artisan migrate --seed
+```
+
+### 7. Jalankan Server Laravel
 
 ```bash
 php artisan serve
 ```
 
-### 7. Akses Aplikasi di Browser
+### 8. Akses Aplikasi di Browser
 
 Buka browser dan akses:
 
